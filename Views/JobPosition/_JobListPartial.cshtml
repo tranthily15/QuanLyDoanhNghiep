@@ -1,0 +1,11 @@
+﻿@* @model List<QuanLyDoanhNghiep.Models.JobPosition>
+
+@foreach (var item in Model)
+{
+    <div class="card mb-2 p-2">
+        <h6>@item.PositionName</h6>
+        <p>@item.Company?.CompanyName</p>
+        <span class="badge bg-secondary">@item.Salary</span>
+    </div>
+}
+ *@

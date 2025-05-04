@@ -1,0 +1,63 @@
+﻿@model QuanLyDoanhNghiep.Models.Employee
+
+@{
+    ViewData["Title"] = "Details";
+}
+<div class="box"></div>
+<div class="box"></div>
+<center>
+    <div class="form-container">
+<h1>Details</h1>
+
+<div>
+    <h4>Employee</h4>
+            <br />
+    <dl class="row">
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.EmployeeName)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.EmployeeName)
+        </dd>
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.Gender)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.Gender)
+        </dd>
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.PhoneNumber)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.PhoneNumber)
+        </dd>
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.Account)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.Account.AccountID)
+        </dd>
+        <dt class = "col-sm-3">
+            @Html.DisplayNameFor(model => model.Company)
+        </dt>
+        <dd class = "col-sm-8">
+            @Html.DisplayFor(model => model.Company.CompanyID)
+        </dd>
+    </dl>
+</div>
+@* <div>
+    <a asp-action="Edit" asp-route-id="@Model?.EmployeeID">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div> *@
+<div class="form-footer">
+            <button type="button" class="btn_save" onclick="location.href='@Url.Action("Edit", new { id = Model?.EmployeeID })'">Chỉnh sửa</button>
+            <button type="button" class="btn_close" onclick="location.href='@Url.Action("Index")'">Đóng</button>
+</div>
+    </div>
+</center>

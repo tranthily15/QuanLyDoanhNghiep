@@ -1,0 +1,91 @@
+﻿body {
+    display: flex;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: #FFA500;
+    color: white;
+    padding-top: 20px;
+    position: fixed;
+    height: 100vh;
+}
+
+    .sidebar ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+
+        .sidebar ul li {
+            padding: 15px;
+        }
+
+            .sidebar ul li a {
+                color: white;
+                text-decoration: none;
+                display: block;
+            }
+
+                .sidebar ul li a:hover {
+                    background-color: #FF8C00;
+                }
+
+
+.main-content {
+    margin-left: 260px;
+    padding: 20px;
+    width: calc(100% - 260px);
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    gap: 20px;
+}
+
+.stat-card {
+    background-color: #f0f0f0;
+    padding: 20px;
+    width: 30%;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.chart-container {
+    margin-top: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+    .chart-container .chart {
+        width: 48%;
+        margin-bottom: 20px;
+    }
+
+#internshipJobChart, #jobApprovalChart {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 350px;
+    max-height: 350px;
+    margin: 0 auto;
+}
+
+
+.pie-chart-container {
+    margin-top: 40px;
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+    .pie-chart-container .pie-chart {
+        width: 48%;
+        display: flex;
+        justify-content: center;
+    }

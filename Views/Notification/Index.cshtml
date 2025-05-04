@@ -1,0 +1,160 @@
+@model IEnumerable<QuanLyDoanhNghiep.Models.Notification>
+
+@{
+    ViewData["Title"] = "Thông báo";
+}
+<div class= "box"></div>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="fas fa-bell me-2"></i>Thông báo của tôi
+                    </h5>
+                    @if (Model.Any(n => !n.IsRead))
+                    {
+                        <form asp-action="MarkAllAsRead" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-light btn-sm">
+                                <i class="fas fa-check-double me-1"></i>Đánh dấu tất cả đã đọc
+                            </button>
+                        </form>
+                    }
+                </div>
+                <div class="card-body p-3">
+                    @if (!Model.Any())
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Không có thông báo nào</h5>
+                            <p class="text-muted">Khi có thông báo mới, chúng sẽ xuất hiện ở đây.</p>
+                        </div>
+                    }
+                    else
+                    {
+                        var unreadNotifications = Model.Where(n => !n.IsRead).ToList();
+                        if (unreadNotifications.Any())
+                        {
+                            <div class="notification-section mb-4">
+                                <h6 class="mb-3 fw-bold">🔔 Thông báo chưa đọc</h6>
+                                @foreach (var notification in unreadNotifications)
+                                {
+                                    <div class="card mb-2 notification-item border-start border-primary" data-id="@notification.NotificationID">
+                                        <div class="card-body py-2 px-3 d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <div class="d-flex align-items-center mb-1">
+                                                    <span class="badge bg-danger me-2">Mới</span>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-clock me-1"></i>@notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                    </small>
+                                                </div>
+                                                <p class="mb-0 notification-message">@notification.Message</p>
+                                            </div>
+                                            <div class="ms-3">
+                                                <form asp-action="MarkAsRead" asp-route-id="@notification.NotificationID" method="post" class="d-inline mark-as-read-form">
+                                                    @Html.AntiForgeryToken()
+                                                    <button type="submit" class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-check"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        var readNotifications = Model.Where(n => n.IsRead).ToList();
+                        if (readNotifications.Any())
+                        {
+                            <div class="notification-section">
+                                <h6 class="mb-3 fw-bold">📨 Thông báo đã đọc</h6>
+                                @foreach (var notification in readNotifications)
+                                {
+                                    <div class="card mb-2 notification-item border-start border-secondary" data-id="@notification.NotificationID">
+                                        <div class="card-body py-2 px-3">
+                                            <div class="d-flex justify-content-between align-items-start">
+                                                <div>
+                                                    <small class="text-muted">
+                                                        <i class="far fa-clock me-1"></i>@notification.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                                    </small>
+                                                    <p class="mb-0 notification-message">@notification.Message</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function updateNotificationCount() {
+            $.get('/Notification/GetUnreadCount', function (data) {
+                if (data.count > 0) {
+                    $('#notificationCount').text(data.count).show();
+                } else {
+                    $('#notificationCount').hide();
+                }
+            });
+        }
+
+        updateNotificationCount();
+        setInterval(updateNotificationCount, 30000);
+
+        $(document).ready(function () {
+            $('.notification-item').click(function (e) {
+                if (!$(e.target).closest('.mark-as-read-form').length) {
+                    var notificationId = $(this).data('id');
+                    if (notificationId) {
+                        window.location.href = '/Notification/ViewAndMarkAsRead/' + notificationId;
+                    }
+                }
+            });
+
+            $('.mark-as-read-form').click(function (e) {
+                e.stopPropagation();
+            });
+        });
+    </script>
+}
+
+<style>
+    .notification-item {
+        transition: box-shadow 0.2s ease-in-out;
+        cursor: pointer;
+    }
+
+        .notification-item:hover {
+            box-shadow: 0 0 0.75rem rgba(0, 123, 255, 0.15);
+        }
+
+    .notification-message {
+        color: #343a40;
+        font-size: 0.95rem;
+    }
+
+    .btn-outline-primary {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .badge {
+        font-size: 0.7rem;
+    }
+
+    .card-body {
+        padding: 0.75rem 1rem !important;
+    }
+
+    .notification-section h6 {
+        color: #495057;
+    }
+</style>

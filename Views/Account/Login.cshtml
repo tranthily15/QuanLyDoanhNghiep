@@ -1,0 +1,147 @@
+﻿@model QuanLyDoanhNghiep.Models.Account
+@{
+    ViewData["Title"] = "Đăng nhập";
+    ViewData["CSS"] = Url.Content("~/css/login.css");
+    Layout = "~/Views/Shared/_AuthLayout.cshtml";
+}
+
+<div class="login-container">
+    <h1 class="form-title">Classy Login Form</h1>
+    <form asp-action="Login" method="post" class="login-form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        
+        <div class="form-group">
+            <div class="input-group">
+                <i class="fas fa-user"></i>
+                <input type="text" asp-for="UserName" placeholder="User name" class="form-control" />
+            </div>
+            <span asp-validation-for="UserName" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <div class="input-group">
+                <i class="fas fa-lock"></i>
+                <input type="password" asp-for="Password" placeholder="••••••" class="form-control" />
+            </div>
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-options">
+            <label class="remember-me">
+                <input type="checkbox" name="remember"> Remember me
+            </label>
+            <a href="#" class="forgot-password">Forgot Password?</a>
+        </div>
+
+        <button type="submit" class="login-button">Login</button>
+    </form>
+</div>
+
+<style>
+.login-container {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 40px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.form-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 2em;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.input-group {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.input-group i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+}
+
+.form-control {
+    width: 100%;
+    padding: 12px 40px;
+    border: none;
+    border-bottom: 2px solid #ddd;
+    background: transparent;
+    transition: all 0.3s ease;
+    font-size: 16px;
+}
+
+.form-control:focus {
+    border-color: #ff4b6c;
+    outline: none;
+}
+
+.form-options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #666;
+}
+
+.forgot-password {
+    color: #666;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: #ff4b6c;
+}
+
+.login-button {
+    width: 100%;
+    padding: 12px;
+    background: #ff4b6c;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.login-button:hover {
+    background: #ff3356;
+}
+
+body {
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+</style>
+
+@section Scripts {
+    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
+

@@ -1,0 +1,603 @@
+﻿@model QuanLyDoanhNghiep.Models.JobPosition
+
+@{
+    ViewData["Title"] = "Chỉnh sửa vị trí tuyển dụng";
+    var provinces = ViewBag.Provinces as List<Province> ?? new List<Province>();
+}
+<div class="box"></div>   
+<div class="container mt-5">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var modelError in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@modelError.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <form asp-action="Edit" id="jobPositionForm" class="needs-validation" novalidate>
+        <input type="hidden" asp-for="PositionID" />
+        <input type="hidden" asp-for="CompanyID" />
+        <div class="row">
+            <!-- Form nhập thông tin -->
+            <div class="col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Chỉnh sửa thông tin</h4>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PositionName" class="form-label fw-bold">Tên vị trí ứng tuyển</label>
+                            <input asp-for="PositionName" class="form-control" required />
+                            <span asp-validation-for="PositionName" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="PositionType" class="form-label fw-bold">Loại vị trí ứng tuyển</label>
+                            <select asp-for="PositionType" class="form-select" required>
+                                <option value="">-- Chọn loại vị trí --</option>
+                                <option value="false">Vị trí thực tập</option>
+                                <option value="true">Vị trí nhân viên</option>
+                            </select>
+                            <span asp-validation-for="PositionType" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="Vacancies" class="form-label fw-bold">Số lượng tuyển</label>
+                                    <input asp-for="Vacancies" class="form-control" type="number" min="1" required />
+                                    <span asp-validation-for="Vacancies" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="TimeWork" class="form-label fw-bold">Thời gian làm việc</label>
+                                    <input asp-for="TimeWork" class="form-control" required />
+                                    <span asp-validation-for="TimeWork" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Salary" class="form-label fw-bold">Mức lương</label>
+                            <input asp-for="Salary" class="form-control" />
+                            <span asp-validation-for="Salary" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu</label>
+                                    <input asp-for="StartDate" type="datetime-local" class="form-control" required />
+                                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group mb-3">
+                                    <label asp-for="EndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                                    <input asp-for="EndDate" type="datetime-local" class="form-control" required />
+                                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="Status" class="form-label fw-bold">Trạng thái tuyển dụng</label>
+                            <select asp-for="Status" class="form-select" required>
+                                <option value="true">Đang tuyển</option>
+                                <option value="false">Kết thúc tuyển</option>
+                            </select>
+                            <span asp-validation-for="Status" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="JobDescription" class="form-label fw-bold">Mô tả công việc</label>
+                            <div id="editor-job-description" class="quill-editor">@Html.Raw(Model.JobDescription)</div>
+                            <input type="hidden" asp-for="JobDescription" id="jobDescription" required />
+                            <span asp-validation-for="JobDescription" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc</label>
+                            <div id="editor-job-requirements" class="quill-editor">@Html.Raw(Model.JobRequirements)</div>
+                            <input type="hidden" asp-for="JobRequirements" id="jobRequirements" required />
+                            <span asp-validation-for="JobRequirements" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label asp-for="JobBenefits" class="form-label fw-bold">Quyền lợi</label>
+                            <div id="editor-job-benefits" class="quill-editor">@Html.Raw(Model.JobBenefits)</div>
+                            <input type="hidden" asp-for="JobBenefits" id="jobBenefits" required />
+                            <span asp-validation-for="JobBenefits" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="form-label fw-bold">Địa chỉ tuyển dụng</label>
+                            <div id="jobLocations">
+                                @if (Model.JobLocations != null && Model.JobLocations.Any())
+                                {
+                                    for (int i = 0; i < Model.JobLocations.Count; i++)
+                                    {
+                                        var location = Model.JobLocations[i];
+                                        <div class="job-location-item card mb-3">
+                                            <div class="card-body">
+                                                <input type="hidden" name="JobLocations[@i].LocationID" value="@location.JobLocationID" />
+                                                <div class="mb-3">
+                                                    <label class="form-label">Tỉnh/Thành phố</label>
+                                                    <select class="form-select province-dropdown" name="JobLocations[@i].ProvinceID" required data-selected="@location.ProvinceID">
+                                                        <option value="">-- Chọn tỉnh/thành phố --</option>
+                                                        @foreach (var province in provinces)
+                                                        {
+                                                            <option value="@province.ProvinceID" selected="@(location.ProvinceID == province.ProvinceID ? "selected" : null)">@province.ProvinceName</option>
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Quận/Huyện</label>
+                                                    <select class="form-select district-dropdown" name="JobLocations[@i].DistrictID" required data-selected="@location.DistrictID">
+                                                        <option value="">-- Chọn quận/huyện --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Phường/Xã</label>
+                                                    <select class="form-select ward-dropdown" name="JobLocations[@i].WardID" required data-selected="@location.WardID">
+                                                        <option value="">-- Chọn phường/xã --</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label class="form-label">Địa chỉ cụ thể</label>
+                                                    <input type="text" class="form-control" name="JobLocations[@i].Street" value="@location.Street" required />
+                                                </div>
+                                                <button type="button" class="btn btn-danger remove-location">
+                                                    <i class="fas fa-trash-alt"></i> Xóa địa chỉ
+                                                </button>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                else
+                                {
+                                    <div class="job-location-item card mb-3">
+                                        <div class="card-body">
+                                            <div class="mb-3">
+                                                <label class="form-label">Tỉnh/Thành phố</label>
+                                                <select class="form-select province-dropdown" name="JobLocations[0].ProvinceID" required>
+                                                    <option value="">-- Chọn tỉnh/thành phố --</option>
+                                                    @foreach (var province in provinces)
+                                                    {
+                                                        <option value="@province.ProvinceID">@province.ProvinceName</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Quận/Huyện</label>
+                                                <select class="form-select district-dropdown" name="JobLocations[0].DistrictID" required>
+                                                    <option value="">-- Chọn quận/huyện --</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Phường/Xã</label>
+                                                <select class="form-select ward-dropdown" name="JobLocations[0].WardID" required>
+                                                    <option value="">-- Chọn phường/xã --</option>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Địa chỉ cụ thể</label>
+                                                <input type="text" class="form-control" name="JobLocations[0].Street" required />
+                                            </div>
+                                            <button type="button" class="btn btn-danger remove-location">
+                                                <i class="fas fa-trash-alt"></i> Xóa địa chỉ
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+
+                            <button type="button" class="btn btn-success" id="addLocation">
+                                <i class="fas fa-plus"></i> Thêm địa chỉ
+                            </button>
+                        </div>
+
+                        <div class="form-footer text-end">
+                            <a asp-action="ActiveJobs" class="btn btn-secondary me-2">
+                                <i class="fas fa-times"></i> Hủy
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Lưu thay đổi
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Xem trước -->
+            <div class="col-md-6">
+                <div class="card shadow-sm preview-container">
+                    <div class="card-body">
+                        <h4 class="card-title mb-4">Xem trước thông tin tuyển dụng</h4>
+
+                        <div class="preview-content" style="opacity: 0.7; pointer-events: none;">
+                            <h1 id="preview-position-name" class="job-title mb-4"></h1>
+                            <div class="job-overview-cards mb-4">
+                                <div class="overview-card">
+                                    <div class="icon-wrapper"><i class="fas fa-money-bill-wave"></i></div>
+                                    <div class="info"><label>Thu nhập</label><span id="preview-salary"></span></div>
+                                </div>
+                                <div class="overview-card">
+                                    <div class="icon-wrapper"><i class="fas fa-map-marker-alt"></i></div>
+                                    <div class="info"><label>Địa điểm</label><span id="preview-locations-short"></span></div>
+                                </div>
+                                <div class="overview-card">
+                                    <div class="icon-wrapper"><i class="fas fa-clock"></i></div>
+                                    <div class="info"><label>Thời gian làm việc</label><span id="preview-time-work"></span></div>
+                                </div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Tổng quan</h3>
+                                <div class="job-overview">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="overview-item">
+                                                <i class="fas fa-users"></i>
+                                                <div class="item-content"><label>Số lượng tuyển</label><span><span id="preview-vacancies"></span> người</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="overview-item">
+                                                <i class="fas fa-briefcase"></i>
+                                                <div class="item-content"><label>Hình thức</label><span id="preview-position-type"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Mô tả công việc</h3>
+                                <div class="section-content" id="preview-description"></div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Yêu cầu ứng viên</h3>
+                                <div class="section-content" id="preview-requirements"></div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Quyền lợi</h3>
+                                <div class="section-content benefits-section" id="preview-benefits"></div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Địa điểm làm việc</h3>
+                                <div id="preview-locations" class="location-list"></div>
+                            </div>
+                            <div class="content-section">
+                                <h3 class="section-title">Trạng thái</h3>
+                                <div id="preview-status"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Styles {
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        /* Copy relevant styles from Create.cshtml preview */
+        .preview-container {
+            position: sticky;
+            top: 20px;
+        }
+        .content-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .section-title { color: #2d2d2d; font-size: 20px; font-weight: 600; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e9ecef; }
+        .job-overview-cards { display: flex; gap: 15px; flex-wrap: wrap; }
+        .overview-card { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
+        .overview-card .icon-wrapper { width: 40px; height: 40px; border-radius: 50%; background-color: #e8f7ef; display: flex; align-items: center; justify-content: center; }
+        .overview-card .icon-wrapper i { color: #ff6b35; font-size: 18px; }
+        .overview-card .info label { display: block; font-size: 13px; color: #6c757d; margin-bottom: 4px; }
+        .overview-card .info span { display: block; font-weight: 600; color: #2d2d2d; }
+        .overview-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
+        .overview-item i { color: #ff6b35; font-size: 20px; width: 24px; }
+        .item-content label { display: block; color: #6c757d; font-size: 14px; margin-bottom: 5px; }
+        .item-content span { color: #2d2d2d; font-weight: 500; }
+        .location-list { display: flex; flex-direction: column; gap: 15px; }
+        .location-item { display: flex; align-items: flex-start; gap: 15px; padding: 15px; border-bottom: 1px solid #e9ecef; }
+        .location-item:last-child { border-bottom: none; }
+        .location-item i { color: #ff6b35; margin-top: 3px; }
+        .location-content .street { font-weight: 500; margin-bottom: 5px; }
+        .location-content .area { color: #6c757d; font-size: 14px; margin: 0; }
+        .job-title { font-size: 24px; font-weight: 700; color: #2d2d2d; margin-bottom: 20px; }
+        .section-content { color: #2d2d2d; line-height: 1.6; }
+        .benefits-section ul { list-style: none; padding: 0; }
+        .benefits-section li { padding-left: 25px; position: relative; margin-bottom: 12px; }
+        .benefits-section li:before { content: '\2713'; color: #ff6b35; position: absolute; left: 0; font-weight: bold; }
+        .quill-editor { height: 150px; margin-bottom: 10px; background-color: white; }
+        .form-footer { margin-top: 30px; }
+         #jobLocations .card { background-color: #f8f9fa; } /* Slightly different bg for location cards */
+         #jobLocations .remove-location {
+            float: right;
+         }
+    </style>
+}
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        // Initialize Quill editors
+        var quillDescription = new Quill('#editor-job-description', { theme: 'snow' });
+        var quillRequirements = new Quill('#editor-job-requirements', { theme: 'snow' });
+        var quillBenefits = new Quill('#editor-job-benefits', { theme: 'snow' });
+
+        // Preview update function (similar to Create.cshtml)
+        function updatePreview() {
+            // Make preview visible and interactive
+            document.querySelector('.preview-content').style.opacity = '1';
+            document.querySelector('.preview-content').style.pointerEvents = 'auto';
+
+            $('#preview-position-name').text($('#PositionName').val() || 'Tên vị trí tuyển dụng');
+            $('#preview-position-type').text($('select[name="PositionType"] option:selected').text());
+            $('#preview-vacancies').text($('#Vacancies').val() || '0');
+            $('#preview-time-work').text($('#TimeWork').val() || 'Chưa cập nhật');
+            $('#preview-salary').text($('#Salary').val() || 'Thỏa thuận');
+            
+            // Update Quill content previews
+            $('#preview-description').html(quillDescription.root.innerHTML);
+            $('#preview-requirements').html(quillRequirements.root.innerHTML);
+            $('#preview-benefits').html(quillBenefits.root.innerHTML);
+            
+            // Update status preview
+            var statusVal = $('select[name="Status"]').val();
+            var statusText = statusVal === 'true' ? '<span class="badge bg-success">Đang tuyển</span>' : '<span class="badge bg-secondary">Đã tắt</span>';
+            $('#preview-status').html(statusText);
+
+            // Update locations preview
+            var locations = [];
+            var firstLocation = '';
+            $('.job-location-item').each(function(index) {
+                var provinceText = $(this).find('.province-dropdown option:selected').text();
+                var districtText = $(this).find('.district-dropdown option:selected').text();
+                var wardText = $(this).find('.ward-dropdown option:selected').text();
+                var street = $(this).find('input[name$=".Street"]').val();
+                var provinceVal = $(this).find('.province-dropdown').val();
+                
+                if(provinceVal && provinceText && districtText && wardText && street && provinceText !== '-- Chọn tỉnh/thành phố --') {
+                    if(index === 0) {
+                        firstLocation = provinceText;
+                    }
+                    var locationHtml = `
+                        <div class="location-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div class="location-content">
+                                <p class="street">${street}</p>
+                                <p class="area">${wardText}, ${districtText}, ${provinceText}</p>
+                            </div>
+                        </div>
+                    `;
+                    locations.push(locationHtml);
+                }
+            });
+            $('#preview-locations-short').text(firstLocation || 'Chưa cập nhật');
+            $('#preview-locations').html(locations.length > 0 ? locations.join('') : '<p class="text-muted">Chưa có địa điểm nào.</p>');
+        }
+
+        // Add event listeners for preview updates
+        $('input, select').on('input change', updatePreview);
+        quillDescription.on('text-change', updatePreview);
+        quillRequirements.on('text-change', updatePreview);
+        quillBenefits.on('text-change', updatePreview);
+        $(document).on('change', '.province-dropdown, .district-dropdown, .ward-dropdown', updatePreview);
+        $(document).on('input', 'input[name$=".Street"]', updatePreview);
+
+        // Bootstrap form validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+
+        // --- Dynamic Location Logic --- 
+        var locationIndex = @(Model.JobLocations?.Count ?? 1); // Start index from existing count
+
+        function updateLocationIndices() {
+            $('#jobLocations .job-location-item').each(function(i) {
+                $(this).find('input, select').each(function() {
+                    var name = $(this).attr('name');
+                    if (name) {
+                        $(this).attr('name', name.replace(/[\d+|template]/, '[' + i + ']'));
+                    }
+                });
+            });
+            locationIndex = $('#jobLocations .job-location-item').length;
+        }
+
+        $('#addLocation').click(function() {
+            // Clone the FIRST item as a template, even if it came from the server
+            var template = $('#jobLocations .job-location-item').first().clone(); 
+            
+            // Clear values and selected state for the new item
+            template.find('input[type="text"], input[type="hidden"][name$=".LocationID"]').val(''); // Clear text and hidden ID
+            template.find('select').each(function() {
+                $(this).prop('selectedIndex', 0); // Reset dropdowns
+                $(this).removeAttr('data-selected'); // Remove selected data attributes
+                if ($(this).hasClass('district-dropdown') || $(this).hasClass('ward-dropdown')) {
+                    $(this).empty().append('<option value="">-- Chọn quận/huyện --</option>'); // Clear dependent dropdowns
+                }
+            });
+            // Update the name index before appending
+            template.find('input, select').each(function() {
+                var name = $(this).attr('name');
+                if (name) {
+                    $(this).attr('name', name.replace(/\[\d+\]/, '[' + locationIndex + ']'));
+                }
+            });
+
+            $('#jobLocations').append(template);
+            locationIndex++;
+            updatePreview(); // Update preview after adding
+        });
+
+        $(document).on('click', '.remove-location', function() {
+            if ($('#jobLocations .job-location-item').length > 1) {
+                $(this).closest('.job-location-item').remove();
+                updateLocationIndices(); // Renumber remaining items
+                updatePreview();
+            } else {
+                alert('Phải có ít nhất một địa chỉ.');
+            }
+        });
+
+        // --- Cascading Dropdowns Logic --- 
+        function fetchDistricts(provinceDropdown, selectedDistrictId = null) {
+            var provinceId = $(provinceDropdown).val();
+            var districtDropdown = $(provinceDropdown).closest('.job-location-item').find('.district-dropdown');
+            var wardDropdown = $(provinceDropdown).closest('.job-location-item').find('.ward-dropdown');
+            
+            districtDropdown.empty().append('<option value="">-- Đang tải... --</option>');
+            wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
+            
+            if (provinceId) {
+                $.get('@Url.Action("GetDistricts", "JobPosition")', { provinceId: provinceId }, function(districts) {
+                    districtDropdown.empty().append('<option value="">-- Chọn quận/huyện --</option>');
+                    districts.forEach(function(district) {
+                        var option = $('<option></option>').attr('value', district.districtID).text(district.districtName);
+                        if(selectedDistrictId && district.districtID == selectedDistrictId) {
+                            option.prop('selected', true);
+                        }
+                        districtDropdown.append(option);
+                    });
+                    // After loading districts, trigger change if a district was pre-selected
+                    if (selectedDistrictId) {
+                        districtDropdown.trigger('change');
+                    }
+                }).fail(function() {
+                    districtDropdown.empty().append('<option value="">-- Lỗi tải --</option>');
+                });
+            }
+        }
+
+        function fetchWards(districtDropdown, selectedWardId = null) {
+            var districtId = $(districtDropdown).val();
+            var wardDropdown = $(districtDropdown).closest('.job-location-item').find('.ward-dropdown');
+            
+            wardDropdown.empty().append('<option value="">-- Đang tải... --</option>');
+            
+            if (districtId) {
+                $.get('@Url.Action("GetWards", "JobPosition")', { districtId: districtId }, function(wards) {
+                    wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
+                    wards.forEach(function(ward) {
+                        var option = $('<option></option>').attr('value', ward.wardID).text(ward.wardName);
+                        if(selectedWardId && ward.wardID == selectedWardId) {
+                            option.prop('selected', true);
+                        }
+                        wardDropdown.append(option);
+                    });
+                    updatePreview(); // Update preview after wards are loaded/selected
+                }).fail(function() {
+                    wardDropdown.empty().append('<option value="">-- Lỗi tải --</option>');
+                });
+            }
+        }
+
+        // Initial load for existing locations
+        $('.province-dropdown').each(function() {
+            var selectedDistrictId = $(this).closest('.job-location-item').find('.district-dropdown').data('selected');
+            if ($(this).val()) { // Only fetch if a province is selected
+                fetchDistricts(this, selectedDistrictId);
+            }
+        });
+        
+        // Need slight delay for district change to trigger ward fetch correctly on initial load
+        // This depends on fetchDistricts completing and triggering change
+        // Let's add a direct call within fetchDistricts completion for initial load
+        
+        // Use event delegation for dynamically added elements
+        $(document).on('change', '.province-dropdown', function() {
+            fetchDistricts(this);
+            updatePreview(); 
+        });
+
+        $(document).on('change', '.district-dropdown', function() {
+            var selectedWardId = $(this).closest('.job-location-item').find('.ward-dropdown').data('selected');
+            // Clear data-selected after initial use if needed, or handle in fetchWards
+            fetchWards(this, selectedWardId);
+            // $(this).closest('.job-location-item').find('.ward-dropdown').removeData('selected'); // Optional: clear after use
+            updatePreview();
+        });
+        
+        $(document).on('change', '.ward-dropdown', function() {
+            updatePreview(); // Update preview when ward changes
+        });
+
+        // Update hidden fields before form submission
+        $('#jobPositionForm').submit(function(event) {
+            // Update Quill hidden fields
+            $('#jobDescription').val(quillDescription.root.innerHTML);
+            $('#jobRequirements').val(quillRequirements.root.innerHTML);
+            $('#jobBenefits').val(quillBenefits.root.innerHTML);
+
+            // Simple Quill validation (check if empty)
+            if (quillDescription.getText().trim().length === 0 || 
+                quillRequirements.getText().trim().length === 0 || 
+                quillBenefits.getText().trim().length === 0) {
+                alert('Vui lòng điền đầy đủ thông tin Mô tả, Yêu cầu và Quyền lợi.');
+                event.preventDefault(); 
+                return false;
+            }
+
+            // Date validation
+            var startDate = new Date($('#StartDate').val());
+            var endDate = new Date($('#EndDate').val());
+            if (endDate < startDate) {
+                alert('Ngày kết thúc phải sau ngày bắt đầu.');
+                event.preventDefault();
+                return false;
+            }
+            
+            // Location validation (ensure at least one valid location exists)
+            let validLocationExists = false;
+            $('#jobLocations .job-location-item').each(function() {
+                const province = $(this).find('.province-dropdown').val();
+                const district = $(this).find('.district-dropdown').val();
+                const ward = $(this).find('.ward-dropdown').val();
+                const street = $(this).find('input[name$=".Street"]').val();
+                if (province && district && ward && street) {
+                    validLocationExists = true;
+                    return false; // Exit .each loop early
+                }
+            });
+            if (!validLocationExists) {
+                alert('Vui lòng cung cấp ít nhất một địa chỉ tuyển dụng hợp lệ.');
+                event.preventDefault();
+                return false;
+            }
+
+        });
+
+        // Initial preview update on page load
+        $(document).ready(function() {
+            updatePreview();
+            // Trigger ward fetch for pre-selected districts after initial district load
+            setTimeout(function() { // Use timeout to ensure districts are loaded
+                $('.district-dropdown').each(function() {
+                    var selectedWardId = $(this).closest('.job-location-item').find('.ward-dropdown').data('selected');
+                    if ($(this).val() && selectedWardId) {
+                        fetchWards(this, selectedWardId);
+                    }
+                });
+            }, 500); // Adjust delay if needed
+        });
+
+    </script>
+}

@@ -1,0 +1,174 @@
+﻿/* Define Admin Color Scheme */
+:root {
+    --admin-primary-color: #f37423;
+    --admin-secondary-color: #e05a2d;
+    /* Darker orange */
+    --admin-accent-color: #ff9220;
+    /* Lighter orange */
+    --admin-text-color: #ecf0f1;
+    /* Light text (for dark background) */
+    --admin-dark-text-color: #2c3e50;
+    /* Dark text (for light background) */
+    --admin-bg-light: #f5f6fa;
+    /* Light background for main content */
+    --admin-border-color: #dee2e6;
+    /* Standard border color */
+}
+
+body.admin-body {
+    display: flex;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: var(--admin-bg-light);
+    /* Use light background for body */
+    color: var(--admin-dark-text-color);
+    /* Default text is dark */
+}
+
+.admin-sidebar {
+    width: 250px;
+    background-color: var(--admin-primary-color);
+    /* Use primary orange */
+    color: var(--admin-text-color);
+    /* Light text */
+    padding-top: 1rem;
+    position: fixed;
+    height: 100vh;
+    top: 0;
+    left: 0;
+    z-index: 1000;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.admin-sidebar .navbar-brand img {
+    /* Style logo if needed */
+}
+
+.admin-sidebar .navbar-brand h5 {
+    font-weight: 600;
+    margin-top: 0.5rem;
+}
+
+.admin-sidebar .nav {
+    padding-left: 0;
+    list-style-type: none;
+    margin-top: 1rem;
+}
+
+.admin-sidebar .nav-item {
+    margin-bottom: 0.5rem;
+}
+
+.admin-sidebar .nav-link {
+    color: var(--admin-text-color);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    /* Add active state style */
+    background-color: var(--admin-secondary-color);
+    /* Darker orange on hover/active */
+    color: #ffffff;
+    /* Ensure text is white on hover */
+}
+
+.admin-sidebar .nav-link i {
+    min-width: 20px;
+    /* Ensure icons align */
+    font-size: 1.1rem;
+}
+
+.main-content {
+    margin-left: 250px;
+    /* Match sidebar width */
+    /* padding is handled in layout */
+    width: calc(100% - 250px);
+    flex-grow: 1;
+}
+
+/* Optional: Style cards and charts within admin */
+.stats {
+    /* display: flex; */
+    /* justify-content: space-around; */
+    /* gap: 20px; */
+}
+
+.stat-card {
+    background-color: #ffffff;
+    /* White cards */
+    /* padding: 20px; */
+    /* width: 30%; */
+    /* text-align: center; */
+    border-radius: 8px;
+    border: 1px solid var(--admin-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    color: var(--admin-dark-text-color);
+}
+
+.chart-container {
+    /* margin-top: 40px; */
+    /* display: flex; */
+    /* flex-wrap: wrap; */
+    /* justify-content: space-between; */
+    /* gap: 20px; */
+}
+
+.chart {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 1px solid var(--admin-border-color);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+/* Adjust button colors within admin if needed */
+.main-content .btn-primary {
+    background-color: var(--admin-accent-color);
+    /* Use accent orange for primary buttons in content */
+    border-color: var(--admin-accent-color);
+    color: var(--admin-dark-text-color);
+    /* Dark text on accent */
+}
+
+.main-content .btn-primary:hover {
+    background-color: var(--admin-secondary-color);
+    /* Darker orange on hover */
+    border-color: var(--admin-secondary-color);
+    color: #fff;
+    /* White text on darker hover */
+}
+
+.main-content .btn-success {
+    background-color: #198754;
+    /* Keep Bootstrap green or map */
+    border-color: #198754;
+}
+
+.main-content .btn-outline-info {
+    color: #0dcaf0;
+    border-color: #0dcaf0;
+}
+
+.main-content .btn-outline-info:hover {
+    background-color: #0dcaf0;
+    color: #fff;
+}
+
+.main-content .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.main-content .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: #fff;
+}

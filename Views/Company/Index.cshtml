@@ -1,0 +1,287 @@
+﻿@model IEnumerable<QuanLyDoanhNghiep.Models.Company>
+
+@{
+    ViewData["Title"] = "Danh sách doanh nghiệp";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+<div class=" box"></div>
+<div class=" box"></div>
+
+<div class="container-fluid px-4 py-5">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <h2 class="fw-bold text-primary">
+                    <i class="fas fa-building me-2"></i>Quản lý doanh nghiệp
+                </h2>
+                <a asp-action="Create" class="btn btn-primary">
+                    <i class="fas fa-plus me-2"></i>Thêm mới
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm search-card">
+                <div class="card-body">
+                    <form class="row g-3" asp-action="Index" method="get"> 
+                        <div class="col-md-5">
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-search"></i>
+                                </span>
+                                <input type="text" name="searchTerm" class="form-control" placeholder="Tìm theo tên hoặc email công ty..." value="@ViewBag.SearchTerm">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                             <select name="provinceId" id="provinceFilter" class="form-select">
+                                <option value="">Tất cả tỉnh/thành phố</option>
+                                @foreach (var province in ViewBag.Provinces)
+                                {
+                                     <option value="@province.ProvinceID" selected="@(ViewBag.ProvinceId == province.ProvinceID ? "selected" : null)">@province.ProvinceName</option>
+                                }
+                            </select>
+                        </div>
+                         <div class="col-md-3">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-filter me-2"></i>Lọc / Tìm kiếm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Company List -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> 
+        @foreach (var item in Model)
+        {
+            <div class="col"> 
+                 <div class="card h-100 shadow-sm company-card">
+                    <div class="card-body d-flex flex-column">
+                        <div class="d-flex align-items-center mb-3 company-card-header">
+                            <div class="company-logo-container flex-shrink-0 me-3">
+                                <img src="~/img/CompanyLogo/@(string.IsNullOrEmpty(item.CompanyLogo) ? "company-default.png" : item.CompanyLogo)" 
+                                     alt="@item.CompanyName Logo" 
+                                     class="company-logo-img" 
+                                     onerror="this.onerror=null; this.src='/img/company-default.png'" />
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="card-title company-name mb-1">
+                                    <a asp-action="Details" asp-route-id="@item.CompanyID" class=" text-decoration-none text-dark company-link">@item.CompanyName</a>
+                                </h5>
+                                <span class="badge bg-@(item.Status == true ? "success" : "warning") company-status">
+                                    @(item.Status == true ? "Đã duyệt" : "Chờ duyệt")
+                                </span>
+                            </div>
+                        </div>
+                        <div class="company-card-info mb-3 flex-grow-1"> 
+                            <p class="mb-1 text-muted small company-info-item">
+                                <i class="fas fa-map-marker-alt text-primary me-2 fa-fw"></i>
+                                @item.StreetAddress, @item.Ward?.WardName, @item.District?.DistrictName, @item.Province?.ProvinceName
+                            </p>
+                            <p class="mb-0 text-muted small company-info-item">
+                                <i class="fas fa-envelope text-primary me-2 fa-fw"></i>
+                                @item.CompanyEmail
+                            </p>
+                        </div>
+                        <div class="company-card-actions">
+                            <div class="d-flex justify-content-end gap-2 flex-wrap"> 
+                                @if (item.Status == false)
+                                {
+                                    <form asp-action="Approve" asp-route-id="@item.CompanyID" method="post" class="d-inline">
+                                        @Html.AntiForgeryToken()
+                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn có chắc chắn muốn duyệt công ty này?')">
+                                            <i class="fas fa-check me-1"></i>Duyệt
+                                        </button>
+                                    </form>
+                                }
+                                <a asp-action="Edit" asp-route-id="@item.CompanyID" class="btn btn-outline-primary btn-sm">
+                                    <i class="fas fa-edit me-1"></i>Sửa
+                                </a>
+                                <a asp-action="Details" asp-route-id="@item.CompanyID" class="btn btn-outline-info btn-sm">
+                                    <i class="fas fa-eye me-1"></i>Chi tiết
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.CompanyID" class="btn btn-outline-danger btn-sm">
+                                    <i class="fas fa-trash me-1"></i>Xóa
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div> 
+
+
+@section Scripts {
+    <script>
+        Optional: Keep the client-side filter trigger if needed, 
+        but server-side filtering via form submit is generally better.
+        $(document).ready(function() {
+            $('#provinceFilter').change(function() {
+                // Submit the form when province changes
+                $(this).closest('form').submit(); 
+            });
+        });
+    </script>
+}
+
+<style>
+    /* Define Orange as primary for this page */
+    --page-primary-color: #ff6b35;
+    --page-primary-hover-color: #e05a2d; /* Darker orange for hover */
+    --page-accent-color: #ff9220; /* Accent orange from previous card style */
+
+    .search-card {
+        border-radius: 10px;
+        border: none;
+    }
+    .search-card .input-group-text {
+        background-color: #fff;
+        border-right: none;
+    }
+     .search-card .input-group-text i { /* Ensure search icon is orange */
+        color: var(--page-primary-color);
+    }
+     .search-card .form-control, .search-card .form-select {
+         border-left: none; 
+     }
+     .search-card .form-control:focus, .search-card .form-select:focus {
+         border-color: #ced4da;
+         box-shadow: none;
+     }
+     .search-card .input-group:focus-within .input-group-text {
+          border-color: #86b7fe;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+     }
+     .search-card .form-control:focus {
+          border-color: #86b7fe;
+          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+     }
+
+    /* Override text-primary for this page's header */
+    h2.text-primary {
+        color: var(--page-primary-color) !important;
+    }
+     h2.text-primary i {
+         color: var(--page-primary-color) !important;
+     }
+
+    /* Override btn-primary for this page */
+    .btn-primary {
+        background-color: var(--page-primary-color);
+        border-color: var(--page-primary-color);
+        color: #fff;
+    }
+    .btn-primary:hover {
+        background-color: var(--page-primary-hover-color);
+        border-color: var(--page-primary-hover-color);
+         color: #fff;
+    }
+
+    .company-card {
+        border: 1px solid #e0e0e0;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+        display: flex; 
+        flex-direction: column; 
+    }
+
+    .company-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
+        border-left: 4px solid var(--page-accent-color); /* Keep accent orange */
+    }
+
+    .company-card-header {
+        /* Add padding or adjust styles if needed */
+        border-bottom: 1px solid #f0f0f0; 
+        padding-bottom: 1rem; 
+    }
+
+    .company-logo-container {
+        width: 65px; 
+        height: 65px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #fff;
+        overflow: hidden;
+    }
+
+    .company-logo-img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .company-name {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.25rem !important;
+    }
+    .company-link {
+         color: #212529; /* Default text color */
+    }
+    .company-link:hover {
+        color: var(--page-accent-color); /* Keep accent orange */
+    }
+
+    .company-status {
+        font-size: 0.75rem;
+        padding: 0.3em 0.6em;
+        font-weight: 500;
+    }
+
+    .company-card-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+        line-height: 1.5;
+        flex-grow: 1; /* Allows info section to grow */
+    }
+    .company-info-item {
+        display: flex;
+        align-items: flex-start; /* Align icon top */
+        margin-bottom: 0.5rem !important;
+    }
+    .company-info-item i {
+         margin-top: 3px; /* Align icon slightly better */
+         color: var(--page-accent-color); /* Keep accent orange */
+    }
+
+    .company-card-actions {
+        border-top: 1px solid #f0f0f0; 
+        padding-top: 0.75rem;
+        margin-top: auto; /* Pushes actions to bottom */
+    }
+
+    .action-btn {
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+    }
+    .action-btn i {
+        margin-right: 0.3rem;
+    }
+
+     /* Ensure card body takes full height for flexbox */
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    /* Ensure specific icons in info use accent orange */
+     .company-info-item .fa-map-marker-alt,
+     .company-info-item .fa-envelope {
+          color: var(--page-accent-color) !important; /* Make sure icons are orange */
+     }
+
+</style>

@@ -1,0 +1,42 @@
+﻿@model QuanLyDoanhNghiep.Models.ITPositionCategory
+
+@{
+    ViewData["Title"] = "Xóa nhóm vị trí CNTT";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">@ViewData["Title"]</h2>
+
+                    <div class="alert alert-danger">
+                        <h4 class="alert-heading">Bạn có chắc chắn muốn xóa nhóm vị trí này?</h4>
+                        <p>Việc xóa nhóm vị trí có thể ảnh hưởng đến các vị trí tuyển dụng đang sử dụng nhóm này.</p>
+                    </div>
+
+                    <div class="mb-4">
+                        <dl class="row">
+                            <dt class="col-sm-3">Tên nhóm vị trí:</dt>
+                            <dd class="col-sm-9">@Model.CategoryName</dd>
+
+                            <dt class="col-sm-3">Mô tả:</dt>
+                            <dd class="col-sm-9">@Model.Description</dd>
+                        </dl>
+                    </div>
+
+                    <form asp-action="Delete">
+                        <input type="hidden" asp-for="CategoryID" />
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> Xóa
+                        </button>
+                        <a asp-action="Index" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Quay lại
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

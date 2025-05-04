@@ -1,0 +1,85 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Employee Panel</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+    <style>
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #f37423;
+            position: fixed;
+            padding-top: 20px;
+        }
+
+            .sidebar .nav-link {
+                color: white !important;
+                font-weight: 500;
+                padding: 15px;
+                display: block;
+            }
+
+                .sidebar .nav-link:hover {
+                    background-color: #e05d1a;
+                }
+
+        .content {
+            margin-left: 260px;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="d-flex">
+        <nav class="sidebar">
+            <a class="navbar-brand d-block text-center" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                <img src="~/img/logo.png" alt="Logo" style="width: 100px; height: 100px;">
+            </a>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Dashboard" asp-action="Index">
+                        <i class="bi bi-grid"></i> Bảng tin
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="JobPost" asp-action="Create">
+                        <i class="bi bi-file-earmark-plus"></i> Đăng tin tuyển
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="JobPost" asp-action="Index">
+                        <i class="bi bi-briefcase"></i> Tin tuyển dụng
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Statistics" asp-action="EmployeeStatistics">
+                        <i class="bi bi-graph-up"></i> Thống kê
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" asp-area="" asp-controller="Notification" asp-action="Index">
+                        <i class="bi bi-bell"></i> Thông báo
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <div class="content">
+            <main role="main" class="pb-3">
+                @RenderBody()
+            </main>
+        </div>
+    </div>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,254 @@
+﻿@model QuanLyDoanhNghiep.Models.JobIndexViewModel
+
+@{
+    ViewData["Title"] = "Index";
+    var total = @Model.FullTimeJobs?.Count() + @Model.Internships?.Count();
+}
+
+<div class="box"></div>
+<div class="box"></div>
+<div class="flex_container bg-white">
+    <div class="event_slider">
+        <img src="https://dainam.edu.vn/uploads/images/ydnu08vevx9gj9uqj9rc20230719085807_thump.jpg" alt="Sự kiện 1" class="active">
+        <img src="https://dainam.edu.vn/uploads/images/fmj44wxft7n7a1fzvxyh20240517045744_thump.jpg" alt="Sự kiện 2">
+        <img src="https://dainam.edu.vn/admin/upload/news/hitgh9zvg7wmvpeojqsh20210614111828_thump.jpg" alt="Sự kiện 3">
+    </div>
+    <div class="job_statistics">
+        <h2>Thống kê việc làm ngày hôm nay @DateTime.Now.ToString("dd/MM/yyyy")</h2>
+        <p>Việc làm đang tuyển: <span class="fw-bold">@total</span></p>
+        <p>Việc làm mới hôm nay: <span class="fw-bold">0</span></p>
+    </div>
+</div>
+
+<!-- Thanh tìm kiếm -->
+<div class="search-bar">
+    <div class="search-input">
+        <i class="bi bi-search"></i>
+        <input type="text" id="searchKeyword" placeholder="Vị trí tuyển dụng" value="@Model.Keyword">
+    </div>
+    <div class="location-filter">
+        <div class="dropdown province-dropdown">
+            <input type="text" id="provinceSearch" class="form-control" placeholder="Nhập Tỉnh/Thành phố" data-bs-toggle="dropdown">
+            <div class="dropdown-menu w-100" id="provinceList">
+                <div class="px-3 py-2">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="selectAllProvinces">
+                        <label class="form-check-label" for="selectAllProvinces">
+                            <i class="bi bi-check2-square"></i> Tất cả
+                        </label>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="province-list-content" style="max-height:300px; overflow-y:auto;">
+                    @foreach (var province in ViewBag.Provinces)
+                    {
+                        <div class="px-3 py-2">
+                            <div class="form-check">
+                                <input class="form-check-input province-checkbox" type="checkbox" value="@province.ProvinceID" id="province_@province.ProvinceID">
+                                <label class="form-check-label" for="province_@province.ProvinceID">
+                                    <i class="bi bi-geo-alt"></i> @province.ProvinceName
+                                </label>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="btn btn-primary search-btn" id="searchButton">
+        <i class="bi bi-search"></i> Tìm kiếm
+    </button>
+</div>
+
+<!-- Danh sách việc làm toàn thời gian -->
+<div class="container mt-4">
+    <h4>Việc làm toàn thời gian</h4>
+    <div id="job-list-fulltime" class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model.FullTimeJobs == null || !Model.FullTimeJobs.Any())
+        {
+            <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
+        }
+        else
+        {
+            @foreach (var item in Model.FullTimeJobs)
+            {
+                <div class="col">
+                    <a asp-action="Details" asp-route-id="@item.PositionID" class="text-decoration-none text-dark position-relative">
+                        <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center">
+                            <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
+                                <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
+                            </div>
+                            <div class="ms-3 flex-grow-1 overflow-hidden">
+                                <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
+                                <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary">@item.Salary</span>
+                                    <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(item.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+    <nav><ul class="pagination justify-content-center mt-4" id="pagination-fulltime"></ul></nav>
+</div>
+
+<div class="container mt-4">
+    <h4>Việc làm thực tập</h4>
+    <div id="job-list-intern" class="row row-cols-1 row-cols-md-3 g-4">
+        @if (Model.Internships == null || !Model.Internships.Any())
+        {
+            <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
+        }
+        else
+        {
+            @foreach (var item in Model.Internships)
+            {
+                <div class="col">
+                    <a asp-action="Details" asp-route-id="@item.PositionID" class="text-decoration-none text-dark position-relative">
+                        <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center">
+                            <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
+                                <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
+                            </div>
+                            <div class="ms-3 flex-grow-1 overflow-hidden">
+                                <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
+                                <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
+                                <div class="d-flex flex-wrap gap-2">
+                                    <span class="badge bg-secondary">@item.Salary</span>
+                                    <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(item.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                </div>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            }
+        }
+    </div>
+    <nav><ul class="pagination justify-content-center mt-4" id="pagination-intern"></ul></nav>
+</div>
+
+<footer>
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>THÔNG TIN LIÊN HỆ</h3>
+                <p>Trung tâm "Việc làm và thực tập sinh viên khoa Công Nghệ Thông Tin</p>
+                <p>Địa điểm: Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà Nội, Hanoi, Vietnam</p>
+                <p>Điện thoại: 096 159 55 99</p>
+                <p>Địa chỉ email: khoa.cntt@dainam.edu.vn</p>
+            </div>
+            <div class="footer-column">
+                <h3>LIÊN KẾT</h3>
+                <a href="#" class="footer-link">Việc làm</a>
+                <a href="#" class="footer-link">Thực tập</a>
+                <a href="#" class="footer-link">Gợi ý việc làm</a>
+                <a href="#" class="footer-link">CV</a>
+            </div>
+            <div class="footer-column">
+                <h3>MẠNG XÃ HỘI</h3>
+                <div class="footer-logo">
+                    <img src="~/img/logo.png" width="200" height="200" />
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+<!-- JavaScript for pagination -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const itemsPerPage = 21; // Số lượng thẻ mỗi trang
+        let currentPageFullTime = 1; // Trang hiện tại của việc làm toàn thời gian
+        let currentPageIntern = 1; // Trang hiện tại của việc làm thực tập
+
+        // Hàm phân trang cho job list
+        function setupPagination(containerId, paginationId, isInternship) {
+            const cards = document.querySelectorAll(`#${containerId} .card.job-card`);
+            const totalItems = cards.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            // Hàm hiển thị trang
+            function showPage(p) {
+                cards.forEach((card, index) => {
+                    card.style.display = (index >= (p - 1) * itemsPerPage && index < p * itemsPerPage) ? "block" : "none";
+                });
+            }
+
+            // Hàm render các nút phân trang
+            function renderPagination() {
+                const pagination = document.getElementById(paginationId);
+                if (!pagination) return;
+
+                pagination.innerHTML = `
+                    <div class="pagination-container">
+                        <button class="btn btn-sm btn-outline-secondary prev-page" ${currentPageFullTime === 1 ? 'disabled' : ''}>
+                            <i class="bi bi-chevron-left"></i> Trước
+                        </button>
+                        <span class="mx-3">Trang ${isInternship ? currentPageIntern : currentPageFullTime} / ${totalPages}</span>
+                        <button class="btn btn-sm btn-outline-secondary next-page" ${currentPageFullTime === totalPages ? 'disabled' : ''}>
+                            Tiếp theo <i class="bi bi-chevron-right"></i>
+                        </button>
+                    </div>
+                `;
+
+                const prevBtn = pagination.querySelector('.prev-page');
+                const nextBtn = pagination.querySelector('.next-page');
+
+                if (prevBtn) {
+                    prevBtn.onclick = () => {
+                        if (isInternship ? currentPageIntern > 1 : currentPageFullTime > 1) {
+                            isInternship ? currentPageIntern-- : currentPageFullTime--;
+                            loadJobData(isInternship ? currentPageIntern : currentPageFullTime, isInternship);
+                        }
+                    };
+                }
+
+                if (nextBtn) {
+                    nextBtn.onclick = () => {
+                        if (isInternship ? currentPageIntern < totalPages : currentPageFullTime < totalPages) {
+                            isInternship ? currentPageIntern++ : currentPageFullTime++;
+                            loadJobData(isInternship ? currentPageIntern : currentPageFullTime, isInternship);
+                        }
+                    };
+                }
+            }
+
+            // Ban đầu hiển thị trang đầu tiên và render phân trang
+            showPage(isInternship ? currentPageIntern : currentPageFullTime);
+            renderPagination();
+        }
+
+        // Hàm tải lại dữ liệu công việc
+        function loadJobData(page, isInternship) {
+            var url = isInternship ? '/JobPosition/LoadInternships' : '/JobPosition/LoadFullTimeJobs';
+
+            $.ajax({
+                url: url,
+                data: { page: page },
+                type: 'GET',
+                success: function (result) {
+                    // Cập nhật lại phần hiển thị với dữ liệu mới
+                    if (isInternship) {
+                        $('#job-list-intern').html(result);
+                        currentPageIntern = page;  // Cập nhật trang hiện tại của internships
+                    } else {
+                        $('#job-list-fulltime').html(result);
+                        currentPageFullTime = page;  // Cập nhật trang hiện tại của fulltime jobs
+                    }
+                    setupPagination(isInternship ? 'job-list-intern' : 'job-list-fulltime', isInternship ? 'pagination-intern' : 'pagination-fulltime', isInternship);
+                },
+                error: function () {
+                    alert('Có lỗi xảy ra trong quá trình tải dữ liệu!');
+                }
+            });
+        }
+
+        // Setup phân trang cho cả việc làm toàn thời gian và thực tập
+        setupPagination('job-list-fulltime', 'pagination-fulltime', false);
+        setupPagination('job-list-intern', 'pagination-intern', true);
+    });
+
+
+</script>

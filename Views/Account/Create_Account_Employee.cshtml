@@ -1,0 +1,120 @@
+﻿<div class="box"></div>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tạo tài khoản mới</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+
+    <div class="container" >
+        <div class="box"></div>
+        <center>
+             <div class="form-container">
+                <center><h3>Thông tin đăng ký</h3></center>
+                <form id="createAccountForm">
+                    <!-- Các trường cho nhan vien -->
+                    <div class="form-group">
+                        <label class="control-label">Mã nhân viên:</label>
+                        <input class="form-control" type="text" id="EmployeeID" name="EmployeeID" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Tên nhân viên:</label>
+                        <input class="form-control" type="text" id="EmployeeName" name="EmployeeName" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Số điện thoại: </label>
+                        <input class="form-control" type="text" id="PhoneNumber" name="PhoneNumber">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Giới tính</label>
+                        <select class="form-control" id="Gender" name="Gender">
+                            <option value="" disabled selected hidden>Nam/Nữ</option>
+                            <option value="false">Nam</option>
+                            <option value="true">Nữ</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Email: </label>
+                        <input class="form-control" type="text" id="Email" name="Email">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mã công ty: </label>
+                        <input class="form-control" type="text" id="CompanyID" name="CompanyID">
+                    </div>
+                    <div class="form-group">
+                    <!-- Các trường cho tài khoản -->
+                        <label class="control-label">Tên tài khoản</label>
+                        <input class="form-control" type="text" id="UserName" name="UserName">
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">Mật khẩu</label>
+                        <input class="form-control" type="password" id="Password" name="Password">
+                    </div>
+                    <br />
+                    <center>
+                        <div class="form-group">
+                            <input type="submit" id="submitForm" value="Tạo mới" class="btn btn-primary" />
+                        </div>
+                    </center>
+                </form>
+            </div>
+        </center>
+    </div>
+    <script>
+        $(document).ready(function () {
+            $("#createAccountForm").on("submit", function (event) {
+                event.preventDefault();
+
+                var AccountData = {
+                    UserName: $('#UserName').val(),
+                    Password: $('#Password').val()
+                };
+
+                // Gửi yêu cầu tạo mới tài khoản
+                $.ajax({
+                    url: "/Account/Create_Account_Employee",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(AccountData),
+                    success: function (result) {
+                        console.log(result);
+                        if (result && result.accountID) {
+                            var accountID = result.accountID;
+                            var EmployeeData = {
+                                EmployeeID: $('#EmployeeID').val(),
+                                EmployeeName: $('#EmployeeName').val(),
+                                PhoneNumber: $('#PhoneNumber').val(),
+                                Gender: $('#Gender').val() === "true",
+                                Email: $('#Email').val(),
+                                CompanyID: $('#CompanyID').val(),
+                                AccountID: accountID  // Đảm bảo rằng accountID được sử dụng ở đây
+                            };
+                            console.log(EmployeeData);
+
+                            // Gửi yêu cầu tạo mới nhân viên
+                            $.ajax({
+                                url: "/Employee/Create1",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify(EmployeeData),
+                                success: function (result) {
+                                    alert("Tạo mới nhân viên thành công!");
+                                    window.location.href = '/Account/Login'; 
+                                },
+                                error: function (err) {
+                                    console.log(err);
+                                    alert("Đã xảy ra lỗi khi tạo mới nhân viên.");
+                                }
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("Tài khoản này hiện đã có, hãy tạo tài khoản khác.");
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,101 @@
+﻿@model IEnumerable<QuanLyDoanhNghiep.Models.Employee>
+
+@{
+    ViewData["Title"] = "Index";
+}
+<div class="box"></div>
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.EmployeeName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Gender)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Email)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Account)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Company)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.EmployeeName)
+            </td>
+            <td>
+                    @if (item.Gender == true)
+                    {
+                        <input style="width:auto;border:none" value="Nữ" readonly />
+                    }
+                    else
+                    {
+                        <input style="width:auto;border:none" value="Nam" readonly />
+                    }
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PhoneNumber)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Account.AccountID)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Company.CompanyID)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.EmployeeID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.EmployeeID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.EmployeeID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
+<footer class="border-top footer text-muted">
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <div class="footer-logo">
+                    <img src="~/img/logo.png" width="100" height="100" />
+                </div>
+                <p>Trung tâm "Việc làm và thực tập sinh viên khoa Công Nghệ Thông Tin</p>
+                <p>Địa điểm: Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà Nội, Hanoi, Vietnam</p>
+                <p>Điện thoại: 096 159 55 99</p>
+                <p>Địa chỉ email: khoa.cntt@dainam.edu.vn</p>
+                <p>Facebook: https://www.facebook.com/dainam.fit</p>
+            </div>
+            <div class="footer-column">
+                <h3>LIÊN KẾT</h3>
+                <a href="#" class="footer-link">Việc làm</a>
+                <a href="#" class="footer-link">Thực tập</a>
+                <a href="#" class="footer-link">Gợi ý việc làm</a>
+                <a href="#" class="footer-link">CV</a>
+            </div>
+            <div class="footer-column">
+                <h3>MẠNG XÃ HỘI</h3>
+                <div class="footer-logo">
+                    <img src="~/img/logo.png" width="200" height="200" />
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>

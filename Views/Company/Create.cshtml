@@ -1,0 +1,320 @@
+﻿@model QuanLyDoanhNghiep.Models.Company
+
+@{
+    ViewData["Title"] = "Đăng ký doanh nghiệp";
+    // Optional: Specify Employer Layout if it existed
+    // Layout = "_Layout_Employer";
+}
+<div class="box"></div>
+
+<div class="employer-form-page">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 col-md-10">
+                 <div class="card shadow-lg employer-card">
+                     <div class="card-header employer-card-header">
+                         <h2 class="text-center mb-0">Đăng ký tài khoản Nhà tuyển dụng</h2>
+                         <p class="text-center text-muted small mb-0">Hoàn thành thông tin dưới đây để tạo hồ sơ công ty</p>
+                     </div>
+                    <div class="card-body p-4 p-md-5">
+                        <form asp-action="Create" enctype="multipart/form-data" class="needs-validation" novalidate>
+                            <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                            <h5 class="form-section-title">Thông tin công ty</h5>
+
+                            <!-- Company Logo Upload -->
+                            <div class="row mb-4 align-items-center">
+                                <div class="col-md-3 text-center">
+                                    <img id="logoPreview" src="~/img/CompanyLogo/default-company.jpg" alt="Company Logo" class="company-logo-preview rounded">
+                                </div>
+                                <div class="col-md-9">
+                                     <label for="logoInput" class="form-label">Logo công ty</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" name="companyLogoFile" id="logoInput" accept="image/*" aria-describedby="logoHelp">
+                                     </div>
+                                    <div id="logoHelp" class="form-text">Tải lên logo định dạng .jpg, .png, .gif (Dung lượng tối đa 2MB)</div>
+                                </div>
+                            </div>
+
+                            <!-- Company Information Fields -->
+                            <div class="row g-3">
+                                <div class="col-12">
+                                     <label asp-for="CompanyName" class="form-label">Tên công ty <span class="text-danger">*</span></label>
+                                    <input asp-for="CompanyName" class="form-control" placeholder="Nhập tên đầy đủ của công ty" required>
+                                    <span asp-validation-for="CompanyName" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                     <label asp-for="CompanyEmail" class="form-label">Email công ty <span class="text-danger">*</span></label>
+                                    <input asp-for="CompanyEmail" type="email" class="form-control" placeholder="vidu@congty.com" required>
+                                    <span asp-validation-for="CompanyEmail" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                    <label asp-for="StreetAddress" class="form-label">Địa chỉ chi tiết <span class="text-danger">*</span></label>
+                                    <input asp-for="StreetAddress" class="form-control" placeholder="Số nhà, tên đường..." required>
+                                    <span asp-validation-for="StreetAddress" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                     <label asp-for="ProvinceID" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                                    <select asp-for="ProvinceID" class="form-select" id="provinceSelect" required>
+                                        <option value="" disabled selected>-- Chọn Tỉnh/Thành phố --</option>
+                                        @foreach (var item in ViewBag.Provinces)
+                                        {
+                                            <option value="@item.Value">@item.Text</option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="ProvinceID" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="DistrictID" class="form-label">Quận/Huyện <span class="text-danger">*</span></label>
+                                    <select asp-for="DistrictID" class="form-select" id="districtSelect" required>
+                                        <option value="" disabled selected>-- Chọn Quận/Huyện --</option>
+                                    </select>
+                                     <span asp-validation-for="DistrictID" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                     <label asp-for="WardID" class="form-label">Phường/Xã <span class="text-danger">*</span></label>
+                                    <select asp-for="WardID" class="form-select" id="wardSelect" required>
+                                        <option value="" disabled selected>-- Chọn Phường/Xã --</option>
+                                    </select>
+                                     <span asp-validation-for="WardID" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-12">
+                                     <label asp-for="CompanyDescription" class="form-label">Giới thiệu công ty</label>
+                                    <textarea asp-for="CompanyDescription" class="form-control" placeholder="Nhập mô tả về công ty" rows="5"></textarea>
+                                    <span asp-validation-for="CompanyDescription" class="text-danger"></span>
+                                </div>
+                            </div>
+
+                            <div class="text-center mt-4 pt-3 border-top">
+                                 <p class="small text-muted">Bằng việc nhấn nút Đăng ký, bạn đồng ý với <a href="#">Điều khoản dịch vụ</a> của chúng tôi.</p>
+                                <button type="submit" class="btn btn-primary btn-lg register-btn">
+                                    <i class="fas fa-check-circle me-2"></i>Đăng ký ngay
+                                </button>
+                            </div>
+                        </form>
+                         <div class="text-center mt-3">
+                            <p class="text-muted">Đã có tài khoản? <a asp-action="Login" asp-controller="Account">Đăng nhập</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function() {
+            // Preview logo
+            $('#logoInput').change(function() {
+                const file = this.files[0];
+                if (file && file.size <= 2 * 1024 * 1024) { // Check size <= 2MB
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#logoPreview').attr('src', e.target.result);
+                    }
+                    reader.readAsDataURL(file);
+                    $(this).removeClass('is-invalid');
+                } else if (file && file.size > 2 * 1024 * 1024) {
+                    alert('Dung lượng logo không được vượt quá 2MB.');
+                    $(this).val(''); // Clear the invalid file
+                     $('#logoPreview').attr('src', '~/img/company-default.png');
+                     $(this).addClass('is-invalid');
+                }
+            });
+
+            // Cascading Dropdowns
+             function populateDropdown(dropdownId, data, defaultOptionText) {
+                var dropdown = $(dropdownId);
+                dropdown.empty();
+                dropdown.append($('<option></option>').val('').prop('disabled', true).prop('selected', true).text(defaultOptionText));
+                $.each(data, function(index, item) {
+                    dropdown.append($('<option></option>').val(item.districtID || item.wardID).text(item.districtName || item.wardName));
+                });
+                dropdown.prop('disabled', data.length === 0);
+            }
+
+            $('#provinceSelect').change(function() {
+                var provinceId = $(this).val();
+                 // Clear lower dropdowns immediately
+                populateDropdown('#districtSelect', [], '-- Chọn Quận/Huyện --');
+                populateDropdown('#wardSelect', [], '-- Chọn Phường/Xã --');
+
+                if (provinceId) {
+                    $.get('@Url.Action("GetDistricts", "Company")', { provinceId: provinceId }, function(data) {
+                        populateDropdown('#districtSelect', data, '-- Chọn Quận/Huyện --');
+                    }).fail(function() { alert('Lỗi tải danh sách Quận/Huyện'); });
+                } else {
+                    populateDropdown('#districtSelect', [], '-- Chọn Quận/Huyện --');
+                }
+            });
+
+            $('#districtSelect').change(function() {
+                var districtId = $(this).val();
+                 populateDropdown('#wardSelect', [], '-- Chọn Phường/Xã --');
+
+                if (districtId) {
+                     $.get('@Url.Action("GetWards", "Company")', { districtId: districtId }, function(data) {
+                         populateDropdown('#wardSelect', data, '-- Chọn Phường/Xã --');
+                    }).fail(function() { alert('Lỗi tải danh sách Phường/Xã'); });
+                } else {
+                    populateDropdown('#wardSelect', [], '-- Chọn Phường/Xã --');
+                }
+            });
+
+             // Initial state: disable district and ward
+             $('#districtSelect').prop('disabled', true);
+             $('#wardSelect').prop('disabled', true);
+        });
+
+        // Bootstrap Validation
+        (function () {
+            'use strict'
+            var forms = document.querySelectorAll('.needs-validation')
+            Array.prototype.slice.call(forms)
+                .forEach(function (form) {
+                    form.addEventListener('submit', function (event) {
+                        if (!form.checkValidity()) {
+                            event.preventDefault()
+                            event.stopPropagation()
+                        }
+                        form.classList.add('was-validated')
+                    }, false)
+                })
+        })()
+    </script>
+}
+
+<style>
+    .employer-form-page {
+        background-color: #f0f2f5; /* Light grey background like TopCV */
+        min-height: calc(100vh - 70px); /* Adjust if header height changes */
+    }
+
+    .employer-card {
+        border: none;
+        border-radius: 12px;
+        background-color: #fff;
+    }
+
+    .employer-card-header {
+        background-color: #fff;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 1.5rem;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .employer-card-header h2 {
+        font-size: 1.75rem;
+        font-weight: 600;
+        color: #2767B1; /* Secondary color */
+    }
+
+    .company-logo-preview {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        border: 2px solid #e0e0e0;
+        padding: 5px;
+        background-color: #f8fafc;
+    }
+
+    .form-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #e0e0e0;
+    }
+
+    .form-label {
+        font-weight: 500;
+        color: #333;
+        margin-bottom: 0.5rem;
+        display: block; /* Ensure label is above input */
+    }
+
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        font-size: 0.95rem;
+        transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #86b7fe; /* Bootstrap default focus */
+        outline: 0;
+        box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25); /* Bootstrap default focus */
+    }
+
+    /* Specific styling for file input to look better */
+     .input-group .form-control {
+         border-top-right-radius: 0;
+         border-bottom-right-radius: 0;
+     }
+    .input-group .btn {
+         border-top-left-radius: 0;
+         border-bottom-left-radius: 0;
+     }
+
+    .form-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .register-btn {
+        padding: 0.8rem 2rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        background-color: #ff6b35; /* Use primary color */
+        border-color: #ff6b35;
+        transition: all 0.3s ease;
+    }
+
+    .register-btn:hover {
+        background-color: #FF8A5C; /* Use hover color */
+        border-color: #FF8A5C;
+        transform: translateY(-2px);
+    }
+
+    .was-validated .form-control:invalid, .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: none; /* Optional: remove default BS icon */
+    }
+    .was-validated .form-select:invalid, .form-select.is-invalid {
+         border-color: #dc3545;
+    }
+    .was-validated .form-control:valid, .form-control.is-valid {
+         border-color: #198754;
+    }
+    .was-validated .form-select:valid, .form-select.is-valid {
+         border-color: #198754;
+    }
+
+     /* Style invalid feedback */
+    .text-danger {
+        font-size: 0.875em;
+    }
+
+     /* Link style */
+     a {
+        color: #FF8A5C; /* Use secondary color for links */
+         text-decoration: none;
+     }
+     a:hover {
+         text-decoration: underline;
+            color: #FF8A5C; /* Darker secondary */
+     }
+
+</style>

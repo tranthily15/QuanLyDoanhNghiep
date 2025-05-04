@@ -1,0 +1,307 @@
+﻿@model IEnumerable<QuanLyDoanhNghiep.Models.CV>
+
+@{
+    ViewData["Title"] = ViewBag.Role == "2" ? "CV của tôi" : "Quản lý CV";
+}
+
+<div class="container mt-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <h2 class="mb-4">@ViewData["Title"]</h2>
+
+    @if (ViewBag.Role == "2")
+    {
+        <!-- Giao diện cho sinh viên -->
+        <div class="row">
+            <!-- CV đang chờ duyệt -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-warning text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-clock"></i> Đang chờ duyệt
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">@ViewBag.PendingCVs.Count</h3>
+                        <div class="list-group">
+
+                            @foreach (var cv in ViewBag.PendingCVs)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h6 class="mb-1">@cv.JobPosition.PositionName</h6>
+                                            <small>@cv.JobPosition.Company.CompanyName</small>
+                                        </div>
+                                        <span class="badge bg-warning">Chờ duyệt</span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm flex-grow-1">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </a>
+                                        @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                <i class="bi bi-file-earmark-text"></i> Xem CV
+                                </button> *@
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV đã chấp nhận -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-check-circle"></i> Đã chấp nhận
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">@ViewBag.AcceptedCVs.Count</h3>
+                        <div class="list-group">
+                            @foreach (var cv in ViewBag.AcceptedCVs)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h6 class="mb-1">@cv.JobPosition.PositionName</h6>
+                                            <small>@cv.JobPosition.Company.CompanyName</small>
+                                        </div>
+                                        <span class="badge bg-success">Đã chấp nhận</span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm flex-grow-1">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </a>
+                                        @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                <i class="bi bi-file-earmark-text"></i> Xem CV
+                                </button> *@
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CV đã từ chối -->
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="card-title mb-0">
+                            <i class="bi bi-x-circle"></i> Đã từ chối
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <h3 class="text-center mb-4">@ViewBag.RejectedCVs.Count</h3>
+                        <div class="list-group">
+                            @foreach (var cv in ViewBag.RejectedCVs)
+                            {
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <div>
+                                            <h6 class="mb-1">@cv.JobPosition.PositionName</h6>
+                                            <small>@cv.JobPosition.Company.CompanyName</small>
+                                        </div>
+                                        <span class="badge bg-danger">Đã từ chối</span>
+                                    </div>
+                                    <div class="d-flex gap-2">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm flex-grow-1">
+                                            <i class="bi bi-eye"></i> Chi tiết
+                                        </a>
+                                        @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                <i class="bi bi-file-earmark-text"></i> Xem CV
+                                </button> *@
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <!-- Giao diện cho nhân viên -->
+        <!-- CV đang chờ duyệt -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-clock"></i> CV đang chờ duyệt
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vị trí</th>
+                                <th>Ứng viên</th>
+                                <th>Ngày nộp</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (ViewBag.PendingCVs.Count == 0)
+                            {
+                                <tr>
+                                    <td colspan="4" class="text-center">Không có CV đang chờ duyệt</td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var cv in ViewBag.PendingCVs)
+                                {
+                                    <tr>
+                                        <td>@cv.JobPosition.PositionName</td>
+                                        <td>@cv.User.FullName</td>
+                                        <td>@cv.SubmissionDate?.ToString("dd/MM/yyyy")</td>
+                                        <td>
+                                            <div class="btn-group">
+                                                @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-file-earmark-text"></i> Xem CV
+                                    </button> *@
+                                                <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm">
+                                                    <i class="bi bi-eye"></i> Chi tiết
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CV đã chấp nhận -->
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-check-circle"></i> CV đã chấp nhận
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vị trí</th>
+                                <th>Ứng viên</th>
+                                <th>Ngày nộp</th>
+                                <th>Ngày duyệt</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cv in ViewBag.AcceptedCVs)
+                            {
+                                <tr>
+                                    <td>@cv.JobPosition.PositionName</td>
+                                    <td>@cv.User.FullName</td>
+                                    <td>@cv.SubmissionDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>@cv.EvaluationDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-file-earmark-text"></i> Xem CV
+                                    </button> *@
+                                            <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i> Chi tiết
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CV đã từ chối -->
+        <div class="card mb-4">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0">
+                    <i class="bi bi-x-circle"></i> CV đã từ chối
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Vị trí</th>
+                                <th>Ứng viên</th>
+                                <th>Ngày nộp</th>
+                                <th>Ngày duyệt</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var cv in ViewBag.RejectedCVs)
+                            {
+                                <tr>
+                                    <td>@cv.JobPosition.PositionName</td>
+                                    <td>@cv.User.FullName</td>
+                                    <td>@cv.SubmissionDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>@cv.EvaluationDate?.ToString("dd/MM/yyyy")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            @* <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-file-earmark-text"></i> Xem CV
+                                    </button> *@
+                                            <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm">
+                                                <i class="bi bi-eye"></i> Chi tiết
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<!-- Popup for PDF Viewer -->
+@* <div id="cvPopup" class="modal fade" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xem CV</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <iframe id="pdf-viewer" src="" style="width: 100%; height: 80vh;"></iframe>
+            </div>
+        </div>
+    </div>
+</div> *@
+
+<script>
+    function openPDFPopup(pdfUrl) {
+        const pdfViewer = document.getElementById("pdf-viewer");
+        pdfViewer.src = pdfUrl;
+        const modal = new bootstrap.Modal(document.getElementById("cvPopup"));
+        modal.show();
+    }
+</script>
+
+<style>
+    .modal-xl {
+        max-width: 90%;
+    }

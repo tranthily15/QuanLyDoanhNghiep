@@ -1,0 +1,129 @@
+﻿@* @model IEnumerable<QuanLyDoanhNghiep.Models.CV>
+@{
+    var status = ViewBag.Status as string;
+    var role = ViewBag.Role as string;
+}
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">Không có CV nào trong mục này.</div>
+}
+else
+{
+    if (role == "2")
+    {
+        <!-- Giao diện cho sinh viên -->
+        <div class="list-group">
+            @foreach (var cv in Model)
+            {
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <h6 class="mb-1">@cv.JobPosition.PositionName</h6>
+                            <small>@cv.JobPosition.Company.CompanyName</small>
+                        </div>
+                        <span class="badge bg-@GetBadgeColor(status)">
+                            @GetStatusText(status)
+                        </span>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm flex-grow-1">
+                            <i class="bi bi-eye"></i> Chi tiết
+                        </a>
+                        <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                            <i class="bi bi-file-earmark-text"></i> Xem CV
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <!-- Giao diện cho nhân viên -->
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Vị trí</th>
+                        <th>Ứng viên</th>
+                        <th>Ngày nộp</th>
+                        @if (status != "pending")
+                        {
+                            <th>Ngày duyệt</th>
+                        }
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var cv in Model)
+                    {
+                        <tr>
+                            <td>@cv.JobPosition.PositionName</td>
+                            <td>@cv.User.FullName</td>
+                            <td>@cv.SubmissionDate?.ToString("dd/MM/yyyy")</td>
+                            @if (status != "pending")
+                            {
+                                <td>@cv.EvaluationDate?.ToString("dd/MM/yyyy")</td>
+                            }
+                            <td>
+                                <div class="btn-group">
+                                    <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </a>
+                                    <button onclick="openPDFPopup('@cv.Resume')" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-file-earmark-text"></i> Xem CV
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+}
+
+@functions {
+    string GetBadgeColor(string status)
+    {
+        return status switch
+        {
+            "pending" => "warning",
+            "accepted" => "success",
+            "rejected" => "danger",
+            _ => "secondary"
+        };
+    }
+
+    string GetStatusText(string status)
+    {
+        return status switch
+        {
+            "pending" => "Chờ duyệt",
+            "accepted" => "Đã chấp nhận",
+            "rejected" => "Đã từ chối",
+            _ => "Không xác định"
+        };
+    }
+}
+ *@
+@model IEnumerable<QuanLyDoanhNghiep.Models.CV>
+
+@foreach (var cv in Model)
+{
+    <div class="list-group-item">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <div>
+                <h6 class="mb-1">@cv.JobPosition.PositionName</h6>
+                <small>@cv.JobPosition.Company.CompanyName</small>
+            </div>
+            <span class="badge bg-warning">@cv.Status</span>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="@Url.Action("Details", new { id = cv.CV_ID })" class="btn btn-info btn-sm flex-grow-1">
+                <i class="bi bi-eye"></i> Chi tiết
+            </a>
+        </div>
+    </div>
+}

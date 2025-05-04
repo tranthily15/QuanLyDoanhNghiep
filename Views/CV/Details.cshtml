@@ -1,0 +1,241 @@
+﻿@model QuanLyDoanhNghiep.Models.CV
+
+@{
+    ViewData["Title"] = "Chi tiết CV";
+}
+<div class="box"></div>
+<div class="box"></div>
+
+<div class="container-fluid mt-4">
+    <div class="row">
+        <!-- CV Preview Section -->
+        <div class="col-md-8 pe-4">
+            <div class="cv-preview-container">
+                <embed src="@Model.Resume" type="application/pdf" class="pdf-viewer">
+            </div>
+        </div>
+
+        <!-- CV Info Section -->
+        <div class="col-md-4">
+            <div class="cv-info-sidebar">
+                <!-- Candidate Info -->
+                <div class="candidate-profile mb-4">
+                    <div class="profile-header d-flex align-items-center">
+                        <div class="avatar">
+                            @{
+                                var initials = Model.User.FullName.Split(' ').Last().Substring(0, 2).ToUpper();
+                            }
+                            <div class="avatar-placeholder">
+                                @initials
+                            </div>
+                        </div>
+                        <div class="profile-info ms-3">
+                            <h3 class="mb-1">@Model.User.FullName</h3>
+                            <p class="email mb-1">
+                                <i class="fas fa-envelope me-2"></i>
+                                @Model.User.Email
+                            </p>
+                            <p class="phone mb-0">
+                                <i class="fas fa-phone me-2"></i>
+                                @Model.User.PhoneNumber
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Position Info -->
+                <div class="position-info mb-4">
+                    <h4 class="section-title">Chiến dịch tuyển dụng</h4>
+                    <div class="info-card">
+                        <div class="company-logo">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <div class="position-details">
+                            <h5>@Model.JobPosition.PositionName</h5>
+                            <p class="mb-2">@Model.JobPosition.Company.CompanyName</p>
+                            <span class="badge @(Model.JobPosition.PositionType ? "bg-success" : "bg-info")">
+                                @(Model.JobPosition.PositionType ? "Nhân viên" : "Thực tập sinh")
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CV Status -->
+                <div class="cv-status mb-4">
+                    <h4 class="section-title">Trạng thái CV</h4>
+                    <div class="status-info">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span>Trạng thái</span>
+                            <span class="status-badge @GetStatusClass(Model.Status)">
+                                @GetStatusText(Model.Status)
+                            </span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span>Nguồn</span>
+                            <span class="source-badge">Ứng tuyển</span>
+                        </div>
+                    </div>
+                </div>
+
+                @if (ViewBag.Role == "1") // Chỉ hiển thị phần đánh giá cho nhân viên
+                {
+                    <!-- CV Evaluation -->
+                    <div class="cv-evaluation mb-4">
+                        <h4 class="section-title">Đánh giá CV</h4>
+                        <div class="evaluation-info">
+                            <p class="mb-3">
+                                <i class="fas fa-calendar me-2"></i>
+                                Đánh giá CV trước @DateTime.Now.ToString("dd/MM")
+                            </p>
+                            
+                            @if (Model.Status == 0)
+                            {
+                                <form id="evaluationForm" method="post" action="@Url.Action("UpdateStatus", "CV")">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@Model.CV_ID" />
+                                    <input type="hidden" name="status" id="statusInput" value="" />
+                                    
+                                    <div class="mb-3">
+                                        <label for="feedback" class="form-label">Nhận xét đánh giá:</label>
+                                        <textarea class="form-control" name="feedback" id="feedback" rows="3" required>@Model.Feedback</textarea>
+                                    </div>
+
+                                    <div class="d-grid gap-2">
+                                        <button type="button" class="btn btn-success" onclick="submitForm(1)">
+                                            <i class="fas fa-check me-2"></i> Duyệt CV
+                                        </button>
+                                        <button type="button" class="btn btn-danger" onclick="submitForm(2)">
+                                            <i class="fas fa-times me-2"></i> Từ chối CV
+                                        </button>
+                                    </div>
+                                </form>
+                            }
+                            else
+                            {
+                                <div class="feedback-display">
+                                    <h5>Phản hồi:</h5>
+                                    <p>@(string.IsNullOrEmpty(Model.Feedback) ? "Chưa có phản hồi" : Model.Feedback)</p>
+                                    <p class="text-muted">
+                                        <small>Đánh giá vào: @(Model.EvaluationDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</small>
+                                    </p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+
+                <!-- Action Buttons -->
+                <div class="cv-actions">
+                    <a href="@Model.Resume" download class="btn btn-outline-primary w-100">
+                        <i class="fas fa-download me-2"></i> Tải CV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function submitForm(status) {
+            if (!document.getElementById('feedback').value.trim()) {
+                alert('Vui lòng nhập nhận xét đánh giá!');
+                return;
+            }
+            
+            document.getElementById('statusInput').value = status;
+            document.getElementById('evaluationForm').submit();
+        }
+    </script>
+}
+
+@functions {
+    string GetStatusClass(int status)
+    {
+        return status switch
+        {
+            0 => "status-pending",
+            1 => "status-approved",
+            2 => "status-rejected",
+            _ => "status-pending"
+        };
+    }
+
+    string GetStatusText(int status)
+    {
+        return status switch
+        {
+            0 => "Chờ duyệt",
+            1 => "Đã duyệt",
+            2 => "Đã từ chối",
+            _ => "Chờ duyệt"
+        };
+    }
+}
+
+<style>
+.cv-preview-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: calc(100vh - 100px);
+    position: sticky;
+    top: 20px;
+    overflow: hidden;
+}
+
+.pdf-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
+
+.cv-info-sidebar {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 24px;
+}
+
+.section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-approved {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-rejected {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.source-badge {
+    background-color: #6c757d;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 4px;
+}
+
+.feedback-display {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    margin-top: 10px;
+}
+</style>

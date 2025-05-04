@@ -1,0 +1,745 @@
+﻿@model QuanLyDoanhNghiep.Models.JobPosition
+
+@{
+    ViewData["Title"] = "Chi tiết công việc";
+}
+<div class="box"></div>
+<div class="box"></div>
+
+<div class="job-details-page">
+    <!-- Breadcrumb -->
+    <div class="breadcrumb-container">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        @Model.PositionName
+                    </li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Banner Section -->
+    <div class="banner-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="job-title-section">
+                        <div class="company-name">
+                            <a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })">
+                                <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo" onerror="this.src='/img/company-default.png'"/>
+                            </a>
+                            <h2><a @* href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })" *@ style="text-decoration: none; color: inherit;">@Model.PositionName</a></h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    @if (ViewBag.Role == "2")
+                    {
+                        <button class="btn btn-apply-now" onclick="showApplyModal()">
+                            <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
+                        </button>
+                    }
+                    @if (ViewBag.Role == "1")
+                    {
+                        <a href="@Url.Action("Edit", new { id = Model.PositionID })" class="btn btn-edit">
+                            <i class="fas fa-edit"></i> Chỉnh sửa
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-md-8">
+                <!-- Job Title and Basic Info -->
+                @* <h1 class="job-title mb-4">@Model.PositionName</h1> *@
+                
+                <!-- Job Overview Cards -->
+                <div class="job-overview-cards mb-4">
+                    <div class="overview-card">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-money-bill-wave"></i>
+                        </div>
+                        <div class="info">
+                            <label>Thu nhập</label>
+                            <span>@(string.IsNullOrEmpty(Model.Salary) ? "Thỏa thuận" : Model.Salary)</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-map-marker-alt"></i>
+                        </div>
+                        <div class="info">
+                            <label>Địa điểm</label>
+                            <span>@(Model.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "Hà Nội, Hồ Chí Minh")</span>
+                        </div>
+                    </div>
+                    <div class="overview-card">
+                        <div class="icon-wrapper">
+                            <i class="fas fa-briefcase"></i>
+                        </div>
+                        <div class="info">
+                            <label>Kinh nghiệm</label>
+                            <span>Không yêu cầu</span>
+                        </div>
+                    </div>
+                </div>
+
+               @*  <div class="job-actions mb-4">
+                    <button class="btn btn-apply-now" onclick="showApplyModal()">
+                        <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
+                    </button>
+                    <!-- <button class="btn btn-save @(ViewBag.IsSaved ? "saved" : "")" onclick="toggleSave()">
+                        <i class="@(ViewBag.IsSaved ? "fas" : "far") fa-heart"></i> @(ViewBag.IsSaved ? "Đã lưu" : "Lưu tin")
+                    </button> --> 
+                </div> *@
+
+                <!-- Job Overview -->
+                <div class="content-section">
+                    <h3 class="section-title">Tổng quan</h3>
+                    <div class="job-overview">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="overview-item">
+                                    <i class="fas fa-users"></i>
+                                    <div class="item-content">
+                                        <label>Số lượng tuyển</label>
+                                        <span>@Model.Vacancies người</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="overview-item">
+                                    <i class="fas fa-briefcase"></i>
+                                    <div class="item-content">
+                                        <label>Hình thức</label>
+                                        <span>@(Model.PositionType ? "Nhân viên chính thức" : "Thực tập sinh")</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="overview-item">
+                                    <i class="fas fa-clock"></i>
+                                    <div class="item-content">
+                                        <label>Thời gian làm việc</label>
+                                        <span>@Model.TimeWork</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Job Description -->
+                <div class="content-section">
+                    <h3 class="section-title">Mô tả công việc</h3>
+                    <div class="section-content">
+                        @Html.Raw(Model.JobDescription)
+                    </div>
+                </div>
+
+                <!-- Job Requirements -->
+                <div class="content-section">
+                    <h3 class="section-title">Yêu cầu ứng viên</h3>
+                    <div class="section-content">
+                        @Html.Raw(Model.JobRequirements)
+                    </div>
+                </div>
+
+                <!-- Benefits -->
+                <div class="content-section">
+                    <h3 class="section-title">Quyền lợi</h3>
+                    <div class="section-content benefits-section">
+                        @Html.Raw(Model.JobBenefits)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-4">
+                <!-- Application Deadline -->
+                <div class="side-section">
+                    <div class="deadline-info">
+                        <i class="fas fa-calendar-alt"></i>
+                        <div class="deadline-content">
+                            <label>Hạn nộp hồ sơ</label>
+                            <span>@Model.EndDate.ToString("dd/MM/yyyy")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Work Locations -->
+                <div class="side-section">
+                    <h4 class="side-title">Địa điểm làm việc</h4>
+                    @if (Model.JobLocations != null && Model.JobLocations.Any())
+                    {
+                        foreach (var location in Model.JobLocations)
+                        {
+                            <div class="location-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="location-content">
+                                    <p class="street">@location.Street</p>
+                                    <p class="area">@(location.Ward?.WardName ?? ""), @(location.District?.DistrictName ?? ""), @(location.Province?.ProvinceName ?? "")</p>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <p class="text-muted">Chưa có thông tin địa điểm làm việc</p>
+                    }
+                </div>
+
+                <!-- Company Info -->
+                <div class="side-section company-info-section">
+                    <h4 class="side-title">Thông tin công ty</h4>
+                    <div class="company-details">
+                        <a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })">
+                           <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo-lg" onerror="this.src='/img/company-default.png'"/>
+                        </a>
+                        <h5><a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })" style="text-decoration: none; color: inherit;">@Model.Company.CompanyName</a></h5>
+                        @* <p><i class="fas fa-globe"></i> <a href="@Model.Company.Website" target="_blank">Website công ty</a></p> *@
+                        <p><i class="fas fa-map-marked-alt"></i> @Model.Company?.StreetAddress, @Model.Company?.Ward?.WardName, @Model.Company?.District?.DistrictName, @Model.Company.Province?.ProvinceName</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Apply Modal -->
+@if (ViewBag.Role == "2")
+{
+    <div class="modal fade" id="applyModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Ứng tuyển vị trí @Model.PositionName</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form asp-controller="CV" asp-action="Submit" method="post" enctype="multipart/form-data">
+                        <input type="hidden" name="PositionID" value="@Model.PositionID" />
+                        <input type="hidden" name="ID" value="@ViewBag.User.ID" />
+
+                        <div class="form-group mb-3">
+                            <label><i class="fas fa-user"></i> Họ và tên</label>
+                            <input type="text" class="form-control" name="FullName" value="@ViewBag.User.FullName" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label><i class="fas fa-envelope"></i> Email</label>
+                            <input type="email" class="form-control" name="Email" value="@ViewBag.User.Email" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label><i class="fas fa-phone"></i> Số điện thoại</label>
+                            <input type="text" class="form-control" name="PhoneNumber" value="@ViewBag.User.PhoneNumber" readonly />
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label><i class="fas fa-file-upload"></i> Tải lên CV</label>
+                            <input type="file" class="form-control" name="ResumeFile" required accept=".pdf,.doc,.docx" />
+                            <small class="text-muted">Hỗ trợ định dạng: PDF, DOC, DOCX (Tối đa 5MB)</small>
+                        </div>
+
+                        <button type="submit" class="btn btn-apply w-100">
+                            <i class="fas fa-paper-plane"></i> Gửi hồ sơ ứng tuyển
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<script>
+function goBack() {
+    // Nếu có returnUrl trong ViewBag
+    @if (ViewBag.ReturnUrl != null)
+    {
+        <text>
+        window.location.href = '@ViewBag.ReturnUrl';
+        </text>
+    }
+    // Nếu không có returnUrl, sử dụng history.back()
+    else
+    {
+        <text>
+        if(document.referrer) {
+            window.location.href = document.referrer;
+        } else {
+            window.location.href = '@Url.Action("Index", "JobPosition")';
+        }
+        </text>
+    }
+}
+
+function showApplyModal() {
+    // Implement your modal show logic
+    $('#applyModal').modal('show');
+}
+
+function toggleSave() {
+    // Implement your save logic
+    $(this).toggleClass('saved');
+}
+</script>
+
+<style>
+    :root {
+        --primary-color: #ff6b35;
+        --secondary-color: #2f2f2f;
+        --border-color: #e9ecef;
+        --hover-color: #f8f9fa;
+        --text-muted: #6c757d;
+        --section-bg: #f8f9fa;
+    }
+
+    /* Banner Section */
+    .banner-section {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        padding: 40px 0;
+        border-bottom: 1px solid var(--border-color);
+        margin-top: -1px; /* To prevent double border with back button */
+    }
+
+    .job-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: var(--secondary-color);
+        margin-bottom: 15px;
+    }
+
+    .company-name {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .company-name h2 {
+        font-size: 20px;
+        margin: 0;
+        color: var(--text-muted);
+    }
+
+    .company-logo {
+        width: 60px;
+        height: 60px;
+        object-fit: contain;
+        border-radius: 8px;
+        background: white;
+        padding: 5px;
+    }
+
+    /* Buttons */
+    .btn-apply {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-apply:hover {
+        background-color: var(--hover-color);
+        color: white;
+        transform: translateY(-2px);
+    }
+
+    .btn-edit {
+        background-color: white;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+        padding: 12px 30px;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit:hover {
+        background-color: var(--primary-color);
+        color: white;
+    }
+
+    /* Content Sections */
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+        color: var(--secondary-color);
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    /* Job Overview */
+    .overview-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
+
+    .overview-item i {
+        color: var(--primary-color);
+        font-size: 20px;
+        width: 24px;
+    }
+
+    .item-content {
+        flex: 1;
+    }
+
+    .item-content label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .item-content span {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+
+    /* Side Sections */
+    .side-section {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .side-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--secondary-color);
+        margin-bottom: 20px;
+    }
+
+    /* Deadline Info */
+    .deadline-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        background-color: #fff8e5;
+        padding: 15px;
+        border-radius: 8px;
+    }
+
+    .deadline-info i {
+        color: #ffc107;
+        font-size: 24px;
+    }
+
+    .deadline-content label {
+        display: block;
+        color: var(--text-muted);
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .deadline-content span {
+        color: var(--secondary-color);
+        font-weight: 600;
+    }
+
+    /* Location Items */
+    .location-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .location-item:last-child {
+        border-bottom: none;
+    }
+
+    .location-item i {
+        color: var(--primary-color);
+    }
+
+    .location-content .street {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .location-content .area {
+        color: var(--text-muted);
+        font-size: 14px;
+        margin: 0;
+    }
+
+    /* Company Info Section */
+    .company-info-section {
+        background: white;
+    }
+
+    .company-details {
+        text-align: center;
+    }
+
+    .company-logo-lg {
+        width: 120px;
+        height: 120px;
+        object-fit: contain;
+        margin-bottom: 15px;
+        border-radius: 12px;
+        padding: 10px;
+        background: white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .company-details h5 {
+        margin-bottom: 15px;
+        color: var(--secondary-color);
+    }
+
+    .company-details p {
+        color: var(--text-muted);
+        margin-bottom: 10px;
+    }
+
+    .company-details i {
+        width: 20px;
+        color: var(--primary-color);
+    }
+
+    .company-details a {
+        color: var(--primary-color);
+        text-decoration: none;
+    }
+
+    .company-details a:hover {
+        text-decoration: underline;
+    }
+
+    /* Modal Styling */
+    .modal-content {
+        border-radius: 12px;
+        border: none;
+    }
+
+    .modal-header {
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 12px 12px 0 0;
+    }
+
+    .modal-body {
+        padding: 25px;
+    }
+
+    .form-control {
+        border-radius: 8px;
+        padding: 12px 15px;
+        border: 1px solid var(--border-color);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(0,177,79,0.25);
+    }
+
+    .form-group label {
+        color: var(--secondary-color);
+        margin-bottom: 8px;
+    }
+
+    .form-group label i {
+        color: var(--primary-color);
+        width: 20px;
+    }
+
+    /* Content Formatting */
+    .section-content {
+        color: var(--secondary-color);
+        line-height: 1.6;
+    }
+
+    .section-content ul {
+        padding-left: 20px;
+    }
+
+    .section-content li {
+        margin-bottom: 10px;
+    }
+
+    .benefits-section ul {
+        list-style: none;
+        padding: 0;
+    }
+
+    .benefits-section li {
+        padding-left: 25px;
+        position: relative;
+        margin-bottom: 12px;
+    }
+
+    .benefits-section li:before {
+        content: '✓';
+        color: var(--primary-color);
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+
+
+    /* Breadcrumb Styles */
+    .breadcrumb-container {
+        background-color: #f8f9fa;
+        padding: 12px 0;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .breadcrumb {
+        margin-bottom: 0;
+        background-color: transparent;
+        padding: 0;
+    }
+
+    .breadcrumb-item {
+        font-size: 14px;
+    }
+
+    .breadcrumb-item a {
+        color:rgb(177, 121, 0);
+        text-decoration: none;
+    }
+
+    .breadcrumb-item a:hover {
+        color: rgb(177, 121, 0);
+        text-decoration: underline;
+    }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #6c757d;
+    }
+
+    /* Job Overview Cards */
+    .job-overview-cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+
+    .overview-card {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .overview-card .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e8f7ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .overview-card .icon-wrapper i {
+        color: #ff6b35;
+        font-size: 18px;
+    }
+
+    .overview-card .info {
+        flex: 1;
+    }
+
+    .overview-card .info label {
+        display: block;
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
+
+    .overview-card .info span {
+        display: block;
+        font-weight: 600;
+        color: #2d2d2d;
+    }
+
+    /* Job Actions */
+    .job-actions {
+        display: flex;
+        gap: 15px;
+    }
+
+    .btn-apply-now {
+        background-color: #ff6b35;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-apply-now:hover {
+        background-color: #ff6b35;
+        transform: translateY(-2px);
+    }
+
+    .btn-save {
+        background-color: white;
+        color: #ff6b35; 
+        padding: 12px 24px;
+        border: 1px solid #ff6b35;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save:hover {
+        background-color: #e8f7ef;
+    }
+
+
+    .job-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 20px;
+    }
+</style>

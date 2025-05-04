@@ -1,0 +1,82 @@
+﻿@model IEnumerable<QuanLyDoanhNghiep.Models.User>
+
+@{
+
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+
+}
+<div class="box"></div>
+<div class="box"></div>
+<h1>Danh sách sinh viên</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                STT
+            </th>
+            <th>
+                Mã sinh vien
+            </th>
+            <th>
+                Họ và tên
+            </th>
+            <th>
+                Ngày sinh
+            </th>
+            <th>
+                Giới tính
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Số điện thoại
+            </th>
+            <th>
+                Tên tài khoản
+            </th>
+
+            <th>
+                chức năng
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var (item, index) in Model.Select((value, i) => (value, i + 1)))
+        {
+            <tr>
+                <td>
+                    @index
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FullName)
+                </td>
+                <td>
+                    @item.DateOfBirth.ToString("dd/MM/yyyy")
+                </td>
+                <td>
+                    @(item.Gender ? "Nữ" : "Nam")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Account.UserName)
+                </td>
+                <td>
+
+                    <a asp-action="Details" asp-route-id="@item.ID">Details</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
