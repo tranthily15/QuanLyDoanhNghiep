@@ -83,7 +83,7 @@ namespace QuanLyDoanhNghiep.Controllers
             var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
 
             var data = await query
-                .OrderByDescending(j => j.CreatedDate)
+                //.OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
@@ -106,7 +106,7 @@ namespace QuanLyDoanhNghiep.Controllers
             var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
 
             var data = await query
-                .OrderByDescending(j => j.CreatedDate)
+                //.OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
