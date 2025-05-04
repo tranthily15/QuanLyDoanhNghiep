@@ -64,34 +64,7 @@
 <div class="container mt-4">
     <h4>Việc làm toàn thời gian</h4>
     <div id="job-list-fulltime" class="row row-cols-1 row-cols-md-3 g-4">
-        
-        @if (Model.FullTimeJobs == null || !Model.FullTimeJobs.Any())
-        {
-            <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
-        }
-        else
-        {
-            @foreach (var item in Model.FullTimeJobs)
-            {
-                <div class="col">
-                    <a asp-action="Details" asp-route-id="@item.PositionID" class="text-decoration-none text-dark position-relative">
-                        <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center">
-                            <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
-                                <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
-                            </div>
-                            <div class="ms-3 flex-grow-1 overflow-hidden">
-                                <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
-                                <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="badge bg-secondary">@item.Salary</span>
-                                    <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(item.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
-        }
+        @await Html.PartialAsync("_JobListPartial", Model.FullTimeJobs)
     </div>
     <nav><ul class="pagination justify-content-center mt-4" id="pagination-fulltime"></ul></nav>
 </div>
@@ -99,33 +72,7 @@
 <div class="container mt-4">
     <h4>Việc làm thực tập</h4>
     <div id="job-list-intern" class="row row-cols-1 row-cols-md-3 g-4">
-        @if (Model.Internships == null || !Model.Internships.Any())
-        {
-            <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
-        }
-        else
-        {
-            @foreach (var item in Model.Internships)
-            {
-                <div class="col">
-                    <a asp-action="Details" asp-route-id="@item.PositionID" class="text-decoration-none text-dark position-relative">
-                        <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center">
-                            <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
-                                <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
-                            </div>
-                            <div class="ms-3 flex-grow-1 overflow-hidden">
-                                <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
-                                <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
-                                <div class="d-flex flex-wrap gap-2">
-                                    <span class="badge bg-secondary">@item.Salary</span>
-                                    <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(item.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
-                                </div>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            }
-        }
+        @await Html.PartialAsync("_JobListPartial", Model.Internships)
     </div>
     <nav><ul class="pagination justify-content-center mt-4" id="pagination-intern"></ul></nav>
 </div>
@@ -163,8 +110,6 @@
         const itemsPerPage = 21;
         let currentPageFullTime = 1;
         let currentPageIntern = 1;
-        let totalPagesFullTime = 1;
-        let totalPagesIntern = 1;
 
         // Hàm phân trang cho job list
         function setupPagination(containerId, paginationId, isInternship) {
@@ -172,12 +117,6 @@
             const cards = container.querySelectorAll('.col');
             const totalItems = cards.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-            if (isInternship) {
-                totalPagesIntern = totalPages;
-            } else {
-                totalPagesFullTime = totalPages;
-            }
 
             // Hàm hiển thị trang
             function showPage(page) {
@@ -193,7 +132,6 @@
                 if (!pagination) return;
 
                 const currentPage = isInternship ? currentPageIntern : currentPageFullTime;
-                const totalPages = isInternship ? totalPagesIntern : totalPagesFullTime;
                 
                 let paginationHtml = `
                     <div class="pagination-container d-flex justify-content-center align-items-center">
@@ -257,7 +195,8 @@
                 data: { page: page },
                 type: 'GET',
                 success: function (result) {
-                    $(`#${containerId}`).html(result);
+                    // Thêm class row vào container trước khi thêm dữ liệu mới
+                    $(`#${containerId}`).html('<div class="row row-cols-1 row-cols-md-3 g-4">' + result + '</div>');
                     setupPagination(containerId, paginationId, isInternship);
                 },
                 error: function () {
