@@ -64,6 +64,7 @@
 <div class="container mt-4">
     <h4>Việc làm toàn thời gian</h4>
     <div id="job-list-fulltime" class="row row-cols-1 row-cols-md-3 g-4">
+        
         @if (Model.FullTimeJobs == null || !Model.FullTimeJobs.Any())
         {
             <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
@@ -160,19 +161,21 @@
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         const itemsPerPage = 21; // Số lượng thẻ mỗi trang
-        let currentPageFullTime = 1; // Trang hiện tại của việc làm toàn thời gian
-        let currentPageIntern = 1; // Trang hiện tại của việc làm thực tập
+        let currentPageFullTime = 1;
+        let currentPageIntern = 1;
 
         // Hàm phân trang cho job list
         function setupPagination(containerId, paginationId, isInternship) {
-            const cards = document.querySelectorAll(`#${containerId} .card.job-card`);
+            const container = document.getElementById(containerId);
+            const cards = container.querySelectorAll('.col');
             const totalItems = cards.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
 
             // Hàm hiển thị trang
-            function showPage(p) {
+            function showPage(page) {
                 cards.forEach((card, index) => {
-                    card.style.display = (index >= (p - 1) * itemsPerPage && index < p * itemsPerPage) ? "block" : "none";
+                    const shouldShow = index >= (page - 1) * itemsPerPage && index < page * itemsPerPage;
+                    card.style.display = shouldShow ? "block" : "none";
                 });
             }
 
@@ -181,35 +184,49 @@
                 const pagination = document.getElementById(paginationId);
                 if (!pagination) return;
 
-                pagination.innerHTML = `
-                    <div class="pagination-container">
-                        <button class="btn btn-sm btn-outline-secondary prev-page" ${currentPageFullTime === 1 ? 'disabled' : ''}>
+                const currentPage = isInternship ? currentPageIntern : currentPageFullTime;
+                
+                let paginationHtml = `
+                    <div class="pagination-container d-flex justify-content-center align-items-center">
+                        <button class="btn btn-sm btn-outline-secondary prev-page me-2" ${currentPage === 1 ? 'disabled' : ''}>
                             <i class="bi bi-chevron-left"></i> Trước
                         </button>
-                        <span class="mx-3">Trang ${isInternship ? currentPageIntern : currentPageFullTime} / ${totalPages}</span>
-                        <button class="btn btn-sm btn-outline-secondary next-page" ${currentPageFullTime === totalPages ? 'disabled' : ''}>
+                        <span class="mx-2">Trang ${currentPage} / ${totalPages}</span>
+                        <button class="btn btn-sm btn-outline-secondary next-page ms-2" ${currentPage === totalPages ? 'disabled' : ''}>
                             Tiếp theo <i class="bi bi-chevron-right"></i>
                         </button>
                     </div>
                 `;
+
+                pagination.innerHTML = paginationHtml;
 
                 const prevBtn = pagination.querySelector('.prev-page');
                 const nextBtn = pagination.querySelector('.next-page');
 
                 if (prevBtn) {
                     prevBtn.onclick = () => {
-                        if (isInternship ? currentPageIntern > 1 : currentPageFullTime > 1) {
-                            isInternship ? currentPageIntern-- : currentPageFullTime--;
-                            loadJobData(isInternship ? currentPageIntern : currentPageFullTime, isInternship);
+                        if (currentPage > 1) {
+                            if (isInternship) {
+                                currentPageIntern--;
+                                loadJobData(currentPageIntern, true);
+                            } else {
+                                currentPageFullTime--;
+                                loadJobData(currentPageFullTime, false);
+                            }
                         }
                     };
                 }
 
                 if (nextBtn) {
                     nextBtn.onclick = () => {
-                        if (isInternship ? currentPageIntern < totalPages : currentPageFullTime < totalPages) {
-                            isInternship ? currentPageIntern++ : currentPageFullTime++;
-                            loadJobData(isInternship ? currentPageIntern : currentPageFullTime, isInternship);
+                        if (currentPage < totalPages) {
+                            if (isInternship) {
+                                currentPageIntern++;
+                                loadJobData(currentPageIntern, true);
+                            } else {
+                                currentPageFullTime++;
+                                loadJobData(currentPageFullTime, false);
+                            }
                         }
                     };
                 }
@@ -223,21 +240,16 @@
         // Hàm tải lại dữ liệu công việc
         function loadJobData(page, isInternship) {
             var url = isInternship ? '/JobPosition/LoadInternships' : '/JobPosition/LoadFullTimeJobs';
+            var containerId = isInternship ? 'job-list-intern' : 'job-list-fulltime';
+            var paginationId = isInternship ? 'pagination-intern' : 'pagination-fulltime';
 
             $.ajax({
                 url: url,
                 data: { page: page },
                 type: 'GET',
                 success: function (result) {
-                    // Cập nhật lại phần hiển thị với dữ liệu mới
-                    if (isInternship) {
-                        $('#job-list-intern').html(result);
-                        currentPageIntern = page;  // Cập nhật trang hiện tại của internships
-                    } else {
-                        $('#job-list-fulltime').html(result);
-                        currentPageFullTime = page;  // Cập nhật trang hiện tại của fulltime jobs
-                    }
-                    setupPagination(isInternship ? 'job-list-intern' : 'job-list-fulltime', isInternship ? 'pagination-intern' : 'pagination-fulltime', isInternship);
+                    $(`#${containerId}`).html(result);
+                    setupPagination(containerId, paginationId, isInternship);
                 },
                 error: function () {
                     alert('Có lỗi xảy ra trong quá trình tải dữ liệu!');
@@ -249,6 +261,4 @@
         setupPagination('job-list-fulltime', 'pagination-fulltime', false);
         setupPagination('job-list-intern', 'pagination-intern', true);
     });
-
-
 </script>

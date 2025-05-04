@@ -9,3 +9,26 @@
     </div>
 }
  *@
+
+@model List<QuanLyDoanhNghiep.Models.JobPosition>
+
+@foreach (var item in Model)
+{
+    <div class="col">
+        <a asp-action="Details" asp-route-id="@item.PositionID" class="text-decoration-none text-dark position-relative">
+            <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center">
+                <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
+                    <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
+                </div>
+                <div class="ms-3 flex-grow-1 overflow-hidden">
+                    <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
+                    <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
+                    <div class="d-flex flex-wrap gap-2">
+                        <span class="badge bg-secondary">@item.Salary</span>
+                        <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(item.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                    </div>
+                </div>
+            </div>
+        </a>
+    </div>
+}

@@ -75,13 +75,14 @@ namespace QuanLyDoanhNghiep.Controllers
             const int PageSize = 21;
             var data = await _context.JobPosition
                 .Include(j => j.Company)
-                .Include(j => j.JobLocations).ThenInclude(l => l.Province)
+                .Include(j => j.JobLocations)
+                    .ThenInclude(l => l.Province)
                 .Where(j => j.Status && j.PositionType)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            return PartialView("_FullTimeJobsList", data);
+            return PartialView("_JobListPartial", data);
         }
 
         public async Task<IActionResult> LoadInternships(int page = 1)
@@ -89,13 +90,14 @@ namespace QuanLyDoanhNghiep.Controllers
             const int PageSize = 21;
             var data = await _context.JobPosition
                 .Include(j => j.Company)
-                .Include(j => j.JobLocations).ThenInclude(l => l.Province)
+                .Include(j => j.JobLocations)
+                    .ThenInclude(l => l.Province)
                 .Where(j => j.Status && !j.PositionType)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            return PartialView("_InternshipsList", data);
+            return PartialView("_JobListPartial", data);
         }
 
 
