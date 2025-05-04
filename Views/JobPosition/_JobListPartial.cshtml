@@ -12,12 +12,12 @@
 
 @model List<QuanLyDoanhNghiep.Models.JobPosition>
 
-@{
-    var totalPages = ViewBag.TotalPages ?? 1;
-    var currentPage = ViewBag.CurrentPage ?? 1;
+@if (Model == null || !Model.Any())
+{
+    <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
 }
-
-<div class="row row-cols-1 row-cols-md-3 g-4">
+else
+{
     @foreach (var item in Model)
     {
         <div class="col">
@@ -38,6 +38,4 @@
             </a>
         </div>
     }
-</div>
-
-<div class="pagination-info d-none" data-total-pages="@totalPages" data-current-page="@currentPage"></div>
+}

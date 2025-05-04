@@ -82,14 +82,16 @@ namespace QuanLyDoanhNghiep.Controllers
             var totalItems = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
 
+            // Đảm bảo page không vượt quá totalPages
+            page = Math.Min(page, totalPages);
+            page = Math.Max(1, page);
+
             var data = await query
                 .OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            ViewBag.TotalPages = totalPages;
-            ViewBag.CurrentPage = page;
             return PartialView("_JobListPartial", data);
         }
 
@@ -105,14 +107,16 @@ namespace QuanLyDoanhNghiep.Controllers
             var totalItems = await query.CountAsync();
             var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
 
+            // Đảm bảo page không vượt quá totalPages
+            page = Math.Min(page, totalPages);
+            page = Math.Max(1, page);
+
             var data = await query
                 .OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            ViewBag.TotalPages = totalPages;
-            ViewBag.CurrentPage = page;
             return PartialView("_JobListPartial", data);
         }
 
