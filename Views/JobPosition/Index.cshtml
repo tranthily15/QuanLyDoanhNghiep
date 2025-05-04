@@ -160,9 +160,11 @@
 <!-- JavaScript for pagination -->
 <script>
     document.addEventListener("DOMContentLoaded", function () {
-        const itemsPerPage = 21; // Số lượng thẻ mỗi trang
+        const itemsPerPage = 21;
         let currentPageFullTime = 1;
         let currentPageIntern = 1;
+        let totalPagesFullTime = 1;
+        let totalPagesIntern = 1;
 
         // Hàm phân trang cho job list
         function setupPagination(containerId, paginationId, isInternship) {
@@ -170,6 +172,12 @@
             const cards = container.querySelectorAll('.col');
             const totalItems = cards.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+            if (isInternship) {
+                totalPagesIntern = totalPages;
+            } else {
+                totalPagesFullTime = totalPages;
+            }
 
             // Hàm hiển thị trang
             function showPage(page) {
@@ -185,6 +193,7 @@
                 if (!pagination) return;
 
                 const currentPage = isInternship ? currentPageIntern : currentPageFullTime;
+                const totalPages = isInternship ? totalPagesIntern : totalPagesFullTime;
                 
                 let paginationHtml = `
                     <div class="pagination-container d-flex justify-content-center align-items-center">

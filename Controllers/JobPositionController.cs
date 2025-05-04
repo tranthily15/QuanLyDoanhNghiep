@@ -73,30 +73,46 @@ namespace QuanLyDoanhNghiep.Controllers
         public async Task<IActionResult> LoadFullTimeJobs(int page = 1)
         {
             const int PageSize = 21;
-            var data = await _context.JobPosition
+            var query = _context.JobPosition
                 .Include(j => j.Company)
                 .Include(j => j.JobLocations)
                     .ThenInclude(l => l.Province)
-                .Where(j => j.Status && j.PositionType)
+                .Where(j => j.Status && j.PositionType);
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+
+            var data = await query
+                .OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
             return PartialView("_JobListPartial", data);
         }
 
         public async Task<IActionResult> LoadInternships(int page = 1)
         {
             const int PageSize = 21;
-            var data = await _context.JobPosition
+            var query = _context.JobPosition
                 .Include(j => j.Company)
                 .Include(j => j.JobLocations)
                     .ThenInclude(l => l.Province)
-                .Where(j => j.Status && !j.PositionType)
+                .Where(j => j.Status && !j.PositionType);
+
+            var totalItems = await query.CountAsync();
+            var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+
+            var data = await query
+                .OrderByDescending(j => j.CreatedDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
+            ViewBag.TotalPages = totalPages;
+            ViewBag.CurrentPage = page;
             return PartialView("_JobListPartial", data);
         }
 
