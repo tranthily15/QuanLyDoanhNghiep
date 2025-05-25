@@ -4,7 +4,7 @@
     ViewData["Title"] = "Chỉnh sửa vị trí tuyển dụng";
     var provinces = ViewBag.Provinces as List<Province> ?? new List<Province>();
 }
-<div class="box"></div>   
+<div class="box"></div>
 <div class="container mt-5">
     @if (!ViewData.ModelState.IsValid)
     {
@@ -102,7 +102,8 @@
 
                         <div class="form-group mb-3">
                             <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc</label>
-                            <div id="editor-job-requirements" class="quill-editor">@Html.Raw(Model.JobRequirements)</div>
+                            <div id="editor-job-requirements" class="quill-editor">@Html.Raw(Model.JobRequirements)
+                            </div>
                             <input type="hidden" asp-for="JobRequirements" id="jobRequirements" required />
                             <span asp-validation-for="JobRequirements" class="text-danger"></span>
                         </div>
@@ -122,7 +123,7 @@
                                     for (int i = 0; i < Model.JobLocations.Count; i++)
                                     {
                                         var location = Model.JobLocations[i];
-                                        <div class="job-location-item card mb-3">
+                                        <div class="job-location-item card mb-3" data-location-id="@location.JobLocationID">
                                             <div class="card-body">
                                                 <input type="hidden" name="JobLocations[@i].LocationID" value="@location.JobLocationID" />
                                                 <div class="mb-3">
@@ -151,7 +152,7 @@
                                                     <label class="form-label">Địa chỉ cụ thể</label>
                                                     <input type="text" class="form-control" name="JobLocations[@i].Street" value="@location.Street" required />
                                                 </div>
-                                                <button type="button" class="btn btn-danger remove-location">
+                                                <button type="button" class="btn btn-danger remove-location" data-location-id="@location.JobLocationID">
                                                     <i class="fas fa-trash-alt"></i> Xóa địa chỉ
                                                 </button>
                                             </div>
@@ -164,7 +165,8 @@
                                         <div class="card-body">
                                             <div class="mb-3">
                                                 <label class="form-label">Tỉnh/Thành phố</label>
-                                                <select class="form-select province-dropdown" name="JobLocations[0].ProvinceID" required>
+                                                <select class="form-select province-dropdown"
+                                                    name="JobLocations[0].ProvinceID" required>
                                                     <option value="">-- Chọn tỉnh/thành phố --</option>
                                                     @foreach (var province in provinces)
                                                     {
@@ -174,19 +176,22 @@
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Quận/Huyện</label>
-                                                <select class="form-select district-dropdown" name="JobLocations[0].DistrictID" required>
+                                                <select class="form-select district-dropdown"
+                                                    name="JobLocations[0].DistrictID" required>
                                                     <option value="">-- Chọn quận/huyện --</option>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Phường/Xã</label>
-                                                <select class="form-select ward-dropdown" name="JobLocations[0].WardID" required>
+                                                <select class="form-select ward-dropdown" name="JobLocations[0].WardID"
+                                                    required>
                                                     <option value="">-- Chọn phường/xã --</option>
                                                 </select>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Địa chỉ cụ thể</label>
-                                                <input type="text" class="form-control" name="JobLocations[0].Street" required />
+                                                <input type="text" class="form-control" name="JobLocations[0].Street"
+                                                    required />
                                             </div>
                                             <button type="button" class="btn btn-danger remove-location">
                                                 <i class="fas fa-trash-alt"></i> Xóa địa chỉ
@@ -228,11 +233,13 @@
                                 </div>
                                 <div class="overview-card">
                                     <div class="icon-wrapper"><i class="fas fa-map-marker-alt"></i></div>
-                                    <div class="info"><label>Địa điểm</label><span id="preview-locations-short"></span></div>
+                                    <div class="info"><label>Địa điểm</label><span id="preview-locations-short"></span>
+                                    </div>
                                 </div>
                                 <div class="overview-card">
                                     <div class="icon-wrapper"><i class="fas fa-clock"></i></div>
-                                    <div class="info"><label>Thời gian làm việc</label><span id="preview-time-work"></span></div>
+                                    <div class="info"><label>Thời gian làm việc</label><span
+                                            id="preview-time-work"></span></div>
                                 </div>
                             </div>
                             <div class="content-section">
@@ -242,13 +249,15 @@
                                         <div class="col-md-6">
                                             <div class="overview-item">
                                                 <i class="fas fa-users"></i>
-                                                <div class="item-content"><label>Số lượng tuyển</label><span><span id="preview-vacancies"></span> người</span></div>
+                                                <div class="item-content"><label>Số lượng tuyển</label><span><span
+                                                            id="preview-vacancies"></span> người</span></div>
                                             </div>
                                         </div>
                                         <div class="col-md-6">
                                             <div class="overview-item">
                                                 <i class="fas fa-briefcase"></i>
-                                                <div class="item-content"><label>Hình thức</label><span id="preview-position-type"></span></div>
+                                                <div class="item-content"><label>Hình thức</label><span
+                                                        id="preview-position-type"></span></div>
                                             </div>
                                         </div>
                                     </div>
@@ -290,40 +299,185 @@
             position: sticky;
             top: 20px;
         }
-        .content-section { background: white; border-radius: 12px; padding: 25px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .section-title { color: #2d2d2d; font-size: 20px; font-weight: 600; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #e9ecef; }
-        .job-overview-cards { display: flex; gap: 15px; flex-wrap: wrap; }
-        .overview-card { flex: 1; min-width: 180px; display: flex; align-items: center; gap: 15px; padding: 15px; background-color: #f8f9fa; border-radius: 8px; border: 1px solid #e9ecef; }
-        .overview-card .icon-wrapper { width: 40px; height: 40px; border-radius: 50%; background-color: #e8f7ef; display: flex; align-items: center; justify-content: center; }
-        .overview-card .icon-wrapper i { color: #ff6b35; font-size: 18px; }
-        .overview-card .info label { display: block; font-size: 13px; color: #6c757d; margin-bottom: 4px; }
-        .overview-card .info span { display: block; font-weight: 600; color: #2d2d2d; }
-        .overview-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; }
-        .overview-item i { color: #ff6b35; font-size: 20px; width: 24px; }
-        .item-content label { display: block; color: #6c757d; font-size: 14px; margin-bottom: 5px; }
-        .item-content span { color: #2d2d2d; font-weight: 500; }
-        .location-list { display: flex; flex-direction: column; gap: 15px; }
-        .location-item { display: flex; align-items: flex-start; gap: 15px; padding: 15px; border-bottom: 1px solid #e9ecef; }
-        .location-item:last-child { border-bottom: none; }
-        .location-item i { color: #ff6b35; margin-top: 3px; }
-        .location-content .street { font-weight: 500; margin-bottom: 5px; }
-        .location-content .area { color: #6c757d; font-size: 14px; margin: 0; }
-        .job-title { font-size: 24px; font-weight: 700; color: #2d2d2d; margin-bottom: 20px; }
-        .section-content { color: #2d2d2d; line-height: 1.6; }
-        .benefits-section ul { list-style: none; padding: 0; }
-        .benefits-section li { padding-left: 25px; position: relative; margin-bottom: 12px; }
-        .benefits-section li:before { content: '\2713'; color: #ff6b35; position: absolute; left: 0; font-weight: bold; }
-        .quill-editor { height: 150px; margin-bottom: 10px; background-color: white; }
-        .form-footer { margin-top: 30px; }
-         #jobLocations .card { background-color: #f8f9fa; } /* Slightly different bg for location cards */
-         #jobLocations .remove-location {
+
+        .content-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .section-title {
+            color: #2d2d2d;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .job-overview-cards {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .overview-card {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .overview-card .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e8f7ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .overview-card .icon-wrapper i {
+            color: #ff6b35;
+            font-size: 18px;
+        }
+
+        .overview-card .info label {
+            display: block;
+            font-size: 13px;
+            color: #6c757d;
+            margin-bottom: 4px;
+        }
+
+        .overview-card .info span {
+            display: block;
+            font-weight: 600;
+            color: #2d2d2d;
+        }
+
+        .overview-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .overview-item i {
+            color: #ff6b35;
+            font-size: 20px;
+            width: 24px;
+        }
+
+        .item-content label {
+            display: block;
+            color: #6c757d;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .item-content span {
+            color: #2d2d2d;
+            font-weight: 500;
+        }
+
+        .location-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .location-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .location-item:last-child {
+            border-bottom: none;
+        }
+
+        .location-item i {
+            color: #ff6b35;
+            margin-top: 3px;
+        }
+
+        .location-content .street {
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .location-content .area {
+            color: #6c757d;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .job-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2d2d2d;
+            margin-bottom: 20px;
+        }
+
+        .section-content {
+            color: #2d2d2d;
+            line-height: 1.6;
+        }
+
+        .benefits-section ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .benefits-section li {
+            padding-left: 25px;
+            position: relative;
+            margin-bottom: 12px;
+        }
+
+        .benefits-section li:before {
+            content: '\2713';
+            color: #ff6b35;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .quill-editor {
+            height: 150px;
+            margin-bottom: 10px;
+            background-color: white;
+        }
+
+        .form-footer {
+            margin-top: 30px;
+        }
+
+        #jobLocations .card {
+            background-color: #f8f9fa;
+        }
+
+        /* Slightly different bg for location cards */
+        #jobLocations .remove-location {
             float: right;
-         }
+        }
     </style>
 }
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
     <script>
         // Initialize Quill editors
@@ -342,12 +496,12 @@
             $('#preview-vacancies').text($('#Vacancies').val() || '0');
             $('#preview-time-work').text($('#TimeWork').val() || 'Chưa cập nhật');
             $('#preview-salary').text($('#Salary').val() || 'Thỏa thuận');
-            
+
             // Update Quill content previews
             $('#preview-description').html(quillDescription.root.innerHTML);
             $('#preview-requirements').html(quillRequirements.root.innerHTML);
             $('#preview-benefits').html(quillBenefits.root.innerHTML);
-            
+
             // Update status preview
             var statusVal = $('select[name="Status"]').val();
             var statusText = statusVal === 'true' ? '<span class="badge bg-success">Đang tuyển</span>' : '<span class="badge bg-secondary">Đã tắt</span>';
@@ -356,26 +510,26 @@
             // Update locations preview
             var locations = [];
             var firstLocation = '';
-            $('.job-location-item').each(function(index) {
+            $('.job-location-item').each(function (index) {
                 var provinceText = $(this).find('.province-dropdown option:selected').text();
                 var districtText = $(this).find('.district-dropdown option:selected').text();
                 var wardText = $(this).find('.ward-dropdown option:selected').text();
                 var street = $(this).find('input[name$=".Street"]').val();
                 var provinceVal = $(this).find('.province-dropdown').val();
-                
-                if(provinceVal && provinceText && districtText && wardText && street && provinceText !== '-- Chọn tỉnh/thành phố --') {
-                    if(index === 0) {
+
+                if (provinceVal && provinceText && districtText && wardText && street && provinceText !== '-- Chọn tỉnh/thành phố --') {
+                    if (index === 0) {
                         firstLocation = provinceText;
                     }
                     var locationHtml = `
-                        <div class="location-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="location-content">
-                                <p class="street">${street}</p>
-                                <p class="area">${wardText}, ${districtText}, ${provinceText}</p>
+                            <div class="location-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <div class="location-content">
+                                    <p class="street">${street}</p>
+                                    <p class="area">${wardText}, ${districtText}, ${provinceText}</p>
+                                </div>
                             </div>
-                        </div>
-                    `;
+                        `;
                     locations.push(locationHtml);
                 }
             });
@@ -411,8 +565,8 @@
         var locationIndex = @(Model.JobLocations?.Count ?? 1); // Start index from existing count
 
         function updateLocationIndices() {
-            $('#jobLocations .job-location-item').each(function(i) {
-                $(this).find('input, select').each(function() {
+            $('#jobLocations .job-location-item').each(function (i) {
+                $(this).find('input, select').each(function () {
                     var name = $(this).attr('name');
                     if (name) {
                         $(this).attr('name', name.replace(/[\d+|template]/, '[' + i + ']'));
@@ -422,13 +576,13 @@
             locationIndex = $('#jobLocations .job-location-item').length;
         }
 
-        $('#addLocation').click(function() {
+        $('#addLocation').click(function () {
             // Clone the FIRST item as a template, even if it came from the server
-            var template = $('#jobLocations .job-location-item').first().clone(); 
-            
+            var template = $('#jobLocations .job-location-item').first().clone();
+
             // Clear values and selected state for the new item
             template.find('input[type="text"], input[type="hidden"][name$=".LocationID"]').val(''); // Clear text and hidden ID
-            template.find('select').each(function() {
+            template.find('select').each(function () {
                 $(this).prop('selectedIndex', 0); // Reset dropdowns
                 $(this).removeAttr('data-selected'); // Remove selected data attributes
                 if ($(this).hasClass('district-dropdown') || $(this).hasClass('ward-dropdown')) {
@@ -436,7 +590,7 @@
                 }
             });
             // Update the name index before appending
-            template.find('input, select').each(function() {
+            template.find('input, select').each(function () {
                 var name = $(this).attr('name');
                 if (name) {
                     $(this).attr('name', name.replace(/\[\d+\]/, '[' + locationIndex + ']'));
@@ -448,13 +602,31 @@
             updatePreview(); // Update preview after adding
         });
 
-        $(document).on('click', '.remove-location', function() {
-            if ($('#jobLocations .job-location-item').length > 1) {
-                $(this).closest('.job-location-item').remove();
-                updateLocationIndices(); // Renumber remaining items
-                updatePreview();
+        $(document).on('click', '.remove-location', function () {
+            var locationId = $(this).data('location-id');
+            var locationCard = $(this).closest('.job-location-item');
+
+            if (locationId) {
+                // Gửi yêu cầu AJAX để xóa JobLocation
+                $.ajax({
+                    url: '/JobPosition/DeleteJobLocation',
+                    type: 'POST',
+                    data: { locationId: locationId },
+                    success: function (response) {
+                        if (response.success) {
+                            alert(response.message);
+                            locationCard.remove(); // Xóa phần tử khỏi giao diện
+                        } else {
+                            alert(response.message);
+                        }
+                    },
+                    error: function () {
+                        alert('Có lỗi xảy ra khi xóa địa điểm.');
+                    }
+                });
             } else {
-                alert('Phải có ít nhất một địa chỉ.');
+                // Nếu không có ID (địa điểm chưa lưu), chỉ cần xóa khỏi giao diện
+                locationCard.remove();
             }
         });
 
@@ -463,16 +635,16 @@
             var provinceId = $(provinceDropdown).val();
             var districtDropdown = $(provinceDropdown).closest('.job-location-item').find('.district-dropdown');
             var wardDropdown = $(provinceDropdown).closest('.job-location-item').find('.ward-dropdown');
-            
+
             districtDropdown.empty().append('<option value="">-- Đang tải... --</option>');
             wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
-            
+
             if (provinceId) {
-                $.get('@Url.Action("GetDistricts", "JobPosition")', { provinceId: provinceId }, function(districts) {
+                $.get('@Url.Action("GetDistricts", "JobPosition")', { provinceId: provinceId }, function (districts) {
                     districtDropdown.empty().append('<option value="">-- Chọn quận/huyện --</option>');
-                    districts.forEach(function(district) {
+                    districts.forEach(function (district) {
                         var option = $('<option></option>').attr('value', district.districtID).text(district.districtName);
-                        if(selectedDistrictId && district.districtID == selectedDistrictId) {
+                        if (selectedDistrictId && district.districtID == selectedDistrictId) {
                             option.prop('selected', true);
                         }
                         districtDropdown.append(option);
@@ -481,7 +653,7 @@
                     if (selectedDistrictId) {
                         districtDropdown.trigger('change');
                     }
-                }).fail(function() {
+                }).fail(function () {
                     districtDropdown.empty().append('<option value="">-- Lỗi tải --</option>');
                 });
             }
@@ -490,69 +662,69 @@
         function fetchWards(districtDropdown, selectedWardId = null) {
             var districtId = $(districtDropdown).val();
             var wardDropdown = $(districtDropdown).closest('.job-location-item').find('.ward-dropdown');
-            
+
             wardDropdown.empty().append('<option value="">-- Đang tải... --</option>');
-            
+
             if (districtId) {
-                $.get('@Url.Action("GetWards", "JobPosition")', { districtId: districtId }, function(wards) {
+                $.get('@Url.Action("GetWards", "JobPosition")', { districtId: districtId }, function (wards) {
                     wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
-                    wards.forEach(function(ward) {
+                    wards.forEach(function (ward) {
                         var option = $('<option></option>').attr('value', ward.wardID).text(ward.wardName);
-                        if(selectedWardId && ward.wardID == selectedWardId) {
+                        if (selectedWardId && ward.wardID == selectedWardId) {
                             option.prop('selected', true);
                         }
                         wardDropdown.append(option);
                     });
                     updatePreview(); // Update preview after wards are loaded/selected
-                }).fail(function() {
+                }).fail(function () {
                     wardDropdown.empty().append('<option value="">-- Lỗi tải --</option>');
                 });
             }
         }
 
         // Initial load for existing locations
-        $('.province-dropdown').each(function() {
+        $('.province-dropdown').each(function () {
             var selectedDistrictId = $(this).closest('.job-location-item').find('.district-dropdown').data('selected');
             if ($(this).val()) { // Only fetch if a province is selected
                 fetchDistricts(this, selectedDistrictId);
             }
         });
-        
+
         // Need slight delay for district change to trigger ward fetch correctly on initial load
         // This depends on fetchDistricts completing and triggering change
         // Let's add a direct call within fetchDistricts completion for initial load
-        
+
         // Use event delegation for dynamically added elements
-        $(document).on('change', '.province-dropdown', function() {
+        $(document).on('change', '.province-dropdown', function () {
             fetchDistricts(this);
-            updatePreview(); 
+            updatePreview();
         });
 
-        $(document).on('change', '.district-dropdown', function() {
+        $(document).on('change', '.district-dropdown', function () {
             var selectedWardId = $(this).closest('.job-location-item').find('.ward-dropdown').data('selected');
             // Clear data-selected after initial use if needed, or handle in fetchWards
             fetchWards(this, selectedWardId);
             // $(this).closest('.job-location-item').find('.ward-dropdown').removeData('selected'); // Optional: clear after use
             updatePreview();
         });
-        
-        $(document).on('change', '.ward-dropdown', function() {
+
+        $(document).on('change', '.ward-dropdown', function () {
             updatePreview(); // Update preview when ward changes
         });
 
         // Update hidden fields before form submission
-        $('#jobPositionForm').submit(function(event) {
+        $('#jobPositionForm').submit(function (event) {
             // Update Quill hidden fields
             $('#jobDescription').val(quillDescription.root.innerHTML);
             $('#jobRequirements').val(quillRequirements.root.innerHTML);
             $('#jobBenefits').val(quillBenefits.root.innerHTML);
 
             // Simple Quill validation (check if empty)
-            if (quillDescription.getText().trim().length === 0 || 
-                quillRequirements.getText().trim().length === 0 || 
+            if (quillDescription.getText().trim().length === 0 ||
+                quillRequirements.getText().trim().length === 0 ||
                 quillBenefits.getText().trim().length === 0) {
                 alert('Vui lòng điền đầy đủ thông tin Mô tả, Yêu cầu và Quyền lợi.');
-                event.preventDefault(); 
+                event.preventDefault();
                 return false;
             }
 
@@ -564,10 +736,10 @@
                 event.preventDefault();
                 return false;
             }
-            
+
             // Location validation (ensure at least one valid location exists)
             let validLocationExists = false;
-            $('#jobLocations .job-location-item').each(function() {
+            $('#jobLocations .job-location-item').each(function () {
                 const province = $(this).find('.province-dropdown').val();
                 const district = $(this).find('.district-dropdown').val();
                 const ward = $(this).find('.ward-dropdown').val();
@@ -586,11 +758,11 @@
         });
 
         // Initial preview update on page load
-        $(document).ready(function() {
+        $(document).ready(function () {
             updatePreview();
             // Trigger ward fetch for pre-selected districts after initial district load
-            setTimeout(function() { // Use timeout to ensure districts are loaded
-                $('.district-dropdown').each(function() {
+            setTimeout(function () { // Use timeout to ensure districts are loaded
+                $('.district-dropdown').each(function () {
                     var selectedWardId = $(this).closest('.job-location-item').find('.ward-dropdown').data('selected');
                     if ($(this).val() && selectedWardId) {
                         fetchWards(this, selectedWardId);

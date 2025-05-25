@@ -2,8 +2,11 @@
 
 @{
     ViewData["Title"] = "Chi tiết công việc";
+    var isSaved = ViewBag.IsSaved ?? false;
 }
-<div class="box"></div>
+
+@Html.AntiForgeryToken()
+
 <div class="box"></div>
 
 <div class="job-details-page">
@@ -31,25 +34,30 @@
                     <div class="job-title-section">
                         <div class="company-name">
                             <a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })">
-                                <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo" onerror="this.src='/img/company-default.png'"/>
+                                <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo" onerror="this.src='/img/company-default.png'" />
                             </a>
                             <h2><a @* href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })" *@ style="text-decoration: none; color: inherit;">@Model.PositionName</a></h2>
                         </div>
                     </div>
                 </div>
                 <div class="col-md-4 text-end">
-                    @if (ViewBag.Role == "2")
-                    {
-                        <button class="btn btn-apply-now" onclick="showApplyModal()">
-                            <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
-                        </button>
-                    }
-                    @if (ViewBag.Role == "1")
-                    {
-                        <a href="@Url.Action("Edit", new { id = Model.PositionID })" class="btn btn-edit">
-                            <i class="fas fa-edit"></i> Chỉnh sửa
-                        </a>
-                    }
+                    <div class="job-actions">
+                        @if (ViewBag.Role == "2")
+                        {
+                            <button class="btn btn-apply-now" onclick="showApplyModal()">
+                                <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
+                            </button>
+                            <button class="btn btn-save @(isSaved ? "saved" : "")" onclick="toggleSaveJob(@Model.PositionID)">
+                                <i class="fas fa-bookmark"></i> @(isSaved ? "Hủy lưu" : "Lưu việc làm")
+                            </button>
+                        }
+                        @if (ViewBag.Role == "1")
+                        {
+                            <a href="@Url.Action("Edit", new { id = Model.PositionID })" class="btn btn-edit">
+                                <i class="fas fa-edit"></i> Chỉnh sửa
+                            </a>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -62,7 +70,7 @@
             <div class="col-md-8">
                 <!-- Job Title and Basic Info -->
                 @* <h1 class="job-title mb-4">@Model.PositionName</h1> *@
-                
+
                 <!-- Job Overview Cards -->
                 <div class="job-overview-cards mb-4">
                     <div class="overview-card">
@@ -94,13 +102,13 @@
                     </div>
                 </div>
 
-               @*  <div class="job-actions mb-4">
-                    <button class="btn btn-apply-now" onclick="showApplyModal()">
-                        <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
-                    </button>
-                    <!-- <button class="btn btn-save @(ViewBag.IsSaved ? "saved" : "")" onclick="toggleSave()">
-                        <i class="@(ViewBag.IsSaved ? "fas" : "far") fa-heart"></i> @(ViewBag.IsSaved ? "Đã lưu" : "Lưu tin")
-                    </button> --> 
+                @*  <div class="job-actions mb-4">
+                <button class="btn btn-apply-now" onclick="showApplyModal()">
+                <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
+                </button>
+                <!-- <button class="btn btn-save @(ViewBag.IsSaved ? "saved" : "")" onclick="toggleSave()">
+                <i class="@(ViewBag.IsSaved ? "fas" : "far") fa-heart"></i> @(ViewBag.IsSaved ? "Đã lưu" : "Lưu tin")
+                </button> -->
                 </div> *@
 
                 <!-- Job Overview -->
@@ -204,7 +212,7 @@
                     <h4 class="side-title">Thông tin công ty</h4>
                     <div class="company-details">
                         <a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })">
-                           <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo-lg" onerror="this.src='/img/company-default.png'"/>
+                            <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo-lg" onerror="this.src='/img/company-default.png'" />
                         </a>
                         <h5><a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })" style="text-decoration: none; color: inherit;">@Model.Company.CompanyName</a></h5>
                         @* <p><i class="fas fa-globe"></i> <a href="@Model.Company.Website" target="_blank">Website công ty</a></p> *@
@@ -262,38 +270,58 @@
     </div>
 }
 
-<script>
-function goBack() {
-    // Nếu có returnUrl trong ViewBag
-    @if (ViewBag.ReturnUrl != null)
-    {
-        <text>
-        window.location.href = '@ViewBag.ReturnUrl';
-        </text>
-    }
-    // Nếu không có returnUrl, sử dụng history.back()
-    else
-    {
-        <text>
-        if(document.referrer) {
-            window.location.href = document.referrer;
-        } else {
-            window.location.href = '@Url.Action("Index", "JobPosition")';
+@section Scripts {
+    <script>
+        function showApplyModal() {
+            $('#applyModal').modal('show');
         }
-        </text>
-    }
-}
 
-function showApplyModal() {
-    // Implement your modal show logic
-    $('#applyModal').modal('show');
-}
+        function toggleSaveJob(positionId) {
+            var button = $('.btn-save');
+            var isCurrentlySaved = button.hasClass('saved');
+            var token = $('input[name="__RequestVerificationToken"]').val();
 
-function toggleSave() {
-    // Implement your save logic
-    $(this).toggleClass('saved');
+            // Disable button during request
+            button.prop('disabled', true);
+
+            $.ajax({
+                url: isCurrentlySaved ? '/JobPosition/UnsaveJob' : '/JobPosition/SaveJob',
+                type: 'POST',
+                data: {
+                    positionId: positionId,
+                    __RequestVerificationToken: token
+                },
+                success: function (response) {
+                    if (response.success) {
+                        if (isCurrentlySaved) {
+                            button.removeClass('saved').html('<i class="fas fa-bookmark"></i> Lưu việc làm');
+                        } else {
+                            button.addClass('saved').html('<i class="fas fa-bookmark"></i> Hủy lưu');
+                        }
+                        // Show success message
+                        alert(response.message);
+                    } else {
+                        // Show error message
+                        alert(response.message || 'Có lỗi xảy ra khi thực hiện thao tác.');
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error:', error);
+                    // Show more detailed error message
+                    var errorMessage = 'Có lỗi xảy ra khi thực hiện thao tác.';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    alert(errorMessage);
+                },
+                complete: function () {
+                    // Re-enable button after request completes
+                    button.prop('disabled', false);
+                }
+            });
+        }
+    </script>
 }
-</script>
 
 <style>
     :root {
@@ -326,11 +354,11 @@ function toggleSave() {
         gap: 15px;
     }
 
-    .company-name h2 {
-        font-size: 20px;
-        margin: 0;
-        color: var(--text-muted);
-    }
+        .company-name h2 {
+            font-size: 20px;
+            margin: 0;
+            color: var(--text-muted);
+        }
 
     .company-logo {
         width: 60px;
@@ -352,11 +380,11 @@ function toggleSave() {
         transition: all 0.3s ease;
     }
 
-    .btn-apply:hover {
-        background-color: var(--hover-color);
-        color: white;
-        transform: translateY(-2px);
-    }
+        .btn-apply:hover {
+            background-color: var(--hover-color);
+            color: white;
+            transform: translateY(-2px);
+        }
 
     .btn-edit {
         background-color: white;
@@ -368,10 +396,10 @@ function toggleSave() {
         transition: all 0.3s ease;
     }
 
-    .btn-edit:hover {
-        background-color: var(--primary-color);
-        color: white;
-    }
+        .btn-edit:hover {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
     /* Content Sections */
     .content-section {
@@ -399,27 +427,27 @@ function toggleSave() {
         margin-bottom: 20px;
     }
 
-    .overview-item i {
-        color: var(--primary-color);
-        font-size: 20px;
-        width: 24px;
-    }
+        .overview-item i {
+            color: var(--primary-color);
+            font-size: 20px;
+            width: 24px;
+        }
 
     .item-content {
         flex: 1;
     }
 
-    .item-content label {
-        display: block;
-        color: var(--text-muted);
-        font-size: 14px;
-        margin-bottom: 5px;
-    }
+        .item-content label {
+            display: block;
+            color: var(--text-muted);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
 
-    .item-content span {
-        color: var(--secondary-color);
-        font-weight: 500;
-    }
+        .item-content span {
+            color: var(--secondary-color);
+            font-weight: 500;
+        }
 
     /* Side Sections */
     .side-section {
@@ -447,10 +475,10 @@ function toggleSave() {
         border-radius: 8px;
     }
 
-    .deadline-info i {
-        color: #ffc107;
-        font-size: 24px;
-    }
+        .deadline-info i {
+            color: #ffc107;
+            font-size: 24px;
+        }
 
     .deadline-content label {
         display: block;
@@ -473,13 +501,13 @@ function toggleSave() {
         border-bottom: 1px solid var(--border-color);
     }
 
-    .location-item:last-child {
-        border-bottom: none;
-    }
+        .location-item:last-child {
+            border-bottom: none;
+        }
 
-    .location-item i {
-        color: var(--primary-color);
-    }
+        .location-item i {
+            color: var(--primary-color);
+        }
 
     .location-content .street {
         font-weight: 500;
@@ -532,9 +560,9 @@ function toggleSave() {
         text-decoration: none;
     }
 
-    .company-details a:hover {
-        text-decoration: underline;
-    }
+        .company-details a:hover {
+            text-decoration: underline;
+        }
 
     /* Modal Styling */
     .modal-content {
@@ -558,20 +586,20 @@ function toggleSave() {
         border: 1px solid var(--border-color);
     }
 
-    .form-control:focus {
-        border-color: var(--primary-color);
-        box-shadow: 0 0 0 0.2rem rgba(0,177,79,0.25);
-    }
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(0,177,79,0.25);
+        }
 
     .form-group label {
         color: var(--secondary-color);
         margin-bottom: 8px;
     }
 
-    .form-group label i {
-        color: var(--primary-color);
-        width: 20px;
-    }
+        .form-group label i {
+            color: var(--primary-color);
+            width: 20px;
+        }
 
     /* Content Formatting */
     .section-content {
@@ -579,13 +607,13 @@ function toggleSave() {
         line-height: 1.6;
     }
 
-    .section-content ul {
-        padding-left: 20px;
-    }
+        .section-content ul {
+            padding-left: 20px;
+        }
 
-    .section-content li {
-        margin-bottom: 10px;
-    }
+        .section-content li {
+            margin-bottom: 10px;
+        }
 
     .benefits-section ul {
         list-style: none;
@@ -598,13 +626,13 @@ function toggleSave() {
         margin-bottom: 12px;
     }
 
-    .benefits-section li:before {
-        content: '✓';
-        color: var(--primary-color);
-        position: absolute;
-        left: 0;
-        font-weight: bold;
-    }
+        .benefits-section li:before {
+            content: '✓';
+            color: var(--primary-color);
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
 
 
     /* Breadcrumb Styles */
@@ -624,24 +652,24 @@ function toggleSave() {
         font-size: 14px;
     }
 
-    .breadcrumb-item a {
-        color:rgb(177, 121, 0);
-        text-decoration: none;
-    }
+        .breadcrumb-item a {
+            color: rgb(177, 121, 0);
+            text-decoration: none;
+        }
 
-    .breadcrumb-item a:hover {
-        color: rgb(177, 121, 0);
-        text-decoration: underline;
-    }
+            .breadcrumb-item a:hover {
+                color: rgb(177, 121, 0);
+                text-decoration: underline;
+            }
 
-    .breadcrumb-item.active {
-        color: #6c757d;
-    }
+        .breadcrumb-item.active {
+            color: #6c757d;
+        }
 
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: ">";
-        color: #6c757d;
-    }
+        .breadcrumb-item + .breadcrumb-item::before {
+            content: ">";
+            color: #6c757d;
+        }
 
     /* Job Overview Cards */
     .job-overview-cards {
@@ -662,37 +690,37 @@ function toggleSave() {
         border: 1px solid #e9ecef;
     }
 
-    .overview-card .icon-wrapper {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background-color: #e8f7ef;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+        .overview-card .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e8f7ef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    .overview-card .icon-wrapper i {
-        color: #ff6b35;
-        font-size: 18px;
-    }
+            .overview-card .icon-wrapper i {
+                color: #ff6b35;
+                font-size: 18px;
+            }
 
-    .overview-card .info {
-        flex: 1;
-    }
+        .overview-card .info {
+            flex: 1;
+        }
 
-    .overview-card .info label {
-        display: block;
-        font-size: 13px;
-        color: #6c757d;
-        margin-bottom: 4px;
-    }
+            .overview-card .info label {
+                display: block;
+                font-size: 13px;
+                color: #6c757d;
+                margin-bottom: 4px;
+            }
 
-    .overview-card .info span {
-        display: block;
-        font-weight: 600;
-        color: #2d2d2d;
-    }
+            .overview-card .info span {
+                display: block;
+                font-weight: 600;
+                color: #2d2d2d;
+            }
 
     /* Job Actions */
     .job-actions {
@@ -713,14 +741,14 @@ function toggleSave() {
         transition: all 0.3s ease;
     }
 
-    .btn-apply-now:hover {
-        background-color: #ff6b35;
-        transform: translateY(-2px);
-    }
+        .btn-apply-now:hover {
+            background-color: #ff6b35;
+            transform: translateY(-2px);
+        }
 
     .btn-save {
         background-color: white;
-        color: #ff6b35; 
+        color: #ff6b35;
         padding: 12px 24px;
         border: 1px solid #ff6b35;
         border-radius: 8px;
@@ -731,9 +759,9 @@ function toggleSave() {
         transition: all 0.3s ease;
     }
 
-    .btn-save:hover {
-        background-color: #e8f7ef;
-    }
+        .btn-save:hover {
+            background-color: #e8f7ef;
+        }
 
 
     .job-title {
@@ -742,4 +770,13 @@ function toggleSave() {
         color: #2d2d2d;
         margin-bottom: 20px;
     }
+
+    .btn-save.saved {
+        background-color: #ff6b35;
+        color: white;
+    }
+
+        .btn-save.saved:hover {
+            background-color: #e85a2a;
+        }
 </style>

@@ -102,7 +102,7 @@ body {
     }
 
 .search-btn {
-    background-color: #ffa944;
+    background-color: #ff9220;
     color: white;
     border: none;
     cursor: pointer;
@@ -165,3 +165,11 @@ body {
     .job-card:hover {
         border-color: #ff9220;
     }
+
+.highlighted-text {
+    color: #ffa944;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 25px; /* điều chỉnh kích thước theo nhu cầu */
+    margin: 10px;
+}

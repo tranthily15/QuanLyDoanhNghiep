@@ -139,16 +139,25 @@ namespace QuanLyDoanhNghiep.Controllers
                 return Json(new { success = false });
             }
 
-            if (!int.TryParse(CurrentID, out int currentID))
+            string realId = null;
+            if (RoleUser == "2")
             {
-                return Json(new { success = false });
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user != null) realId = user.ID;
+                else return Json(new { success = false });
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp != null) realId = emp.EmployeeID;
+                else return Json(new { success = false });
             }
 
             var notification = await _context.Notification
                 .FirstOrDefaultAsync(n => n.NotificationID == id &&
                                         n.UserRole == RoleUser &&
-                                        ((n.UserRole == "2" && n.UserID.Equals(currentID)) ||
-                                         (n.UserRole == "1" && n.EmployeeID.Equals(currentID)) ||
+                                        ((n.UserRole == "2" && n.UserID == realId) ||
+                                         (n.UserRole == "1" && n.EmployeeID == realId) ||
                                          (n.UserRole == "0")));
 
             if (notification != null)
@@ -287,14 +296,28 @@ namespace QuanLyDoanhNghiep.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUnreadNotifications()
         {
-            if (!IsLogin || !int.TryParse(CurrentID, out int currentID))
+            if (!IsLogin)
                 return Json(new List<object>());
+
+            string realId = null;
+            if (RoleUser == "2")
+            {
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user != null) realId = user.ID;
+                else return Json(new List<object>());
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp != null) realId = emp.EmployeeID;
+                else return Json(new List<object>());
+            }
 
             var notifications = await _context.Notification
                 .Where(n => n.UserRole == RoleUser &&
                             !n.IsRead &&
-                            ((n.UserRole == "2" && n.UserID.Equals(currentID)) ||
-                            (n.UserRole == "1" && n.EmployeeID.Equals(currentID)) ||
+                            ((n.UserRole == "2" && n.UserID == realId) ||
+                            (n.UserRole == "1" && n.EmployeeID == realId) ||
                             (n.UserRole == "0")))
                 .OrderByDescending(n => n.CreatedAt)
                 .Take(5)
@@ -310,50 +333,25 @@ namespace QuanLyDoanhNghiep.Controllers
             return Json(notifications);
         }
 
+        // GET: Notification/ViewAndMarkAsRead/{id}
         public async Task<IActionResult> ViewAndMarkAsRead(int id)
         {
             if (!IsLogin)
             {
                 return RedirectToAction("Login", "Account");
             }
-
-            if (!int.TryParse(CurrentID, out int currentID))
-            {
-                return RedirectToAction("Login", "Account");
-            }
-
-            // Tìm thông báo dựa trên ID và quyền truy cập
+            var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+            var employee = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
             var notification = await _context.Notification
-                .FirstOrDefaultAsync(n => n.NotificationID == id);
+                .FirstOrDefaultAsync(n => n.NotificationID == id &&
+                                        n.UserRole == RoleUser &&
+                                        ((n.UserRole == "2" && n.UserID.Equals(user.ID)) ||
+                                         (n.UserRole == "1" && n.EmployeeID.Equals(employee.EmployeeID)) ||
+                                         (n.UserRole == "0")));
 
-            // Kiểm tra quyền truy cập
-            if (notification == null || notification.UserRole != RoleUser)
+            if (notification == null)
             {
-                TempData["ErrorMessage"] = "Thông báo không tồn tại hoặc bạn không có quyền truy cập.";
-                return RedirectToAction(nameof(Index));
-            }
-
-            // Kiểm tra quyền truy cập chi tiết dựa trên loại người dùng
-            bool hasAccess = false;
-            if (RoleUser == "2") // Sinh viên
-            {
-                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID == currentID);
-                hasAccess = user != null && notification.UserID == user.ID;
-            }
-            else if (RoleUser == "1") // Nhân viên
-            {
-                var employee = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID == currentID);
-                hasAccess = employee != null && notification.EmployeeID == employee.EmployeeID;
-            }
-            else if (RoleUser == "0") // Admin
-            {
-                hasAccess = true;
-            }
-
-            if (!hasAccess)
-            {
-                TempData["ErrorMessage"] = "Bạn không có quyền truy cập thông báo này.";
-                return RedirectToAction(nameof(Index));
+                return NotFound();
             }
 
             // Đánh dấu thông báo đã đọc
@@ -363,20 +361,16 @@ namespace QuanLyDoanhNghiep.Controllers
             // Chuyển hướng đến đường dẫn trong thông báo
             if (!string.IsNullOrEmpty(notification.NotificationPath))
             {
-                // Kiểm tra xem đường dẫn có hợp lệ không
-                if (notification.NotificationPath.StartsWith("/"))
+                // Kiểm tra xem đường dẫn có bắt đầu bằng / không
+                string path = notification.NotificationPath;
+                if (!path.StartsWith("/"))
                 {
-                    return Redirect(notification.NotificationPath);
+                    path = "/" + path;
                 }
-                else
-                {
-                    // Nếu đường dẫn không bắt đầu bằng /, thêm / vào đầu
-                    return Redirect("/" + notification.NotificationPath);
-                }
+                return Redirect(path);
             }
 
             // Nếu không có đường dẫn, quay về trang thông báo
-            TempData["InfoMessage"] = "Thông báo đã được đánh dấu là đã đọc.";
             return RedirectToAction(nameof(Index));
         }
     }

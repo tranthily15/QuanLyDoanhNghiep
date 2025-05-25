@@ -4,15 +4,55 @@
 
 <div class="box"> </div>
 <div class="box"> </div>
+@if (ViewBag.Student != null)
+{
+    var student = ViewBag.Student;
+    <div class="student-profile-card mb-4">
+        <div class="profile-header">
+            <div class="profile-avatar">
+                @{
+                    var initials = !string.IsNullOrEmpty(student.FullName) 
+                        ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
+                        : "SV";
+                }
+                <div class="avatar-placeholder">@initials</div>
+            </div>
+            <div class="profile-info">
+                <h4 class="profile-name">@(student.FullName ?? "Sinh viên")</h4>
+                <div class="profile-stats">
+                    <div class="stat-item">
+                        <i class="fas fa-file-alt"></i>
+                        <span>@(ViewBag.cv?["TotalCVCount"] ?? 0) CV đã nộp</span>
+                    </div>
+                    <div class="stat-item">
+                        <i class="fas fa-check-circle"></i>
+                        <span>@(ViewBag.cv?["AcceptedCount"] ?? 0) CV được chấp nhận</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-contact">
+            <div class="contact-item">
+                <i class="fas fa-envelope"></i>
+                <span>@(student.Email ?? "Chưa cập nhật")</span>
+            </div>
+            <div class="contact-item">
+                <i class="fas fa-phone"></i>
+                <span>@(student.PhoneNumber ?? "Chưa cập nhật")</span>
+            </div>
+        </div>
+    </div>
+}
+
 <div class="dashboard-container">
     <div class="container-fluid">
         <h2 class="mb-4">Thống kê cá nhân</h2>
 
         <!-- Thống kê CV -->
-        <div class="row mb-4">
+        <div class="row">
             <div class="col-md-8">
                 <div class="section-card">
-                     <div class="section-header">
+                    <div class="section-header">
                         <h4>
                             <i class="fas fa-file-alt"></i> Thống kê CV của bạn
                             <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê CV đã nộp và trạng thái"></i>
@@ -25,7 +65,7 @@
                                     <i class="fas fa-file-alt"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <h5>@ViewBag.cv["TotalCVCount"]</h5>
+                                    <h5>@(ViewBag.cv?["TotalCVCount"] ?? 0)</h5>
                                     <p>Tổng số CV</p>
                                 </div>
                             </div>
@@ -36,7 +76,7 @@
                                     <i class="fas fa-clock"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <h5>@ViewBag.cv["PendingCount"]</h5>
+                                    <h5>@(ViewBag.cv?["PendingCount"] ?? 0)</h5>
                                     <p>Đang chờ</p>
                                 </div>
                             </div>
@@ -47,25 +87,25 @@
                                     <i class="fas fa-check-circle"></i>
                                 </div>
                                 <div class="stat-content">
-                                     <h5>@ViewBag.cv["AcceptedCount"]</h5>
-                                     <p>Đã chấp nhận</p>
+                                    <h5>@(ViewBag.cv?["AcceptedCount"] ?? 0)</h5>
+                                    <p>Đã chấp nhận</p>
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-3">
-                           <div class="stat-box">
+                            <div class="stat-box">
                                 <div class="stat-icon red">
                                     <i class="fas fa-times-circle"></i>
                                 </div>
                                 <div class="stat-content">
-                                    <h5>@ViewBag.cv["RejectedCount"]</h5>
+                                    <h5>@(ViewBag.cv?["RejectedCount"] ?? 0)</h5>
                                     <p>Đã từ chối</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-                     <div class="chart-section">
-                         <div class="chart-header">
+                    <div class="chart-section">
+                        <div class="chart-header">
                             <span>Phân bố CV theo trạng thái</span>
                         </div>
                         <div class="chart-container" style="height: 250px;">
@@ -75,117 +115,27 @@
                 </div>
             </div>
             <div class="col-md-4">
-                 <div class="section-card">
+                <div class="section-card">
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-history"></i> Thống kê theo thời gian
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Số liệu CV và việc làm theo thời gian"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Số liệu CV theo thời gian"></i>
                         </h4>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp hôm nay
-                            <span class="badge bg-primary rounded-pill">@ViewBag.timeStats["CVsSubmittedToday"]</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedToday"] ?? 0)</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp tuần này
-                            <span class="badge bg-primary rounded-pill">@ViewBag.timeStats["CVsSubmittedThisWeek"]</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisWeek"] ?? 0)</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp tháng này
-                            <span class="badge bg-primary rounded-pill">@ViewBag.timeStats["CVsSubmittedThisMonth"]</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Việc làm mới tuần này
-                            <span class="badge bg-success rounded-pill">@ViewBag.timeStats["NewJobsThisWeek"]</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            Việc làm mới tháng này
-                            <span class="badge bg-success rounded-pill">@ViewBag.timeStats["NewJobsThisMonth"]</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisMonth"] ?? 0)</span>
                         </li>
                     </ul>
-                </div>
-            </div>
-        </div>
-
-        <!-- Thống kê JobPosition -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="section-card">
-                     <div class="section-header">
-                        <h4>
-                            <i class="fas fa-briefcase"></i> Thống kê việc làm
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê các loại việc làm đang có"></i>
-                        </h4>
-                    </div>
-                    <div class="row stats-row mb-4">
-                        <div class="col-md-3">
-                           <div class="stat-box">
-                                <div class="stat-icon blue">
-                                    <i class="fas fa-briefcase"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@ViewBag.job["TotalActiveJobs"]</h5>
-                                    <p>Tổng việc làm</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                           <div class="stat-box">
-                                <div class="stat-icon yellow">
-                                     <i class="fas fa-user-graduate"></i> <!-- Changed icon -->
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@ViewBag.job["InternJobs"]</h5>
-                                    <p>Vị trí thực tập</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                             <div class="stat-box">
-                                <div class="stat-icon green">
-                                    <i class="fas fa-user-tie"></i> <!-- Changed icon -->
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@ViewBag.job["EmployeeJobs"]</h5>
-                                     <p>Vị trí nhân viên</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                             <div class="stat-box">
-                                <div class="stat-icon red">
-                                    <i class="fas fa-calendar-times"></i> <!-- Changed icon -->
-                                </div>
-                                <div class="stat-content">
-                                     <h5>@ViewBag.job["JobsClosingSoon"]</h5>
-                                     <p>Sắp hết hạn</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                             <div class="chart-section">
-                                 <div class="chart-header">
-                                    <span>Phân bố CV theo loại vị trí ứng tuyển</span>
-                                </div>
-                                <div class="chart-container">
-                                    <canvas id="cvTypeChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                             <div class="chart-section">
-                                <div class="chart-header">
-                                    <span>Phân bố loại hình vị trí tuyển dụng</span>
-                                </div>
-                                <div class="chart-container">
-                                    <canvas id="jobTypeChart"></canvas>
-                                </div>
-                             </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -325,101 +275,138 @@
     font-size: 13px;
     padding: 6px 10px;
 }
+
+.student-profile-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease;
+}
+
+.student-profile-card:hover {
+    transform: translateY(-5px);
+}
+
+.profile-header {
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+}
+
+.profile-avatar {
+    flex-shrink: 0;
+}
+
+.profile-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 3px solid white;
+}
+
+.profile-info {
+    flex: 1;
+}
+
+.profile-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #2d2d2d;
+    margin-bottom: 0.5rem;
+}
+
+.profile-stats {
+    display: flex;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.stat-item i {
+    color: #ff6b35;
+}
+
+.profile-contact {
+    padding: 1.5rem 2rem;
+    display: flex;
+    gap: 2rem;
+    border-top: 1px solid #e9ecef;
+    background: white;
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    color: #6c757d;
+}
+
+.contact-item i {
+    color: #ff6b35;
+    font-size: 1.1rem;
+}
+
+.avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #ff6b35 0%, #ff8f6b 100%);
+    color: white;
+    font-size: 2rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+}
 </style>
 
 @section Scripts {
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // CV Type Chart
-    const cvTypeCtx = document.getElementById('cvTypeChart').getContext('2d');
-    new Chart(cvTypeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['CV Thực tập', 'CV Nhân viên'],
-            datasets: [{
-                data: [
-                    @ViewBag.cv["InternApplications"],
-                    @ViewBag.cv["EmployeeApplications"]
-                ],
-                backgroundColor: ['#fbbc04', '#00b14f'] // Use consistent colors
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                 legend: {
-                    position: 'bottom'
-                },
-                title: {
-                    display: false // Title moved to chart-header
-                }
-            }
-        }
-    });
-
-    // CV Status Chart (Changed from bar to doughnut for better comparison)
+    // CV Status Chart
     const cvStatusCtx = document.getElementById('cvStatusChart').getContext('2d');
     new Chart(cvStatusCtx, {
-        type: 'doughnut', // Changed type
+        type: 'doughnut',
         data: {
             labels: ['Đang chờ', 'Đã duyệt', 'Từ chối'],
             datasets: [{
                 label: 'Số lượng CV',
                 data: [
-                   // @ViewBag.cv["TotalCVCount"], // Total is usually not shown in doughnut
-                    @ViewBag.cv["PendingCount"],
-                    @ViewBag.cv["AcceptedCount"],
-                    @ViewBag.cv["RejectedCount"]
+                    @(ViewBag.cv?["PendingCount"] ?? 0),
+                    @(ViewBag.cv?["AcceptedCount"] ?? 0),
+                    @(ViewBag.cv?["RejectedCount"] ?? 0)
                 ],
-                backgroundColor: ['#fbbc04', '#00b14f', '#ea4335'] // Use consistent colors
+                backgroundColor: ['#fbbc04', '#00b14f', '#ea4335']
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                 legend: {
+                legend: {
                     position: 'bottom'
                 },
                 title: {
-                    display: false, // Title moved to chart-header
-                    text: 'Tổng CV: @ViewBag.cv["TotalCVCount"]' // Keep total in title if needed
+                    display: false
                 }
             }
         }
     });
 
-
-    // Job Type Chart
-    const jobTypeCtx = document.getElementById('jobTypeChart').getContext('2d');
-    new Chart(jobTypeCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Vị trí thực tập', 'Vị trí nhân viên'],
-            datasets: [{
-                data: [
-                    @ViewBag.job["InternJobs"],
-                    @ViewBag.job["EmployeeJobs"]
-                ],
-                backgroundColor: ['#fbbc04', '#1a73e8'] // Use consistent colors
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                 legend: {
-                    position: 'bottom'
-                },
-                title: {
-                     display: false // Title moved to chart-header
-                }
-            }
-        }
-    });
-
-     // Initialize Bootstrap tooltips
+    // Initialize Bootstrap tooltips
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl)

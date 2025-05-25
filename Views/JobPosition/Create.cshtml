@@ -29,13 +29,13 @@
                         <h4 class="card-title mb-4">Thông tin vị trí tuyển dụng</h4>
 
                         <div class="form-group mb-3">
-                            <label asp-for="PositionName" class="form-label fw-bold">Tên vị trí ứng tuyển</label>
+                            <label asp-for="PositionName" class="form-label fw-bold">Tên vị trí ứng tuyển <span class="text-danger">*</span></label>
                             <input asp-for="PositionName" class="form-select" required />
                             <span asp-validation-for="PositionName" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="PositionType" class="form-label fw-bold">Loại vị trí ứng tuyển</label>
+                            <label asp-for="PositionType" class="form-label fw-bold">Loại vị trí ứng tuyển <span class="text-danger">*</span></label>
                             <select asp-for="PositionType" class="form-select" required>
                                 
                                 <option value="">-- Chọn loại vị trí --</option>
@@ -48,14 +48,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="Vacancies" class="form-label fw-bold">Số lượng tuyển</label>
+                                    <label asp-for="Vacancies" class="form-label fw-bold">Số lượng tuyển <span class="text-danger">*</span></label>
                                     <input asp-for="Vacancies" class="form-select" type="number" min="1" required />
                                     <span asp-validation-for="Vacancies" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="TimeWork" class="form-label fw-bold">Thời gian làm việc</label>
+                                    <label asp-for="TimeWork" class="form-label fw-bold">Thời gian làm việc <span class="text-danger">*</span></label>
                                     <input asp-for="TimeWork" class="form-select" required />
                                     <span asp-validation-for="TimeWork" class="text-danger"></span>
                                 </div>
@@ -63,7 +63,7 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="Salary" class="form-label fw-bold">Mức lương</label>
+                            <label asp-for="Salary" class="form-label fw-bold">Mức lương <span class="text-danger">*</span></label>
                             <input asp-for="Salary" class="form-select" required />
                             <span asp-validation-for="Salary" class="text-danger"></span>
                         </div>
@@ -71,14 +71,14 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu</label>
+                                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu <span class="text-danger">*</span></label>
                                     <input asp-for="StartDate" type="datetime-local" class="form-select" required />
                                     <span asp-validation-for="StartDate" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="EndDate" class="form-label fw-bold">Ngày kết thúc</label>
+                                    <label asp-for="EndDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
                                     <input asp-for="EndDate" type="datetime-local" class="form-select" required />
                                     <span asp-validation-for="EndDate" class="text-danger"></span>
                                 </div>
@@ -86,27 +86,27 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobDescription" class="form-label fw-bold">Mô tả công việc</label>
+                            <label asp-for="JobDescription" class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
                             <div id="editor-job-description" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobDescription" id="jobDescription" required />
                             <span asp-validation-for="JobDescription" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc</label>
+                            <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc <span class="text-danger">*</span></label>
                             <div id="editor-job-requirements" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobRequirements" id="jobRequirements" required />
                             <span asp-validation-for="JobRequirements" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobBenefits" class="form-label fw-bold">Quyền lợi</label>
+                            <label asp-for="JobBenefits" class="form-label fw-bold">Quyền lợi <span class="text-danger">*</span></label>
                             <div id="editor-job-benefits" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobBenefits" id="jobBenefits" required />
                             <span asp-validation-for="JobBenefits" class="text-danger"></span>
                         </div>
                         <div class="form-group mb-3">
-                            <label asp-for="CategoryID" class="form-label fw-bold">Nhóm vị trí CNTT</label>
+                            <label asp-for="CategoryID" class="form-label fw-bold">Nhóm vị trí CNTT <span class="text-danger">*</span></label>
                             <select asp-for="CategoryID" class="form-select" asp-items="ViewBag.Categories">
                                 <option value="">-- Chọn nhóm vị trí --</option>
                             </select>
@@ -114,7 +114,7 @@
                         </div>
 
                         <div class="form-group mb-4">
-                            <label class="form-label fw-bold">Địa chỉ tuyển dụng</label>
+                            <label class="form-label fw-bold">Địa chỉ tuyển dụng <span class="text-danger">*</span></label>
                             <div id="jobLocations">
                                 <div class="job-location-item card mb-3">
                                     <div class="card-body">

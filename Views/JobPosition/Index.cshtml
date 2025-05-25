@@ -1,212 +1,240 @@
 ﻿@model QuanLyDoanhNghiep.Models.JobIndexViewModel
 
 @{
-    ViewData["Title"] = "Index";
-    var total = @Model.FullTimeJobs?.Count() + @Model.Internships?.Count();
+    ViewData["Title"] = "Trang chủ";
 }
 
 <div class="box"></div>
-<div class="box"></div>
-<div class="flex_container bg-white">
-    <div class="event_slider">
-        <img src="https://dainam.edu.vn/uploads/images/ydnu08vevx9gj9uqj9rc20230719085807_thump.jpg" alt="Sự kiện 1" class="active">
-        <img src="https://dainam.edu.vn/uploads/images/fmj44wxft7n7a1fzvxyh20240517045744_thump.jpg" alt="Sự kiện 2">
-        <img src="https://dainam.edu.vn/admin/upload/news/hitgh9zvg7wmvpeojqsh20210614111828_thump.jpg" alt="Sự kiện 3">
-    </div>
-    <div class="job_statistics">
-        <h2>Thống kê việc làm ngày hôm nay @DateTime.Now.ToString("dd/MM/yyyy")</h2>
-        <p>Việc làm đang tuyển: <span class="fw-bold">@total</span></p>
-        <p>Việc làm mới hôm nay: <span class="fw-bold">0</span></p>
-    </div>
+<div class="single-image-container bg-white">
+    <img src="~/img/anhindex.jpg" 
+         alt="Thông tin việc làm"
+         style="width: 100%; height: 100%;">
 </div>
 
-<!-- Thanh tìm kiếm -->
-<div class="search-bar">
-    <div class="search-input">
-        <i class="bi bi-search"></i>
-        <input type="text" id="searchKeyword" placeholder="Vị trí tuyển dụng" value="@Model.Keyword">
-    </div>
-    <div class="location-filter">
-        <div class="dropdown province-dropdown">
-            <input type="text" id="provinceSearch" class="form-control" placeholder="Nhập Tỉnh/Thành phố" data-bs-toggle="dropdown">
-            <div class="dropdown-menu w-100" id="provinceList">
-                <div class="px-3 py-2">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="selectAllProvinces">
-                        <label class="form-check-label" for="selectAllProvinces">
-                            <i class="bi bi-check2-square"></i> Tất cả
-                        </label>
-                    </div>
+<div class="container py-4">
+    <div class="search-container bg-white rounded-4 shadow-sm p-4 mb-4">
+        <form id="searchForm" class="row g-3 align-items-end" method="get" action="@Url.Action("Index", "JobPosition")">
+            <div class="col-md-6">
+                <label for="keyword" class="form-label text-muted mb-2">
+                    <i class="bi bi-search me-1"></i>Tìm kiếm
+                </label>
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                        <i class="bi bi-briefcase text-muted"></i>
+                    </span>
+                    <input type="text" id="keyword" name="keyword" class="form-control border-start-0 rounded-end-3" 
+                           placeholder="Nhập vị trí công việc, kỹ năng hoặc tên công ty..." 
+                           value="@Model.Keyword">
                 </div>
-                <div class="dropdown-divider"></div>
-                <div class="province-list-content" style="max-height:300px; overflow-y:auto;">
-                    @foreach (var province in ViewBag.Provinces)
+            </div>
+            <div class="col-md-5">
+                <label for="provinceFilter" class="form-label text-muted mb-2">
+                    <i class="bi bi-geo-alt me-1"></i>Địa điểm
+                </label>
+                <select id="provinceFilter" name="provinces" class="form-select rounded-3">
+                    <option value="">Tất cả địa điểm</option>
+                    @foreach (var p in ViewBag.Provinces)
                     {
-                        <div class="px-3 py-2">
-                            <div class="form-check">
-                                <input class="form-check-input province-checkbox" type="checkbox" value="@province.ProvinceID" id="province_@province.ProvinceID">
-                                <label class="form-check-label" for="province_@province.ProvinceID">
-                                    <i class="bi bi-geo-alt"></i> @province.ProvinceName
-                                </label>
-                            </div>
+                        <option value="@p.ProvinceID" >@p.ProvinceName</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-1">
+                <button class="btn search-btn w-100" id="searchButton"><i class="bi bi-search"></i> </button>
+
+            </div>
+        </form>
+    </div>
+
+    <div id="searchResults">
+        <div id="jobListFulltime" class="mb-5">
+            <h4 class="highlighted-text mb-4">Việc làm toàn thời gian</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @if (Model.FullTimeJobs != null && Model.FullTimeJobs.Any())
+                {
+                    @foreach (var job in Model.FullTimeJobs)
+                    {
+                        <div class="col">
+                            <a href="/JobPosition/Details/@job.PositionID" class="text-decoration-none">
+                                <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center h-100">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:85px; height:85px;">
+                                        <img src="/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")" 
+                                             alt="@job.Company?.CompanyName" 
+                                             style="width:100%; height:100%; object-fit:contain; display:block;">
+                                    </div>
+                                    <div class="ms-3 flex-grow-1 overflow-hidden">
+                                        <h6 class="fw-bold mb-2 position-name text-truncate text-dark" 
+                                            title="@job.PositionName" data-bs-toggle="tooltip">
+                                            @job.PositionName
+                                        </h6>
+                                        <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="badge bg-secondary">@job.Salary</span>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "Không rõ")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         </div>
                     }
-                </div>
+                }
+                else
+                {
+                    <div class="col-12"><div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div></div>
+                }
             </div>
+            @if (Model.TotalFullTimePages > 1)
+            {
+                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage - 1, internshipPage = Model.InternshipPage })" 
+                       class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == 1 ? "disabled" : "")">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <span class="text-muted">
+                        <strong>@Model.FullTimePage</strong> / @Model.TotalFullTimePages trang
+                    </span>
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage + 1, internshipPage = Model.InternshipPage })" 
+                       class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == Model.TotalFullTimePages ? "disabled" : "")">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            }
+        </div>
+
+        <div id="jobListIntern">
+            <h4 class="highlighted-text mb-4">Việc làm thực tập</h4>
+            <div class="row row-cols-1 row-cols-md-3 g-4">
+                @if (Model.Internships != null && Model.Internships.Any())
+                {
+                    @foreach (var job in Model.Internships)
+                    {
+                        <div class="col">
+                            <a href="/JobPosition/Details/@job.PositionID" class="text-decoration-none">
+                                <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center h-100">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:85px; height:85px;">
+                                        <img src="/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")" 
+                                             alt="@job.Company?.CompanyName" 
+                                             style="width:100%; height:100%; object-fit:contain; display:block;">
+                                    </div>
+                                    <div class="ms-3 flex-grow-1 overflow-hidden">
+                                        <h6 class="fw-bold mb-2 position-name text-truncate text-dark" 
+                                            title="@job.PositionName" data-bs-toggle="tooltip">
+                                            @job.PositionName
+                                        </h6>
+                                        <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="badge bg-secondary">@job.Salary</span>
+                                            <span class="badge bg-light text-dark">
+                                                <i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "Không rõ")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="col-12"><div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div></div>
+                }
+            </div>
+            @if (Model.TotalInternshipPages > 1)
+            {
+                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage - 1, fulltimePage = Model.FullTimePage })" 
+                       class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == 1 ? "disabled" : "")">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                    <span class="text-muted">
+                        <strong>@Model.InternshipPage</strong> / @Model.TotalInternshipPages trang
+                    </span>
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage + 1, fulltimePage = Model.FullTimePage })" 
+                       class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == Model.TotalInternshipPages ? "disabled" : "")">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </div>
+            }
         </div>
     </div>
-    <button class="btn btn-primary search-btn" id="searchButton">
-        <i class="bi bi-search"></i> Tìm kiếm
-    </button>
 </div>
 
-<!-- Danh sách việc làm toàn thời gian -->
-<div class="container mt-4">
-    <h4>Việc làm toàn thời gian</h4>
-    <div id="job-list-fulltime" class="row row-cols-1 row-cols-md-3 g-4">
-        @await Html.PartialAsync("_JobListPartial", Model.FullTimeJobs)
-    </div>
-    <nav><ul class="pagination justify-content-center mt-4" id="pagination-fulltime"></ul></nav>
-</div>
-
-<div class="container mt-4">
-    <h4>Việc làm thực tập</h4>
-    <div id="job-list-intern" class="row row-cols-1 row-cols-md-3 g-4">
-        @await Html.PartialAsync("_JobListPartial", Model.Internships)
-    </div>
-    <nav><ul class="pagination justify-content-center mt-4" id="pagination-intern"></ul></nav>
-</div>
-
-<footer>
-    <div class="footer">
-        <div class="footer-content">
-            <div class="footer-column">
-                <h3>THÔNG TIN LIÊN HỆ</h3>
-                <p>Trung tâm "Việc làm và thực tập sinh viên khoa Công Nghệ Thông Tin</p>
-                <p>Địa điểm: Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà Nội, Hanoi, Vietnam</p>
-                <p>Điện thoại: 096 159 55 99</p>
-                <p>Địa chỉ email: khoa.cntt@dainam.edu.vn</p>
-            </div>
-            <div class="footer-column">
-                <h3>LIÊN KẾT</h3>
-                <a href="#" class="footer-link">Việc làm</a>
-                <a href="#" class="footer-link">Thực tập</a>
-                <a href="#" class="footer-link">Gợi ý việc làm</a>
-                <a href="#" class="footer-link">CV</a>
-            </div>
-            <div class="footer-column">
-                <h3>MẠNG XÃ HỘI</h3>
-                <div class="footer-logo">
-                    <img src="~/img/logo.png" width="200" height="200" />
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
-
-<!-- JavaScript for pagination -->
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const itemsPerPage = 21;
-        let currentPageFullTime = 1;
-        let currentPageIntern = 1;
-
-        // Hàm phân trang cho job list
-        function setupPagination(containerId, paginationId, isInternship) {
-            const container = document.getElementById(containerId);
-            const cards = container.querySelectorAll('.col');
-            const totalItems = cards.length;
-            const totalPages = Math.ceil(totalItems / itemsPerPage);
-
-            // Hàm hiển thị trang
-            function showPage(page) {
-                cards.forEach((card, index) => {
-                    const shouldShow = index >= (page - 1) * itemsPerPage && index < page * itemsPerPage;
-                    card.style.display = shouldShow ? "block" : "none";
-                });
-            }
-
-            // Hàm render các nút phân trang
-            function renderPagination() {
-                const pagination = document.getElementById(paginationId);
-                if (!pagination) return;
-
-                const currentPage = isInternship ? currentPageIntern : currentPageFullTime;
-                
-                let paginationHtml = `
-                    <div class="pagination-container d-flex justify-content-center align-items-center">
-                        <button class="btn btn-sm btn-outline-secondary prev-page me-2" ${currentPage === 1 ? 'disabled' : ''}>
-                            <i class="bi bi-chevron-left"></i> Trước
-                        </button>
-                        <span class="mx-2">Trang ${currentPage} / ${totalPages}</span>
-                        <button class="btn btn-sm btn-outline-secondary next-page ms-2" ${currentPage === totalPages ? 'disabled' : ''}>
-                            Tiếp theo <i class="bi bi-chevron-right"></i>
-                        </button>
-                    </div>
-                `;
-
-                pagination.innerHTML = paginationHtml;
-
-                const prevBtn = pagination.querySelector('.prev-page');
-                const nextBtn = pagination.querySelector('.next-page');
-
-                if (prevBtn) {
-                    prevBtn.onclick = () => {
-                        if (currentPage > 1) {
-                            if (isInternship) {
-                                currentPageIntern--;
-                                loadJobData(currentPageIntern, true);
-                            } else {
-                                currentPageFullTime--;
-                                loadJobData(currentPageFullTime, false);
-                            }
-                        }
-                    };
-                }
-
-                if (nextBtn) {
-                    nextBtn.onclick = () => {
-                        if (currentPage < totalPages) {
-                            if (isInternship) {
-                                currentPageIntern++;
-                                loadJobData(currentPageIntern, true);
-                            } else {
-                                currentPageFullTime++;
-                                loadJobData(currentPageFullTime, false);
-                            }
-                        }
-                    };
-                }
-            }
-
-            // Ban đầu hiển thị trang đầu tiên và render phân trang
-            showPage(isInternship ? currentPageIntern : currentPageFullTime);
-            renderPagination();
+@section Styles {
+    <style>
+        .search-container {
+            background: linear-gradient(to right, #f8f9fa, #ffffff);
+            border: 1px solid rgba(0,0,0,.08);
         }
 
-        // Hàm tải lại dữ liệu công việc
-        function loadJobData(page, isInternship) {
-            var url = isInternship ? '/JobPosition/LoadInternships' : '/JobPosition/LoadFullTimeJobs';
-            var containerId = isInternship ? 'job-list-intern' : 'job-list-fulltime';
-            var paginationId = isInternship ? 'pagination-intern' : 'pagination-fulltime';
-
-            $.ajax({
-                url: url,
-                data: { page: page },
-                type: 'GET',
-                success: function (result) {
-                    // Thêm class row vào container trước khi thêm dữ liệu mới
-                    $(`#${containerId}`).html('<div class="row row-cols-1 row-cols-md-3 g-4">' + result + '</div>');
-                    setupPagination(containerId, paginationId, isInternship);
-                },
-                error: function () {
-                    alert('Có lỗi xảy ra trong quá trình tải dữ liệu!');
-                }
-            });
+        .form-label {
+            font-size: 0.9rem;
+            font-weight: 500;
         }
 
-        // Setup phân trang cho cả việc làm toàn thời gian và thực tập
-        setupPagination('job-list-fulltime', 'pagination-fulltime', false);
-        setupPagination('job-list-intern', 'pagination-intern', true);
-    });
-</script>
+        .input-group-text {
+            border-color: #dee2e6;
+        }
+
+        .form-control, .form-select {
+            border-color: #dee2e6;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #86b7fe;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+        }
+
+        .btn-primary {
+            padding: 0.6rem 1.5rem;
+            font-weight: 500;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .highlighted-text {
+            color: #2c3e50;
+            font-weight: 600;
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .highlighted-text::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 70%;
+                background-color: #ff9220;
+            border-radius: 2px;
+        }
+
+        .job-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+            border: none;
+            border-radius: 10px;
+        }
+
+        .job-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.1)!important;
+        }
+    </style>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('[data-bs-toggle="tooltip"]').tooltip();
+        });
+    </script>
+}

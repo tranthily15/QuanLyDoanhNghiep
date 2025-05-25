@@ -1,20 +1,10 @@
-﻿@* @model List<QuanLyDoanhNghiep.Models.JobPosition>
-
-@foreach (var item in Model)
-{
-    <div class="card mb-2 p-2">
-        <h6>@item.PositionName</h6>
-        <p>@item.Company?.CompanyName</p>
-        <span class="badge bg-secondary">@item.Salary</span>
-    </div>
-}
- *@
-
 @model List<QuanLyDoanhNghiep.Models.JobPosition>
 
 @if (Model == null || !Model.Any())
 {
-    <div class="col-12"><p class="text-center">Không có vị trí tuyển dụng nào.</p></div>
+    <div class="col-12">
+        <p class="text-center">Không có vị trí tuyển dụng nào.</p>
+    </div>
 }
 else
 {
@@ -27,7 +17,7 @@ else
                         <img src="~/img/CompanyLogo/@item.Company?.CompanyLogo" alt="@item.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
                     </div>
                     <div class="ms-3 flex-grow-1 overflow-hidden">
-                        <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName" data-bs-toggle="tooltip">@item.PositionName</h6>
+                        <h6 class="fw-bold mb-1 position-name text-truncate" title="@item.PositionName">@item.PositionName</h6>
                         <p class="text-muted mb-1 small text-truncate">@item.Company?.CompanyName</p>
                         <div class="d-flex flex-wrap gap-2">
                             <span class="badge bg-secondary">@item.Salary</span>

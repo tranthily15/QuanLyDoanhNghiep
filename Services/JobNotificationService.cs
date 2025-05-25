@@ -42,7 +42,8 @@ namespace QuanLyDoanhNghiep.Services
                         CreatedAt = DateTime.Now,
                         UserRole = "1",
                         IsRead = false,
-                        EmployeeID = e.EmployeeID // Gửi cho tất cả nhân viên của công ty
+                        EmployeeID = e.EmployeeID, // Gửi cho tất cả nhân viên của công ty
+                        NotificationPath = $"/JobPostion/Details/{job.PositionID}"
                     };
                     _context.Notification.Add(notification);
                 }

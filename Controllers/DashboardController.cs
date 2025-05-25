@@ -174,12 +174,13 @@ namespace QuanLyDoanhNghiep.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var userId = int.Parse(CurrentID);
-            
+           var user = await _context.User
+                .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+
             // Thống kê CV của sinh viên
             var cvList = await _context.CV
                 .Include(c => c.JobPosition)
-                .Where(c => c.ID.Equals(userId))
+                .Where(c => c.ID.Equals(user.ID))
                 .ToListAsync();
 
             var summaryCV = new Dictionary<string, int>
@@ -188,8 +189,8 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "PendingCount", cvList.Count(c => c.Status == 0) },
                 { "AcceptedCount", cvList.Count(c => c.Status == 1) },
                 { "RejectedCount", cvList.Count(c => c.Status == 2) },
-                { "InternApplications", cvList.Count(c => !c.JobPosition.PositionType) },
-                { "EmployeeApplications", cvList.Count(c => c.JobPosition.PositionType) }
+                { "InternApplications", cvList.Count(c => c.JobPosition != null && !c.JobPosition.PositionType) },
+                { "EmployeeApplications", cvList.Count(c => c.JobPosition != null && c.JobPosition.PositionType) }
             };
             ViewBag.cv = summaryCV;
 
@@ -222,6 +223,8 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "NewJobsThisMonth", jobList.Count(j => j.StartDate >= thisMonthStart) }
             };
             ViewBag.timeStats = timeBasedStats;
+
+            ViewBag.Student = user;
 
             return View();
         }

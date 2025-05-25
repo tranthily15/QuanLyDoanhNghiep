@@ -17,7 +17,7 @@
 
         <!-- CV Info Section -->
         <div class="col-md-4">
-            <div class="cv-info-sidebar">
+            <div class="cv-info-sidebar p-4 rounded-4 shadow-sm bg-white">
                 <!-- Candidate Info -->
                 <div class="candidate-profile mb-4">
                     <div class="profile-header d-flex align-items-center">
@@ -25,105 +25,98 @@
                             @{
                                 var initials = Model.User.FullName.Split(' ').Last().Substring(0, 2).ToUpper();
                             }
-                            <div class="avatar-placeholder">
-                                @initials
-                            </div>
+                            <div class="avatar-placeholder">@initials</div>
                         </div>
                         <div class="profile-info ms-3">
-                            <h3 class="mb-1">@Model.User.FullName</h3>
-                            <p class="email mb-1">
-                                <i class="fas fa-envelope me-2"></i>
-                                @Model.User.Email
-                            </p>
-                            <p class="phone mb-0">
-                                <i class="fas fa-phone me-2"></i>
-                                @Model.User.PhoneNumber
-                            </p>
+                            <h4 class="mb-1 fw-bold">@Model.User.FullName</h4>
+                            <div class="d-flex flex-column small text-muted">
+                                <span><i class="fas fa-envelope me-2"></i>@Model.User.Email</span>
+                                <span><i class="fas fa-phone me-2"></i>@Model.User.PhoneNumber</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-
+                <hr />
                 <!-- Position Info -->
                 <div class="position-info mb-4">
-                    <h4 class="section-title">Chiến dịch tuyển dụng</h4>
-                    <div class="info-card">
-                        <div class="company-logo">
-                            <i class="fas fa-building"></i>
+                    <h5 class="section-title mb-2">Vị trí ứng tuyển</h5>
+                    <div class="d-flex align-items-center">
+                        <div class="company-logo me-3">
+                            <i class="fas fa-building fa-2x text-primary"></i>
                         </div>
-                        <div class="position-details">
-                            <h5>@Model.JobPosition.PositionName</h5>
-                            <p class="mb-2">@Model.JobPosition.Company.CompanyName</p>
+                        <div>
+                            <div class="fw-semibold">@Model.JobPosition.PositionName</div>
+                            <div class="text-muted small mb-1">@Model.JobPosition.Company.CompanyName</div>
                             <span class="badge @(Model.JobPosition.PositionType ? "bg-success" : "bg-info")">
                                 @(Model.JobPosition.PositionType ? "Nhân viên" : "Thực tập sinh")
                             </span>
                         </div>
                     </div>
                 </div>
-
+                <hr />
                 <!-- CV Status -->
                 <div class="cv-status mb-4">
-                    <h4 class="section-title">Trạng thái CV</h4>
-                    <div class="status-info">
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <span>Trạng thái</span>
-                            <span class="status-badge @GetStatusClass(Model.Status)">
-                                @GetStatusText(Model.Status)
-                            </span>
-                        </div>
-                        <div class="d-flex justify-content-between align-items-center">
-                            <span>Nguồn</span>
-                            <span class="source-badge">Ứng tuyển</span>
-                        </div>
+                    <h5 class="section-title mb-2">Trạng thái CV</h5>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Trạng thái</span>
+                        <span class="status-badge @GetStatusClass(Model.Status)">
+                            @GetStatusText(Model.Status)
+                        </span>
                     </div>
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span>Nguồn</span>
+                        <span class="source-badge">Ứng tuyển</span>
+                    </div>
+                    @if (Model.Status != 0)
+                    {
+                        <div class="feedback-display mt-3">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-comment-dots fa-lg me-2 text-primary"></i>
+                                <span class="fw-semibold">Phản hồi của người duyệt:</span>
+                            </div>
+                            <div class="feedback-content px-2 py-2 rounded-3 bg-light">
+                                @if (!string.IsNullOrEmpty(Model.Feedback))
+                                {
+                                    <span>@Model.Feedback</span>
+                                }
+                                else
+                                {
+                                    <span class="text-muted fst-italic">Chưa có phản hồi</span>
+                                }
+                            </div>
+                            <div class="text-end text-muted small mt-1">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                @(Model.EvaluationDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                            </div>
+                        </div>
+                    }
                 </div>
-
-                @if (ViewBag.Role == "1") // Chỉ hiển thị phần đánh giá cho nhân viên
+                @if (ViewBag.Role == "1" && Model.Status == 0)
                 {
+                    <hr />
                     <!-- CV Evaluation -->
                     <div class="cv-evaluation mb-4">
-                        <h4 class="section-title">Đánh giá CV</h4>
-                        <div class="evaluation-info">
-                            <p class="mb-3">
-                                <i class="fas fa-calendar me-2"></i>
-                                Đánh giá CV trước @DateTime.Now.ToString("dd/MM")
-                            </p>
-                            
-                            @if (Model.Status == 0)
-                            {
-                                <form id="evaluationForm" method="post" action="@Url.Action("UpdateStatus", "CV")">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.CV_ID" />
-                                    <input type="hidden" name="status" id="statusInput" value="" />
-                                    
-                                    <div class="mb-3">
-                                        <label for="feedback" class="form-label">Nhận xét đánh giá:</label>
-                                        <textarea class="form-control" name="feedback" id="feedback" rows="3" required>@Model.Feedback</textarea>
-                                    </div>
-
-                                    <div class="d-grid gap-2">
-                                        <button type="button" class="btn btn-success" onclick="submitForm(1)">
-                                            <i class="fas fa-check me-2"></i> Duyệt CV
-                                        </button>
-                                        <button type="button" class="btn btn-danger" onclick="submitForm(2)">
-                                            <i class="fas fa-times me-2"></i> Từ chối CV
-                                        </button>
-                                    </div>
-                                </form>
-                            }
-                            else
-                            {
-                                <div class="feedback-display">
-                                    <h5>Phản hồi:</h5>
-                                    <p>@(string.IsNullOrEmpty(Model.Feedback) ? "Chưa có phản hồi" : Model.Feedback)</p>
-                                    <p class="text-muted">
-                                        <small>Đánh giá vào: @(Model.EvaluationDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</small>
-                                    </p>
-                                </div>
-                            }
-                        </div>
+                        <h5 class="section-title mb-2">Đánh giá CV</h5>
+                        <form id="evaluationForm" method="post" action="@Url.Action("UpdateStatus", "CV")">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.CV_ID" />
+                            <input type="hidden" name="status" id="statusInput" value="" />
+                            <div class="mb-3">
+                                <label for="feedback" class="form-label">Nhận xét đánh giá:</label>
+                                <textarea class="form-control" name="feedback" id="feedback" rows="3" required>@Model.Feedback</textarea>
+                            </div>
+                            <div class="d-grid gap-2">
+                                <button type="button" class="btn btn-success" onclick="submitForm(1)">
+                                    <i class="fas fa-check me-2"></i> Duyệt CV
+                                </button>
+                                <button type="button" class="btn btn-danger" onclick="submitForm(2)">
+                                    <i class="fas fa-times me-2"></i> Từ chối CV
+                                </button>
+                            </div>
+                        </form>
                     </div>
                 }
-
+                <hr />
                 <!-- Action Buttons -->
                 <div class="cv-actions">
                     <a href="@Model.Resume" download class="btn btn-outline-primary w-100">
@@ -191,17 +184,29 @@
 }
 
 .cv-info-sidebar {
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    padding: 24px;
+    background: transparent;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
 }
 
 .section-title {
-    font-size: 18px;
+    font-size: 1.1rem;
     font-weight: 600;
-    color: #333;
-    margin-bottom: 16px;
+    color: #2c3e50;
+}
+
+.candidate-profile .avatar-placeholder {
+    width: 56px;
+    height: 56px;
+    background: #e0f2fe;
+    color: #0d6efd;
+    font-size: 1.5rem;
+    font-weight: 700;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .status-badge {
@@ -234,8 +239,22 @@
 
 .feedback-display {
     background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 4px;
+    padding: 15px 10px 10px 10px;
+    border-radius: 8px;
     margin-top: 10px;
+    border: 1px solid #e3e6ed;
+}
+
+.feedback-content {
+    font-size: 1rem;
+    color: #222;
+}
+
+.cv-evaluation textarea.form-control {
+    border-radius: 8px;
+}
+
+.cv-actions {
+    margin-top: 18px;
 }
 </style>

@@ -19,7 +19,7 @@ namespace QuanLyDoanhNghiep.Controllers
         public UserController(QuanLyDoanhNghiepDBContext context, SyncDataService syncDataService)
         {
             _context = context;
-            _syncDataService = syncDataService; 
+            _syncDataService = syncDataService;
         }
 
         // GET: User
@@ -160,6 +160,26 @@ namespace QuanLyDoanhNghiep.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Profile()
+        {
+            if (!IsLogin || RoleUser != "2") // Kiểm tra quyền (RoleUser = 2 là sinh viên)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+           
+            var user = await _context.User
+                .Include (u => u.Account)
+                .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return View(user);
         }
 
         private bool UserExists(string id)

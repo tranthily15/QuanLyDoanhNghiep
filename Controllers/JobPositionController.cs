@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using QuanLyDoanhNghiep.Models;
+using System.Linq;
 
 namespace QuanLyDoanhNghiep.Controllers
 {
@@ -15,112 +16,244 @@ namespace QuanLyDoanhNghiep.Controllers
 
         public async Task<IActionResult> Index(string keyword, string provinces, int internshipPage = 1, int fulltimePage = 1)
         {
-            const int PageSize = 21;
+            try
+            {
+                const int PageSize = 18;
 
-            var baseQuery = _context.JobPosition
+                var baseQuery = _context.JobPosition
+                    .Include(j => j.Company)
+                    .Include(j => j.JobLocations)
+                        .ThenInclude(l => l.Province)
+                    .Where(j => j.Status == true);
+
+                if (!string.IsNullOrEmpty(keyword))
+                {
+                    baseQuery = baseQuery.Where(j => j.PositionName.Contains(keyword) ||
+                                                   j.JobDescription.Contains(keyword) ||
+                                                   j.Company.CompanyName.Contains(keyword));
+                }
+
+                if (!string.IsNullOrEmpty(provinces))
+                {
+                    var provinceIds = provinces.Split(',').ToList();
+                    baseQuery = baseQuery.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
+                }
+
+                if (IsLogin && RoleUser == "1")
+                {
+                    baseQuery = baseQuery.Where(j => j.Company.CompanyID == int.Parse(CurrentCompanyID));
+                }
+
+                // Lấy full danh sách (để tính tổng số trang)
+                var internshipQuery = baseQuery.Where(j => !j.PositionType);
+                var fulltimeQuery = baseQuery.Where(j => j.PositionType);
+
+                var totalInterns = await internshipQuery.CountAsync();
+                var totalFulltime = await fulltimeQuery.CountAsync();
+
+                var internships = await internshipQuery
+                    .OrderByDescending(j => j.StartDate)
+                    .Skip((internshipPage - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToListAsync();
+
+                var fulltimeJobs = await fulltimeQuery
+                    .OrderByDescending(j => j.StartDate)
+                    .Skip((fulltimePage - 1) * PageSize)
+                    .Take(PageSize)
+                    .ToListAsync();
+
+                var model = new JobIndexViewModel
+                {
+                    Internships = internships,
+                    FullTimeJobs = fulltimeJobs,
+                    Keyword = keyword ?? string.Empty,
+                    SelectedProvinces = provinces?.Split(',') ?? Array.Empty<string>(),
+                    InternshipPage = internshipPage,
+                    FullTimePage = fulltimePage,
+                    TotalInternshipPages = (int)Math.Ceiling((double)totalInterns / PageSize),
+                    TotalFullTimePages = (int)Math.Ceiling((double)totalFulltime / PageSize)
+                };
+
+                ViewBag.Role = RoleUser;
+                ViewBag.Provinces = await _context.Province.ToListAsync();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.WriteLine($"Error in Index action: {ex.Message}");
+                // Return a default model if there's an error
+                var model = new JobIndexViewModel
+                {
+                    Internships = new List<JobPosition>(),
+                    FullTimeJobs = new List<JobPosition>(),
+                    Keyword = keyword ?? string.Empty,
+                    SelectedProvinces = Array.Empty<string>(),
+                    InternshipPage = 1,
+                    FullTimePage = 1,
+                    TotalInternshipPages = 0,
+                    TotalFullTimePages = 0
+                };
+                ViewBag.Role = RoleUser;
+                ViewBag.Provinces = await _context.Province.ToListAsync();
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetFulltime(string keyword, string provinces, string jobType, string salaryRange, int page = 1)
+        {
+            const int PageSize = 6;
+            
+            // Build base query
+            var query = _context.JobPosition
                 .Include(j => j.Company)
                 .Include(j => j.JobLocations)
                     .ThenInclude(l => l.Province)
-                .Where(j => j.Status == true);
+                .Where(j => j.Status == true && j.PositionType == true);
 
-            if (!string.IsNullOrEmpty(keyword))
+            // Apply keyword search if provided
+            if (!string.IsNullOrWhiteSpace(keyword))
             {
-                baseQuery = baseQuery.Where(j => EF.Functions.Like(j.PositionName, $"%{keyword}%") ||
-                                                 EF.Functions.Like(j.JobDescription, $"%{keyword}%"));
+                query = query.Where(j => j.PositionName.Contains(keyword) ||
+                                        j.JobDescription.Contains(keyword) ||
+                                        j.Company.CompanyName.Contains(keyword));
             }
 
+            // Apply province filter if provided
             if (!string.IsNullOrEmpty(provinces))
             {
                 var provinceIds = provinces.Split(',').ToList();
-                baseQuery = baseQuery.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
+                query = query.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
             }
 
-            if (IsLogin && RoleUser == "1")
-            {
-                baseQuery = baseQuery.Where(j => j.Company.CompanyID == int.Parse(CurrentCompanyID));
-            }
+            // Get total count before pagination
+            var total = await query.CountAsync();
 
-            // Lấy full danh sách (để tính tổng số trang)
-            var internshipQuery = baseQuery.Where(j => !j.PositionType);
-            var fulltimeQuery = baseQuery.Where(j => j.PositionType);
-
-            var totalInterns = await internshipQuery.CountAsync();
-            var totalFulltime = await fulltimeQuery.CountAsync();
-            Console.WriteLine($"Total FullTimeJobs: {totalFulltime}");
-            var internships = await internshipQuery
+            // Apply pagination
+            var jobs = await query
+                .OrderByDescending(j => j.StartDate)
+                .Skip((page - 1) * PageSize)
+                .Take(PageSize)
+                .Select(j => new
+                {
+                    j.PositionID,
+                    j.PositionName,
+                    j.Salary,
+                    j.Company.CompanyName,
+                    CompanyLogo = j.Company.CompanyLogo ?? "default.png",
+                    ProvinceName = j.JobLocations.Select(l => l.Province.ProvinceName).FirstOrDefault() ?? "Không rõ"
+                })
                 .ToListAsync();
 
-            var fulltimeJobs = await fulltimeQuery
-                .ToListAsync();
-
-            var model = new JobIndexViewModel
+            return Json(new
             {
-                Internships = internships,
-                FullTimeJobs = fulltimeJobs,
-                Keyword = keyword ?? string.Empty,
-                SelectedProvinces = provinces?.Split(',') ?? Array.Empty<string>(),
-                InternshipPage = internshipPage,
-                FullTimePage = fulltimePage,
-                TotalInternshipPages = (int)Math.Ceiling((double)totalInterns / PageSize),
-                TotalFullTimePages = (int)Math.Ceiling((double)totalFulltime / PageSize)
-            };
-
-            ViewBag.Role = RoleUser;
-            ViewBag.Provinces = await _context.Province.ToListAsync();
-
-            return View(model);
+                Jobs = jobs,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)total / PageSize)
+            });
         }
-        public async Task<IActionResult> LoadFullTimeJobs(int page = 1)
+
+        [HttpGet]
+        public async Task<IActionResult> GetIntern(string keyword, string provinces, string jobType, string salaryRange, int page = 1)
         {
-            const int PageSize = 21;
+            const int PageSize = 6;
+            
+            // Build base query
             var query = _context.JobPosition
                 .Include(j => j.Company)
                 .Include(j => j.JobLocations)
                     .ThenInclude(l => l.Province)
-                .Where(j => j.Status && j.PositionType);
+                .Where(j => j.Status == true && j.PositionType == false);
 
-            var totalItems = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+            // Apply keyword search if provided
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                query = query.Where(j => j.PositionName.Contains(keyword) ||
+                                        j.JobDescription.Contains(keyword) ||
+                                        j.Company.CompanyName.Contains(keyword));
+            }
 
-            // Đảm bảo page không vượt quá totalPages
-            page = Math.Min(page, totalPages);
-            page = Math.Max(1, page);
+            // Apply province filter if provided
+            if (!string.IsNullOrEmpty(provinces))
+            {
+                var provinceIds = provinces.Split(',').ToList();
+                query = query.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
+            }
 
-            var data = await query
-                //.OrderByDescending(j => j.CreatedDate)
+            // Get total count before pagination
+            var total = await query.CountAsync();
+
+            // Apply pagination
+            var jobs = await query
+                .OrderByDescending(j => j.StartDate)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
+                .Select(j => new
+                {
+                    j.PositionID,
+                    j.PositionName,
+                    j.Salary,
+                    j.Company.CompanyName,
+                    CompanyLogo = j.Company.CompanyLogo ?? "default.png",
+                    ProvinceName = j.JobLocations.Select(l => l.Province.ProvinceName).FirstOrDefault() ?? "Không rõ"
+                })
                 .ToListAsync();
 
-            return PartialView("_JobListPartial", data);
+            return Json(new
+            {
+                Jobs = jobs,
+                CurrentPage = page,
+                TotalPages = (int)Math.Ceiling((double)total / PageSize)
+            });
         }
 
-        public async Task<IActionResult> LoadInternships(int page = 1)
-        {
-            const int PageSize = 21;
-            var query = _context.JobPosition
-                .Include(j => j.Company)
-                .Include(j => j.JobLocations)
-                    .ThenInclude(l => l.Province)
-                .Where(j => j.Status && !j.PositionType);
+        //[HttpGet]
+        //public async Task<IActionResult> GetInternships(string keyword, string provinces, int page = 1)
+        //{
+        //    const int PageSize = 18;
 
-            var totalItems = await query.CountAsync();
-            var totalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
+        //    var query = _context.JobPosition
+        //        .Include(j => j.Company)
+        //        .Include(j => j.JobLocations)
+        //            .ThenInclude(l => l.Province)
+        //        .Where(j => j.Status == true && !j.PositionType); // Internship
 
-            // Đảm bảo page không vượt quá totalPages
-            page = Math.Min(page, totalPages);
-            page = Math.Max(1, page);
+        //    if (!string.IsNullOrEmpty(keyword))
+        //    {
+        //        query = query.Where(j => EF.Functions.Like(j.PositionName, $"%{keyword}%") ||
+        //                                 EF.Functions.Like(j.JobDescription, $"%{keyword}%"));
+        //    }
 
-            var data = await query
-                //.OrderByDescending(j => j.CreatedDate)
-                .Skip((page - 1) * PageSize)
-                .Take(PageSize)
-                .ToListAsync();
+        //    if (!string.IsNullOrEmpty(provinces))
+        //    {
+        //        var provinceIds = provinces.Split(',').ToList();
+        //        query = query.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
+        //    }
 
-            return PartialView("_JobListPartial", data);
-        }
+        //    var total = await query.CountAsync();
+        //    var data = await query
+        //        .OrderByDescending(j => j.StartDate)
+        //        .Skip((page - 1) * PageSize)
+        //        .Take(PageSize)
+        //        .Select(j => new {
+        //            j.PositionID,
+        //            j.PositionName,
+        //            j.Salary,
+        //            CompanyName = j.Company.CompanyName,
+        //            CompanyLogo = j.Company.CompanyLogo,
+        //            ProvinceName = j.JobLocations.Select(l => l.Province.ProvinceName).FirstOrDefault()
+        //        }).ToListAsync();
 
-
+        //    return Json(new
+        //    {
+        //        TotalPages = (int)Math.Ceiling((double)total / PageSize),
+        //        CurrentPage = page,
+        //        Jobs = data
+        //    });
+        //}
 
         // GET: JobPosition/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -130,12 +263,9 @@ namespace QuanLyDoanhNghiep.Controllers
                 return NotFound();
             }
             var jobPosition = await _context.JobPosition
-                    .Include(j => j.Company)
-                        .ThenInclude(c => c.Ward)
-                    .Include(j => j.Company)
-                        .ThenInclude(w => w.District)
-                    .Include(j => j.Company)
-                        .ThenInclude(d => d.Province)
+                    .Include(j => j.Company.Ward)
+                    .Include(j => j.Company.District)
+                    .Include(j => j.Company.Province)
                     .Include(j => j.JobLocations)
                         .ThenInclude(l => l.Ward)
                     .Include(j => j.JobLocations)
@@ -150,17 +280,42 @@ namespace QuanLyDoanhNghiep.Controllers
 
             if (!IsLogin)
             {
+                ViewBag.IsLogin = IsLogin;
+                ViewBag.RoleUser = RoleUser;
                 return View(jobPosition);
             }
-            else if (IsLogin && RoleUser == "2") // sinh vien
+            else if (IsLogin && RoleUser == "2") // sinh viên
             {
+                ViewBag.IsLogin = IsLogin;
+                ViewBag.RoleUser = RoleUser;
                 ViewBag.User = _context.User.FirstOrDefault(u => u.AccountID.ToString().Equals(CurrentID));
+                // Kiểm tra xem vị trí đã được lưu chưa
+                ViewBag.IsSaved = await _context.SavedJob
+                    .AnyAsync(sj => sj.UserID == CurrentID && sj.PositionID == id && sj.IsSaved);
                 return View(jobPosition);
             }
             else
             {
                 return View(jobPosition);
             }
+        }
+
+        [HttpGet]
+        [Route("api/jobpositions")]
+        public async Task<IActionResult> GetJobPositions()
+        {
+            var jobPositions = await _context.JobPosition
+                .Where(j => j.Status == true) // Chỉ lấy các vị trí đang hoạt động
+                .Select(j => new
+                {
+                    j.PositionID,
+                    j.PositionName,
+                    j.JobDescription,
+                    j.JobRequirements
+                })
+                .ToListAsync();
+
+            return Ok(jobPositions);
         }
 
         // GET: JobPosition/Create
@@ -260,31 +415,26 @@ namespace QuanLyDoanhNghiep.Controllers
             }
 
             var companyId = int.Parse(CurrentCompanyID);
-            // Load JobPosition including its current JobLocations
             var jobPosition = await _context.JobPosition
-                .Include(jp => jp.JobLocations) // Include existing locations
-                    .ThenInclude(jl => jl.Ward) // Include details for dropdowns
                 .Include(jp => jp.JobLocations)
-                    .ThenInclude(w => w.District)
+                    .ThenInclude(jl => jl.Province)
                 .Include(jp => jp.JobLocations)
-                    .ThenInclude(d => d.Province)
+                    .ThenInclude(jl => jl.District)
+                .Include(jp => jp.JobLocations)
+                    .ThenInclude(jl => jl.Ward)
                 .FirstOrDefaultAsync(jp => jp.PositionID == id && jp.CompanyID == companyId);
 
             if (jobPosition == null)
             {
-                // Ensure the user can only edit their own jobs
                 return NotFound();
             }
 
-            // Load Provinces for dropdowns
+            // Load danh sách tỉnh/thành phố cho dropdown
             ViewBag.Provinces = await _context.Province.ToListAsync();
-            // Pass existing locations to the view (optional, view can iterate Model.JobLocations)
-            // ViewBag.ExistingLocations = jobPosition.JobLocations;
 
             return View(jobPosition);
         }
 
-        // POST: JobPosition/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, JobPosition jobPosition, List<JobLocation> JobLocations)
@@ -299,90 +449,88 @@ namespace QuanLyDoanhNghiep.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            // Ensure the company ID matches the logged-in user
             var companyId = int.Parse(CurrentCompanyID);
             if (jobPosition.CompanyID != companyId)
             {
                 ModelState.AddModelError("", "Bạn không có quyền chỉnh sửa vị trí này.");
             }
 
-            // Basic ModelState validation first
             if (ModelState.IsValid)
             {
                 try
                 {
-                    // Handle JobLocations: Remove old, add new
+                    // Lấy danh sách địa điểm hiện tại trong DB
                     var existingLocations = await _context.JobLocation
                         .Where(l => l.PositionID == id)
                         .ToListAsync();
-                    _context.JobLocation.RemoveRange(existingLocations);
 
-                    if (JobLocations != null && JobLocations.Any())
+                    // Lọc danh sách mới (loại bỏ bản ghi không hợp lệ)
+                    var validNewLocations = JobLocations
+                        .Where(l => !string.IsNullOrEmpty(l.ProvinceID) &&
+                                    !string.IsNullOrEmpty(l.DistrictID) &&
+                                    !string.IsNullOrEmpty(l.Street))
+                        .GroupBy(x => new { x.ProvinceID, x.DistrictID, Ward = x.WardID ?? "", x.Street })
+                        .Select(g => g.First())
+                        .ToList();
+
+                    if (!validNewLocations.Any())
                     {
-                        var uniqueNewLocations = JobLocations
-                            .Where(l => !string.IsNullOrEmpty(l.ProvinceID) &&
-                                      !string.IsNullOrEmpty(l.DistrictID) &&
-                                      !string.IsNullOrEmpty(l.WardID) &&
-                                      !string.IsNullOrEmpty(l.Street))
-                            .GroupBy(x => new { x.ProvinceID, x.DistrictID, x.WardID, x.Street })
-                            .Select(g => g.First())
-                            .ToList();
-
-                        if (!uniqueNewLocations.Any())
-                        {
-                            ModelState.AddModelError("", "Vui lòng cung cấp ít nhất một địa điểm hợp lệ.");
-                        }
-                        else
-                        {
-                            foreach (var location in uniqueNewLocations)
-                            {
-                                location.PositionID = id; // Assign the correct PositionID
-                                _context.JobLocation.Add(location);
-                            }
-                        }
-
-                    }
-                    else
-                    { // No locations submitted
-                        ModelState.AddModelError("", "Vui lòng cung cấp ít nhất một địa điểm.");
-                    }
-
-                    // Re-check ModelState after location processing
-                    if (!ModelState.IsValid)
-                    {
+                        ModelState.AddModelError("", "Vui lòng cung cấp ít nhất một địa điểm hợp lệ.");
                         ViewBag.Provinces = await _context.Province.ToListAsync();
-                        // Reload the original job position data in case of error to avoid losing other edits
-                        var originalJob = await _context.JobPosition.AsNoTracking().FirstOrDefaultAsync(j => j.PositionID == id);
-                        jobPosition.JobLocations = originalJob?.JobLocations ?? new List<JobLocation>(); // Keep original locations on error
                         return View(jobPosition);
                     }
 
-                    // If all good, update the JobPosition itself
-                    _context.Update(jobPosition);
+                    // Tìm location đã bị xoá (có trong DB nhưng không có trong danh sách mới)
+                    var toDelete = existingLocations.Where(e =>
+                        !validNewLocations.Any(n =>
+                            n.ProvinceID == e.ProvinceID &&
+                            n.DistrictID == e.DistrictID &&
+                            n.WardID == e.WardID &&
+                            n.Street.Trim().Equals(e.Street.Trim(), StringComparison.OrdinalIgnoreCase)
+                        )
+                    ).ToList();
+
+                    // Tìm location mới (có trong danh sách mới nhưng không tồn tại trong DB)
+                    var toAdd = validNewLocations.Where(n =>
+                        !existingLocations.Any(e =>
+                            n.ProvinceID == e.ProvinceID &&
+                            n.DistrictID == e.DistrictID &&
+                            n.WardID == e.WardID &&
+                            n.Street.Trim().Equals(e.Street.Trim(), StringComparison.OrdinalIgnoreCase)
+                        )
+                    ).ToList();
+
+                    // Thực hiện thao tác xóa và thêm mới
+                    if (toDelete.Any())
+                    {
+                        _context.JobLocation.RemoveRange(toDelete);
+                    }
+
+                    foreach (var location in toAdd)
+                    {
+                        location.PositionID = id;
+                        _context.JobLocation.Add(location);
+                    }
+
+                    // Cập nhật thông tin JobPosition
+                    _context.Entry(jobPosition).State = EntityState.Modified;
                     await _context.SaveChangesAsync();
+
                     TempData["SuccessMessage"] = "Cập nhật vị trí tuyển dụng thành công!";
-                    return RedirectToAction(nameof(ActiveJobs)); // Redirect to the job list
+                    return RedirectToAction(nameof(ActiveJobs));
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    // ... (concurrency handling) ...
                     ModelState.AddModelError("", "Lỗi tương tranh. Dữ liệu có thể đã bị thay đổi bởi người khác.");
                 }
                 catch (Exception ex)
                 {
-                    // Log the exception (ex)
-                    ModelState.AddModelError("", "Đã xảy ra lỗi không mong muốn khi cập nhật.");
+                    ModelState.AddModelError("", "Đã xảy ra lỗi không mong muốn: " + ex.Message);
                 }
             }
 
-            // If ModelState is invalid at any point, return to the view
+            // Nếu có lỗi thì trả lại view
             ViewBag.Provinces = await _context.Province.ToListAsync();
-            // Reload locations if they weren't passed back correctly or if initial load failed
-            if (jobPosition.JobLocations == null || !jobPosition.JobLocations.Any())
-            {
-                var originalJob = await _context.JobPosition.Include(j => j.JobLocations).AsNoTracking().FirstOrDefaultAsync(j => j.PositionID == id);
-                jobPosition.JobLocations = originalJob?.JobLocations ?? new List<JobLocation>();
-            }
             return View(jobPosition);
         }
 
@@ -525,9 +673,7 @@ namespace QuanLyDoanhNghiep.Controllers
         [HttpGet]
         public IActionResult GetDistricts(string provinceId)
         {
-
             var districts = _context.District
-
                 .Where(d => provinceId.Contains(d.ProvinceID))
                 .Select(d => new { districtID = d.DistrictID, districtName = d.DistrictName })
                 .ToList();
@@ -542,6 +688,151 @@ namespace QuanLyDoanhNghiep.Controllers
                         .Select(w => new { w.WardID, w.WardName })
                         .ToList();
             return Json(wards);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteJobLocation(int locationId)
+        {
+            var jobLocation = await _context.JobLocation.FindAsync(locationId);
+            if (jobLocation == null)
+            {
+                return Json(new { success = false, message = "Địa điểm không tồn tại." });
+            }
+
+            try
+            {
+                _context.JobLocation.Remove(jobLocation);
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Đã xóa địa điểm thành công." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> List(string type = "all")
+        {
+            var baseQuery = _context.JobPosition
+                .Include(j => j.Company)
+                .Include(j => j.JobLocations)
+                    .ThenInclude(l => l.Province)
+                .Where(j => j.Status == true);
+
+            if (type == "intern")
+            {
+                baseQuery = baseQuery.Where(j => !j.PositionType);
+            }
+            else if (type == "fulltime")
+            {
+                baseQuery = baseQuery.Where(j => j.PositionType);
+            }
+            // else: all
+
+            var jobs = await baseQuery.ToListAsync();
+            return View(jobs);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SaveJob(int positionId)
+        {
+            if (!IsLogin || RoleUser != "2") // Chỉ cho phép sinh viên lưu vị trí
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập với tài khoản sinh viên để lưu vị trí." });
+            }
+
+            try
+            {
+                var userId = CurrentID;
+                var existingSavedJob = await _context.SavedJob
+                    .FirstOrDefaultAsync(sj => sj.UserID == userId && sj.PositionID == positionId);
+
+                if (existingSavedJob != null)
+                {
+                    if (existingSavedJob.IsSaved)
+                    {
+                        return Json(new { success = false, message = "Bạn đã lưu vị trí này rồi." });
+                    }
+                    else
+                    {
+                        existingSavedJob.IsSaved = true;
+                        existingSavedJob.SavedDate = DateTime.Now;
+                        _context.Update(existingSavedJob);
+                    }
+                }
+                else
+                {
+                    var savedJob = new SavedJob
+                    {
+                        UserID = userId,
+                        PositionID = positionId,
+                        SavedDate = DateTime.Now,
+                        IsSaved = true
+                    };
+                    _context.SavedJob.Add(savedJob);
+                }
+
+                await _context.SaveChangesAsync();
+                return Json(new { success = true, message = "Đã lưu vị trí thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UnsaveJob(int positionId)
+        {
+            if (!IsLogin || RoleUser != "2")
+            {
+                return Json(new { success = false, message = "Bạn cần đăng nhập với tài khoản sinh viên để thực hiện thao tác này." });
+            }
+
+            try
+            {
+                var userId = CurrentID;
+                var savedJob = await _context.SavedJob
+                    .FirstOrDefaultAsync(sj => sj.UserID == userId && sj.PositionID == positionId);
+
+                if (savedJob == null || !savedJob.IsSaved)
+                {
+                    return Json(new { success = false, message = "Vị trí này chưa được lưu." });
+                }
+
+                savedJob.IsSaved = false;
+                _context.Update(savedJob);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Đã hủy lưu vị trí thành công!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        public async Task<IActionResult> SavedJobs()
+        {
+            if (!IsLogin || RoleUser != "2")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var userId = CurrentID;
+            var savedJobs = await _context.SavedJob
+                .Include(sj => sj.JobPosition)
+                    .ThenInclude(jp => jp.Company)
+                .Include(sj => sj.JobPosition)
+                    .ThenInclude(jp => jp.JobLocations)
+                        .ThenInclude(jl => jl.Province)
+                .Where(sj => sj.UserID == userId)
+                .OrderByDescending(sj => sj.SavedDate)
+                .ToListAsync();
+
+            return View(savedJobs);
         }
     }
 }

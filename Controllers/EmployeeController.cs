@@ -86,11 +86,11 @@ namespace QuanLyDoanhNghiep.Controllers
                 }
                 _context.Employee.Add(employee);
                 await _context.SaveChangesAsync();
-                return Ok();  
+                return Ok();
             }
             return BadRequest(ModelState);
         }
-  
+
 
         // GET: Employee/Edit/5
         public async Task<IActionResult> Edit(string? id)
@@ -180,6 +180,27 @@ namespace QuanLyDoanhNghiep.Controllers
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        public async Task<IActionResult> Profile()
+        {
+            if (!IsLogin || RoleUser != "1") // Kiểm tra quyền (RoleUser = 1 là nhân viên)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            var employeeId = CurrentID;
+            var employee = await _context.Employee
+                .Include(e => e.Account)
+                .Include(e => e.Company)
+                .FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(employeeId));
+
+            if (employee == null)
+            {
+                return NotFound();
+            }
+
+            return View(employee);
         }
 
         private bool EmployeeExists(string id)

@@ -25,7 +25,7 @@ namespace QuanLyDoanhNghiep.Controllers
         public async Task<IActionResult> Index()
         {
             var accounts = await _context.Account.ToListAsync();
-            return View(accounts); 
+            return View(accounts);
         }
 
         // GET: Account/Details/5
@@ -157,24 +157,7 @@ namespace QuanLyDoanhNghiep.Controllers
         {
             if (ModelState.IsValid)
             {
-                //if (!IsLogin)
-                //{
-                //    // Nếu người dùng có quyền là 2, chỉ tạo tài khoản có quyền là
-                //    if (model.Quyen != 2)
-                //    {
-                //        ModelState.AddModelError("", "Bạn chỉ được phép tạo tại khoản cho khách hàng");
-                //        return View(model);
-                //    }
-                //}
-                //else if (RoleUser == "1")
-                //{
-                //    // Nếu người dùng có quyền là 1, có thể tạo tài khoản có quyền là 1 hoặc 2
-                //    if (model.Role != 1 && model.Role != 2)
-                //    {
-                //        ModelState.AddModelError("", "Bạn không có quyền được tài khoản admin");
-                //        return View(model);
-                //    }
-                //}
+
 
                 var existingAccount = _context.Account.FirstOrDefault(m => m.UserName.Equals(model.UserName));
                 if (existingAccount != null)
@@ -201,12 +184,60 @@ namespace QuanLyDoanhNghiep.Controllers
             return RedirectToAction("Login");
         }
 
+        public IActionResult ChangePassword()
+        {
+            if (!IsLogin)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ChangePassword(string currentPassword, string newPassword, string confirmPassword)
+        {
+            if (!IsLogin)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+
+            if (newPassword != confirmPassword)
+            {
+                ModelState.AddModelError("", "Mật khẩu mới và xác nhận mật khẩu không khớp.");
+                return View();
+            }
+
+            var account = await _context.Account.FirstOrDefaultAsync(a => a.AccountID.ToString() == CurrentID);
+            if (account == null)
+            {
+                return NotFound();
+            }
+
+            if (!VerifyPassword(account.Password, currentPassword))
+            {
+                ModelState.AddModelError("", "Mật khẩu hiện tại không đúng.");
+                return View();
+            }
+
+            // Mã hóa mật khẩu mới
+            using var hashMethod = SHA256.Create();
+            account.Password = Util.Cryptography.GetHash(hashMethod, newPassword);
+
+            _context.Update(account);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+            return RedirectToAction("Index", "Home");
+        }
+
         //// GET: Account/Create
         //public IActionResult Create()
         //{
         //    return View();
         //}
-        
+
         //// POST: Account/Create
         //// To protect from overposting attacks, enable the specific properties you want to bind to.
         //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
