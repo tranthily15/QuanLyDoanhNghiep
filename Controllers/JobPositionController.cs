@@ -288,10 +288,12 @@ namespace QuanLyDoanhNghiep.Controllers
             {
                 ViewBag.IsLogin = IsLogin;
                 ViewBag.RoleUser = RoleUser;
-                ViewBag.User = _context.User.FirstOrDefault(u => u.AccountID.ToString().Equals(CurrentID));
+                var user = await _context.User
+                    .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                ViewBag.User = user;
                 // Kiểm tra xem vị trí đã được lưu chưa
                 ViewBag.IsSaved = await _context.SavedJob
-                    .AnyAsync(sj => sj.UserID == CurrentID && sj.PositionID == id && sj.IsSaved);
+                    .AnyAsync(sj => sj.UserID == user.ID && sj.PositionID == id && sj.IsSaved);
                 return View(jobPosition);
             }
             else
@@ -778,7 +780,9 @@ namespace QuanLyDoanhNghiep.Controllers
 
             try
             {
-                var userId = CurrentID;
+                var user = await _context.User
+                    .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                var userId = user.ID;
                 var savedJob = await _context.SavedJob
                     .FirstOrDefaultAsync(sj => sj.UserID == userId && sj.PositionID == positionId);
 
@@ -806,7 +810,9 @@ namespace QuanLyDoanhNghiep.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-            var userId = CurrentID;
+            var user = await _context.User
+                   .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+            var userId = user.ID;
             var savedJobs = await _context.SavedJob
                 .Include(sj => sj.JobPosition)
                     .ThenInclude(jp => jp.Company)
