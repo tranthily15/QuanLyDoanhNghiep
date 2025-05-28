@@ -68,6 +68,7 @@ namespace QuanLyDoanhNghiep.Controllers
             ViewBag.IsLogin = IsLogin;
             ViewBag.Role = RoleUser;
             ViewBag.CurrentUser = CurrentUser;
+            ViewBag.CurrentCompanyID = CurrentCompanyID;
             base.OnActionExecuted(filterContext);
         }
     }

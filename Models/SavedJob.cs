@@ -15,10 +15,7 @@ namespace QuanLyDoanhNghiep.Models
         [Required]
         public int PositionID { get; set; }
 
-        [Required]
         public DateTime SavedDate { get; set; }
-
-        [Required]
         public bool IsSaved { get; set; }
 
         // Navigation properties
@@ -28,4 +25,4 @@ namespace QuanLyDoanhNghiep.Models
         [ForeignKey("PositionID")]
         public virtual JobPosition JobPosition { get; set; }
     }
-} 
+}

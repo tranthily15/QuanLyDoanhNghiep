@@ -72,9 +72,11 @@
             0% {
                 transform: scale(1);
             }
+
             50% {
                 transform: scale(1.2);
             }
+
             100% {
                 transform: scale(1);
             }
@@ -139,11 +141,13 @@
                                     <i class="fas fa-chart-bar text-light"></i> Thống kê
                                 </a>
                                 <li class="nav-item mx-1 position-relative">
-                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown"
+                                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-bell fa-fw fs-5"></i>
                                         <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown"
+                                        aria-labelledby="notificationDropdown" style="width: 360px;">
                                         <div class="dropdown-header d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0">Thông báo</h6>
                                             <button class="btn btn-link btn-sm p-0 mark-all-read">
@@ -165,7 +169,7 @@
                                 <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="Create">
                                     <i class="fas fa-file-alt text-light"></i> Đăng tin tuyển
                                 </a>
-                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="Index">
+                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="ActiveJobs">
                                     <i class="fas fa-briefcase text-light"></i> Tin tuyển dụng
                                 </a>
                                 <a class="nav-link text-light" asp-area="" asp-controller="CV" asp-action="Index">
@@ -176,11 +180,13 @@
                                     <i class="fas fa-chart-bar text-light"></i> Thống kê
                                 </a>
                                 <li class="nav-item mx-1 position-relative">
-                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown"
+                                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-bell fa-fw fs-5"></i>
                                         <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown"
+                                        aria-labelledby="notificationDropdown" style="width: 360px;">
                                         <div class="dropdown-header d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0">Thông báo</h6>
                                             <button class="btn btn-link btn-sm p-0 mark-all-read">
@@ -205,16 +211,21 @@
                                 <a class="nav-link text-light" asp-area="" asp-controller="CV" asp-action="Index">
                                     <i class="fas fa-file-alt text-light"></i> CV của tôi
                                 </a>
+                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="SavedJobs">
+                                    <i class="fas fa-heart text-light"></i> Việc làm đã lưu
+                                </a>
                                 <a class="nav-link text-light" asp-area="" asp-controller="Dashboard"
                                     asp-action="Index_Student">
                                     <i class="fas fa-chart-bar text-light"></i> Thống kê
                                 </a>
                                 <li class="nav-item mx-1 position-relative">
-                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown"
+                                        role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                         <i class="fas fa-bell fa-fw fs-5"></i>
                                         <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
                                     </a>
-                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown" aria-labelledby="notificationDropdown" style="width: 360px;">
+                                    <div class="dropdown-menu dropdown-menu-end notification-dropdown"
+                                        aria-labelledby="notificationDropdown" style="width: 360px;">
                                         <div class="dropdown-header d-flex justify-content-between align-items-center">
                                             <h6 class="mb-0">Thông báo</h6>
                                             <button class="btn btn-link btn-sm p-0 mark-all-read">
@@ -243,8 +254,13 @@
                             <div class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="userDropdown">
                                 @if (ViewBag.Role == "1")
                                     {
-                                        <a class="dropdown-item" asp-area="" asp-controller="Employee" asp-action="Profile">
-                                            <i class="bi bi-person-square"></i> Thông tin cá nhân
+                                        <a class="dropdown-item" asp-area="" asp-controller="Company" asp-action="Details"
+                                            asp-route-id="@ViewBag.CurrentCompanyID">
+                                            <i class="bi bi-person-square"></i> Thông tin công ty
+                                        </a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="Employee"
+                                            asp-action="CompanyEmployees">
+                                            <i class="bi bi-building"></i> Nhân viên của công ty
                                         </a>
                                     }
                                     else if (ViewBag.Role == "2")
@@ -310,44 +326,44 @@
                 $.get('/Notification/GetUnreadNotifications', function (data) {
                     var $list = $('.notification-list');
                     $list.empty();
-                    
+
                     if (data && data.length > 0) {
-                        data.forEach(function(notification) {
+                        data.forEach(function (notification) {
                             var $item = $(`
-                                <div class="notification-item unread" data-id="${notification.notificationID}" data-path="${notification.notificationPath || ''}">
-                                    <div class="d-flex align-items-start">
-                                        <div class="notification-icon me-2">
-                                            <i class="fas fa-bell"></i>
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <div class="notification-text">${notification.message}</div>
-                                            <div class="notification-meta">
-                                                <small class="text-muted">
-                                                    <i class="far fa-clock me-1"></i>
-                                                    ${new Date(notification.createdAt).toLocaleString('vi-VN', {
-                                                        hour: '2-digit',
-                                                        minute: '2-digit',
-                                                        day: '2-digit',
-                                                        month: '2-digit',
-                                                        year: 'numeric'
-                                                    })}
-                                                </small>
+                                        <div class="notification-item unread" data-id="${notification.notificationID}" data-path="${notification.notificationPath || ''}">
+                                            <div class="d-flex align-items-start">
+                                                <div class="notification-icon me-2">
+                                                    <i class="fas fa-bell"></i>
+                                                </div>
+                                                <div class="flex-grow-1">
+                                                    <div class="notification-text">${notification.message}</div>
+                                                    <div class="notification-meta">
+                                                        <small class="text-muted">
+                                                            <i class="far fa-clock me-1"></i>
+                                                            ${new Date(notification.createdAt).toLocaleString('vi-VN', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            })}
+                                                        </small>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                </div>
-                            `);
+                                    `);
                             $list.append($item);
                         });
                     } else {
                         $list.html(`
-                            <div class="text-center py-3">
-                                <i class="fas fa-bell-slash text-muted mb-2"></i>
-                                <p class="text-muted mb-0">Không có thông báo mới</p>
-                            </div>
-                        `);
+                                    <div class="text-center py-3">
+                                        <i class="fas fa-bell-slash text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">Không có thông báo mới</p>
+                                    </div>
+                                `);
                     }
-                }).fail(function() {
+                }).fail(function () {
                     console.error('Failed to load notifications');
                 });
             }
@@ -358,7 +374,7 @@
                     if (data.count > 0) {
                         $badge.text(data.count > 99 ? '99+' : data.count).show();
                         $badge.addClass('animate');
-                        setTimeout(function() {
+                        setTimeout(function () {
                             $badge.removeClass('animate');
                         }, 500);
                     } else {
@@ -368,21 +384,21 @@
             }
 
             // Handle notification click in dropdown
-            $(document).on('click', '.notification-dropdown .notification-item', function(e) {
+            $(document).on('click', '.notification-dropdown .notification-item', function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                
+
                 var $item = $(this);
                 var notificationId = $item.data('id');
                 var notificationPath = $item.data('path');
 
                 // Mark as read first
-                $.post('/Notification/MarkAsRead', { id: notificationId }, function(response) {
+                $.post('/Notification/MarkAsRead', { id: notificationId }, function (response) {
                     if (response.success) {
                         // Update UI
                         $item.removeClass('unread');
                         updateNotificationCount();
-                        
+
                         // Navigate to the notification path if exists
                         if (notificationPath) {
                             // Đảm bảo đường dẫn bắt đầu bằng /
@@ -392,7 +408,7 @@
                             window.location.href = notificationPath;
                         }
                     }
-                }).fail(function() {
+                }).fail(function () {
                     console.error('Failed to mark notification as read');
                 });
             });
@@ -403,15 +419,15 @@
             });
 
             // Mark all as read
-            $('.mark-all-read').click(function(e) {
+            $('.mark-all-read').click(function (e) {
                 e.preventDefault();
                 e.stopPropagation();
-                $.post('/Notification/MarkAllAsRead', function(response) {
+                $.post('/Notification/MarkAllAsRead', function (response) {
                     if (response.success) {
                         loadNotifications();
                         updateNotificationCount();
                     }
-                }).fail(function() {
+                }).fail(function () {
                     console.error('Failed to mark all as read');
                 });
             });

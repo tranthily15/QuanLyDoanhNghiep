@@ -4,21 +4,15 @@
     ViewData["Title"] = "Danh sách doanh nghiệp";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
-<div class=" box"></div>
-<div class=" box"></div>
-
 <div class="container-fluid px-4 py-5">
-    <!-- Header Section -->
     <div class="row mb-4">
-        <div class="col-12">
-            <div class="d-flex justify-content-between align-items-center">
-                <h2 class="fw-bold text-primary">
-                    <i class="fas fa-building me-2"></i>Quản lý doanh nghiệp
-                </h2>
-                <a asp-action="Create" class="btn btn-primary">
-                    <i class="fas fa-plus me-2"></i>Thêm mới
-                </a>
-            </div>
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <h2 class="fw-bold text-primary">
+                <i class="fas fa-building me-2"></i>Quản lý doanh nghiệp
+            </h2>
+            <a asp-action="Create" class="btn btn-primary">
+                <i class="fas fa-plus me-2"></i>Thêm mới
+            </a>
         </div>
     </div>
 
@@ -27,27 +21,31 @@
         <div class="col-12">
             <div class="card shadow-sm search-card">
                 <div class="card-body">
-                    <form class="row g-3" asp-action="Index" method="get"> 
+                    <form class="row g-3" asp-action="Index" method="get">
                         <div class="col-md-5">
                             <div class="input-group">
                                 <span class="input-group-text">
                                     <i class="fas fa-search"></i>
                                 </span>
-                                <input type="text" name="searchTerm" class="form-control" placeholder="Tìm theo tên hoặc email công ty..." value="@ViewBag.SearchTerm">
+                                <input type="text" name="searchTerm" class="form-control"
+                                    placeholder="Tìm theo tên hoặc email công ty..." value="@ViewBag.SearchTerm">
                             </div>
                         </div>
                         <div class="col-md-4">
-                             <select name="provinceId" id="provinceFilter" class="form-select">
+                            <select name="provinceId" id="provinceFilter" class="form-select">
                                 <option value="">Tất cả tỉnh/thành phố</option>
                                 @foreach (var province in ViewBag.Provinces)
                                 {
-                                     <option value="@province.ProvinceID" selected="@(ViewBag.ProvinceId == province.ProvinceID ? "selected" : null)">@province.ProvinceName</option>
+                                    <option value="@province.ProvinceID"
+                                        selected="@(ViewBag.ProvinceId == province.ProvinceID ? "selected" : null)">
+                                        @province.ProvinceName</option>
                                 }
                             </select>
                         </div>
-                         <div class="col-md-3">
+
+                        <div class="col-md-3">
                             <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-filter me-2"></i>Lọc / Tìm kiếm
+                                <i class="fas fa-filter me-2"></i>Tìm kiếm
                             </button>
                         </div>
                     </form>
@@ -56,78 +54,248 @@
         </div>
     </div>
 
-    <!-- Company List -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> 
-        @foreach (var item in Model)
-        {
-            <div class="col"> 
-                 <div class="card h-100 shadow-sm company-card">
-                    <div class="card-body d-flex flex-column">
-                        <div class="d-flex align-items-center mb-3 company-card-header">
-                            <div class="company-logo-container flex-shrink-0 me-3">
-                                <img src="~/img/CompanyLogo/@(string.IsNullOrEmpty(item.CompanyLogo) ? "company-default.png" : item.CompanyLogo)" 
-                                     alt="@item.CompanyName Logo" 
-                                     class="company-logo-img" 
-                                     onerror="this.onerror=null; this.src='/img/company-default.png'" />
-                            </div>
-                            <div class="flex-grow-1">
-                                <h5 class="card-title company-name mb-1">
-                                    <a asp-action="Details" asp-route-id="@item.CompanyID" class=" text-decoration-none text-dark company-link">@item.CompanyName</a>
-                                </h5>
-                                <span class="badge bg-@(item.Status == true ? "success" : "warning") company-status">
-                                    @(item.Status == true ? "Đã duyệt" : "Chờ duyệt")
+    <!-- Danh sách công ty dạng bảng -->
+    <div class="table-responsive">
+        <table class="table table-hover align-middle shadow-sm rounded-4 overflow-hidden modern-table">
+            <thead class="table-light">
+                <tr>
+                    <th class="text-center">STT</th>
+                    <th>Tên công ty</th>
+                    <th>Email</th>
+                    <th>Địa chỉ</th>
+                    <th class="text-center">Trạng thái</th>
+                    <th class="text-center">Chức năng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center text-muted">Không có công ty nào.</td>
+                    </tr>
+                }
+                else
+                {
+                    int stt = 1;
+                    foreach (var item in Model)
+                    {
+                        <tr class="align-middle">
+                            <td class="text-center fw-bold">@stt</td>
+                            <td>
+                                <a asp-action="Details" asp-route-id="@item.CompanyID" class="text-dark">@item.CompanyName</a>
+                            </td>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-envelope text-primary"></i>
+                                    <span>@item.CompanyEmail</span>
                                 </span>
-                            </div>
-                        </div>
-                        <div class="company-card-info mb-3 flex-grow-1"> 
-                            <p class="mb-1 text-muted small company-info-item">
-                                <i class="fas fa-map-marker-alt text-primary me-2 fa-fw"></i>
-                                @item.StreetAddress, @item.Ward?.WardName, @item.District?.DistrictName, @item.Province?.ProvinceName
-                            </p>
-                            <p class="mb-0 text-muted small company-info-item">
-                                <i class="fas fa-envelope text-primary me-2 fa-fw"></i>
-                                @item.CompanyEmail
-                            </p>
-                        </div>
-                        <div class="company-card-actions">
-                            <div class="d-flex justify-content-end gap-2 flex-wrap"> 
-                                @if (item.Status == false)
-                                {
-                                    <form asp-action="Approve" asp-route-id="@item.CompanyID" method="post" class="d-inline">
-                                        @Html.AntiForgeryToken()
-                                        <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Bạn có chắc chắn muốn duyệt công ty này?')">
-                                            <i class="fas fa-check me-1"></i>Duyệt
-                                        </button>
-                                    </form>
-                                }
-                                <a asp-action="Edit" asp-route-id="@item.CompanyID" class="btn btn-outline-primary btn-sm">
-                                    <i class="fas fa-edit me-1"></i>Sửa
-                                </a>
-                                <a asp-action="Details" asp-route-id="@item.CompanyID" class="btn btn-outline-info btn-sm">
-                                    <i class="fas fa-eye me-1"></i>Chi tiết
-                                </a>
-                                <a asp-action="Delete" asp-route-id="@item.CompanyID" class="btn btn-outline-danger btn-sm">
-                                    <i class="fas fa-trash me-1"></i>Xóa
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        }
-    </div>
-</div> 
+                            </td>
+                            <td>
+                                <span class="d-flex align-items-center gap-2">
+                                    <i class="fas fa-map-marker-alt text-danger"></i>
+                                    <span>
+                                        @item.StreetAddress, @item.Ward?.WardName, @item.District?.DistrictName,
+                                        @item.Province?.ProvinceName
+                                    </span>
+                                </span>
+                            </td>
+                            <td class="text-center">
+                                <form asp-action="ToggleStatus" asp-route-id="@item.CompanyID" method="post" class="d-inline toggle-status-form">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="currentStatus" value="@item.Status" />
+                                    <button type="button" class="btn btn-toggle-status border-0 bg-transparent p-0"
+                                        data-company="@item.CompanyID" data-status="@item.Status"
+                                        title="@(item.Status == 1 ? "Đang hoạt động" : (item.Status == 2 ? "Ngừng hoạt động" : "Chưa duyệt"))">
+                                        <span class="form-switch">
+                                            <input type="checkbox" class="form-check-input" disabled
+                                                @(item.Status == 1 ? "checked" : "")>
+                                            <span class="badge ms-2
+                                                @(item.Status == 1 ? "bg-success" : (item.Status == 2 ? "bg-secondary" : "bg-warning text-dark"))">
+                                                @(item.Status == 1 ? "Đang hoạt động" : (item.Status == 2 ? "Ngừng hoạt động" : "Chưa duyệt"))
+                                            </span>
+                                        </span>
+                                    </button>
+                                </form>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
 
+                                    <a asp-action="Details" asp-route-id="@item.CompanyID"
+                                        class="btn btn-light border action-btn" data-bs-toggle="tooltip" title="Xem chi tiết">
+                                        <i class="fas fa-eye text-info"></i>
+                                    </a>
+
+                            @if (item.Status == 0)
+                                    {
+                                        <form asp-action="Approve" asp-route-id="@item.CompanyID" method="post" class="d-inline approve-form">
+                                            @Html.AntiForgeryToken()
+                                            <button type="button" class="btn btn-success action-btn btn-approve-company" data-company="@item.CompanyID" data-bs-toggle="tooltip" title="Duyệt công ty">
+                                                <i class="fas fa-check-circle"></i> Duyệt
+                                            </button>
+                                        </form>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                        stt++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            @{
+                int currentPage = ViewBag.CurrentPage ?? 1;
+                int totalPages = ViewBag.TotalPages ?? 1;
+                string searchTerm = ViewBag.SearchTerm as string ?? "";
+                string provinceId = ViewBag.ProvinceId as string ?? "";
+                string districtId = ViewBag.DistrictId as string ?? "";
+            }
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <a class="page-link"
+                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage - 1 })">Trước</a>
+            </li>
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <a class="page-link"
+                        href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = i })">@i</a>
+                </li>
+            }
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <a class="page-link"
+                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage + 1 })">Sau</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<!-- Modal xác nhận tắt công ty -->
+<div class="modal fade" id="confirmDisableModal" tabindex="-1" aria-labelledby="confirmDisableModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title" id="confirmDisableModalLabel"><i
+                        class="fas fa-exclamation-triangle text-danger"></i> Xác nhận ngừng hoạt động</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn <b>ngừng hoạt động</b> công ty này? <br>
+                <span class="text-danger">Tất cả vị trí tuyển dụng của công ty cũng sẽ bị tắt!</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDisableBtn">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận duyệt công ty -->
+<div class="modal fade" id="confirmApproveModal" tabindex="-1" aria-labelledby="confirmApproveModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h5 class="modal-title" id="confirmApproveModalLabel">
+                    <i class="fas fa-check-circle text-white"></i> Xác nhận duyệt công ty
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn <b>duyệt</b> công ty này không?<br>
+                <span class="text-success">Sau khi duyệt, công ty sẽ nhận được email thông báo và có thể hoạt động trên hệ thống.</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="confirmApproveBtn">Xác nhận duyệt</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal xác nhận mở lại công ty -->
+<div class="modal fade" id="confirmEnableModal" tabindex="-1" aria-labelledby="confirmEnableModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success">
+                <h5 class="modal-title" id="confirmEnableModalLabel">
+                    <i class="fas fa-check-circle text-white"></i> Xác nhận mở lại hoạt động
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc chắn muốn <b>mở lại hoạt động</b> cho công ty này không?<br>
+                <span class="text-success">Công ty sẽ được chuyển sang trạng thái hoạt động.</span>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="confirmEnableBtn">Xác nhận</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        Optional: Keep the client-side filter trigger if needed, 
-        but server-side filtering via form submit is generally better.
-        $(document).ready(function() {
-            $('#provinceFilter').change(function() {
-                // Submit the form when province changes
-                $(this).closest('form').submit(); 
+        // Tooltip Bootstrap
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+
+        let formToDisable = null;
+        let formToEnable = null;
+        let formToApprove = null;
+
+        // Khi click nút bật/tắt trạng thái
+        document.querySelectorAll('.btn-toggle-status').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                const status = this.getAttribute('data-status');
+                if (status == "1") {
+                    // Nếu đang hoạt động, xác nhận trước khi tắt
+                    formToDisable = this.closest('form');
+                    var modal = new bootstrap.Modal(document.getElementById('confirmDisableModal'));
+                    modal.show();
+                } else if (status == "2") {
+                    // Nếu đang ngừng hoạt động, xác nhận trước khi bật lại
+                    formToEnable = this.closest('form');
+                    var modal = new bootstrap.Modal(document.getElementById('confirmEnableModal'));
+                    modal.show();
+                }
             });
+        });
+
+        // Khi xác nhận tắt
+        document.getElementById('confirmDisableBtn').addEventListener('click', function () {
+            if (formToDisable) {
+                formToDisable.submit();
+            }
+        });
+
+        // Khi xác nhận mở lại
+        document.getElementById('confirmEnableBtn').addEventListener('click', function () {
+            if (formToEnable) {
+                formToEnable.submit();
+            }
+        });
+
+        // Xác nhận duyệt công ty
+        document.querySelectorAll('.btn-approve-company').forEach(btn => {
+            btn.addEventListener('click', function (e) {
+                e.preventDefault();
+                formToApprove = this.closest('form');
+                var modal = new bootstrap.Modal(document.getElementById('confirmApproveModal'));
+                modal.show();
+            });
+        });
+
+        document.getElementById('confirmApproveBtn').addEventListener('click', function () {
+            if (formToApprove) {
+                formToApprove.submit();
+            }
         });
     </script>
 }
@@ -135,43 +303,55 @@
 <style>
     /* Define Orange as primary for this page */
     --page-primary-color: #ff6b35;
-    --page-primary-hover-color: #e05a2d; /* Darker orange for hover */
-    --page-accent-color: #ff9220; /* Accent orange from previous card style */
+    --page-primary-hover-color: #e05a2d;
+    /* Darker orange for hover */
+    --page-accent-color: #ff9220;
+    /* Accent orange from previous card style */
 
     .search-card {
         border-radius: 10px;
         border: none;
     }
+
     .search-card .input-group-text {
         background-color: #fff;
         border-right: none;
     }
-     .search-card .input-group-text i { /* Ensure search icon is orange */
+
+    .search-card .input-group-text i {
+        /* Ensure search icon is orange */
         color: var(--page-primary-color);
     }
-     .search-card .form-control, .search-card .form-select {
-         border-left: none; 
-     }
-     .search-card .form-control:focus, .search-card .form-select:focus {
-         border-color: #ced4da;
-         box-shadow: none;
-     }
-     .search-card .input-group:focus-within .input-group-text {
-          border-color: #86b7fe;
-          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-     }
-     .search-card .form-control:focus {
-          border-color: #86b7fe;
-          box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
-     }
+
+    .search-card .form-control,
+    .search-card .form-select {
+        border-left: none;
+    }
+
+    .search-card .form-control:focus,
+    .search-card .form-select:focus {
+        border-color: #ced4da;
+        box-shadow: none;
+    }
+
+    .search-card .input-group:focus-within .input-group-text {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
+
+    .search-card .form-control:focus {
+        border-color: #86b7fe;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+    }
 
     /* Override text-primary for this page's header */
     h2.text-primary {
         color: var(--page-primary-color) !important;
     }
-     h2.text-primary i {
-         color: var(--page-primary-color) !important;
-     }
+
+    h2.text-primary i {
+        color: var(--page-primary-color) !important;
+    }
 
     /* Override btn-primary for this page */
     .btn-primary {
@@ -179,34 +359,36 @@
         border-color: var(--page-primary-color);
         color: #fff;
     }
+
     .btn-primary:hover {
         background-color: var(--page-primary-hover-color);
         border-color: var(--page-primary-hover-color);
-         color: #fff;
+        color: #fff;
     }
 
     .company-card {
         border: 1px solid #e0e0e0;
         border-radius: 10px;
         transition: all 0.3s ease;
-        display: flex; 
-        flex-direction: column; 
+        display: flex;
+        flex-direction: column;
     }
 
     .company-card:hover {
         transform: translateY(-5px);
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1) !important;
-        border-left: 4px solid var(--page-accent-color); /* Keep accent orange */
+        border-left: 4px solid var(--page-accent-color);
+        /* Keep accent orange */
     }
 
     .company-card-header {
         /* Add padding or adjust styles if needed */
-        border-bottom: 1px solid #f0f0f0; 
-        padding-bottom: 1rem; 
+        border-bottom: 1px solid #f0f0f0;
+        padding-bottom: 1rem;
     }
 
     .company-logo-container {
-        width: 65px; 
+        width: 65px;
         height: 65px;
         border: 1px solid #eee;
         border-radius: 8px;
@@ -228,11 +410,15 @@
         font-weight: 600;
         margin-bottom: 0.25rem !important;
     }
+
     .company-link {
-         color: #212529; /* Default text color */
+        color: #212529;
+        /* Default text color */
     }
+
     .company-link:hover {
-        color: var(--page-accent-color); /* Keep accent orange */
+        color: #ff6b35 !important;
+        text-decoration: underline;
     }
 
     .company-status {
@@ -245,33 +431,48 @@
         font-size: 0.85rem;
         color: #6c757d;
         line-height: 1.5;
-        flex-grow: 1; /* Allows info section to grow */
+        flex-grow: 1;
+        /* Allows info section to grow */
     }
+
     .company-info-item {
         display: flex;
-        align-items: flex-start; /* Align icon top */
+        align-items: flex-start;
+        /* Align icon top */
         margin-bottom: 0.5rem !important;
     }
+
     .company-info-item i {
-         margin-top: 3px; /* Align icon slightly better */
-         color: var(--page-accent-color); /* Keep accent orange */
+        margin-top: 3px;
+        /* Align icon slightly better */
+        color: var(--page-accent-color);
+        /* Keep accent orange */
     }
 
     .company-card-actions {
-        border-top: 1px solid #f0f0f0; 
+        border-top: 1px solid #f0f0f0;
         padding-top: 0.75rem;
-        margin-top: auto; /* Pushes actions to bottom */
+        margin-top: auto;
+        /* Pushes actions to bottom */
     }
 
     .action-btn {
         padding: 0.3rem 0.6rem;
         font-size: 0.8rem;
+        border-radius: 8px !important;
+        transition: box-shadow 0.2s;
     }
+
+    .action-btn:hover {
+        box-shadow: 0 2px 8px rgba(255, 107, 53, 0.12);
+        background: #fff7f3;
+    }
+
     .action-btn i {
         margin-right: 0.3rem;
     }
 
-     /* Ensure card body takes full height for flexbox */
+    /* Ensure card body takes full height for flexbox */
     .card-body {
         display: flex;
         flex-direction: column;
@@ -279,9 +480,80 @@
     }
 
     /* Ensure specific icons in info use accent orange */
-     .company-info-item .fa-map-marker-alt,
-     .company-info-item .fa-envelope {
-          color: var(--page-accent-color) !important; /* Make sure icons are orange */
-     }
+    .company-info-item .fa-map-marker-alt,
+    .company-info-item .fa-envelope {
+        color: var(--page-accent-color) !important;
+        /* Make sure icons are orange */
+    }
 
+    .btn-success,
+    .btn-secondary {
+        min-width: 120px;
+        font-weight: 600;
+    }
+
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+
+    .btn-secondary {
+        background-color: #6c757d;
+        border-color: #6c757d;
+    }
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+        border-color: #545b62;
+    }
+
+    .modern-table {
+        border-radius: 16px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+    }
+
+    .modern-table th,
+    .modern-table td {
+        vertical-align: middle !important;
+    }
+
+    .modern-table tr:hover {
+        background: #f8f9fa !important;
+        transition: background 0.2s;
+    }
+
+    .company-link:hover {
+        color: #ff6b35 !important;
+        text-decoration: underline;
+    }
+
+    .form-switch {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-check-input {
+        width: 2.5em;
+        height: 1.3em;
+        margin-right: 0.2em;
+        cursor: pointer;
+        accent-color: #28a745;
+    }
+
+    .badge.bg-success,
+    .badge.bg-secondary {
+        font-size: 0.95em;
+        padding: 0.5em 0.9em;
+        border-radius: 1em;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+    }
 </style>

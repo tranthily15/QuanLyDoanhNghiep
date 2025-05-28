@@ -90,6 +90,7 @@ namespace QuanLyDoanhNghiep.Services
                             Honors = userApi.Honors,
                             Email = userApi.Email,
                             PhoneNumber = userApi.PhoneNumber,
+                            Khoa = userApi.Khoa,
                             AccountID = (int)userApi.AccountID
                         };
 
@@ -170,6 +171,7 @@ namespace QuanLyDoanhNghiep.Services
                         Honors = userApi.Honors,
                         Email = userApi.Email,
                         PhoneNumber = userApi.PhoneNumber,
+                        Khoa = userApi.Khoa,
                         AccountID = (int)userApi.AccountID
                     };
 

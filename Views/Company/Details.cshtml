@@ -6,24 +6,27 @@
     // var companyJobs = ViewBag.CompanyJobs as List<JobPosition> ?? new List<JobPosition>();
 }
 <div class="box"></div>
-<div class="box"></div>
 
 <div class="company-profile-page">
     <!-- Banner Section -->
     <div class="company-banner-container">
-        <div class="company-banner-bg" style="background-image: url('/img/company-cover-default.jpg');"> 
-            </div>
+        <div class="company-banner-bg"
+            style="background-image: url('@Url.Content("~/img/company-cover-default.jpg")');">
+        </div>
         <div class="company-banner-overlay"></div>
+
         <div class="container company-banner-content">
             <div class="row align-items-end">
                 <div class="col-md-8 d-flex align-items-center">
                     <div class="company-logo-wrapper">
-                        <img src="~/img/CompanyLogo/@Model.CompanyLogo" alt="Logo @Model.CompanyName" class="company-logo-main" onerror="this.src='/img/company-default.png'"/>
+                        <img src="~/img/CompanyLogo/@Model.CompanyLogo" alt="Logo @Model.CompanyName"
+                            class="company-logo-main" onerror="this.src='/img/company-default.png'" />
                     </div>
                     <div class="company-header-info">
                         <h1 class="company-name-main">@Model.CompanyName</h1>
                         <p class="company-address-main">
-                            <i class="fas fa-map-marker-alt"></i> @Model.StreetAddress, @(Model.Ward?.WardName ?? ""), @(Model.District?.DistrictName ?? ""), @(Model.Province?.ProvinceName ?? "")
+                            <i class="fas fa-map-marker-alt"></i> @Model.StreetAddress, @(Model.Ward?.WardName ?? ""),
+                            @(Model.District?.DistrictName ?? ""), @(Model.Province?.ProvinceName ?? "")
                         </p>
                         @* Thêm các thông tin khác nếu có trong model, ví dụ:
                         <p class="company-website"><i class="fas fa-globe"></i> <a href="@Model.Website" target="_blank">@Model.Website</a></p>
@@ -34,11 +37,11 @@
                 <div class="col-md-4 text-end">
                     @* Nút theo dõi nếu cần *@
                     @* <button class="btn btn-follow"><i class="fas fa-plus"></i> Theo dõi</button> *@
-                    @if(ViewBag.Role == "1") // Admin or Employee can edit
+                    @if (ViewBag.Role == "1") // Admin or Employee can edit
                     {
-                         <a href="@Url.Action("Edit", new { id = Model.CompanyID })" class="btn btn-edit-company">
+                        <a href="@Url.Action("Edit", new { id = Model.CompanyID })" class="btn btn-edit-company">
                             <i class="fas fa-edit"></i> Chỉnh sửa thông tin
-                         </a>
+                        </a>
                     }
                 </div>
             </div>
@@ -53,9 +56,10 @@
                 <div class="company-section">
                     <h2 class="section-title"><i class="fas fa-info-circle"></i> Giới thiệu công ty</h2>
                     <div class="section-content company-description">
-                         @if (!string.IsNullOrEmpty(Model.CompanyDescription))
+                        @if (!string.IsNullOrEmpty(Model.CompanyDescription))
                         {
-                            @Html.Raw(Model.CompanyDescription) // Dùng Raw nếu Description là HTML
+                            @Html.Raw(Model.CompanyDescription)
+                            // Dùng Raw nếu Description là HTML
                         }
                         else
                         {
@@ -66,41 +70,73 @@
 
                 <!-- Việc làm đang tuyển (Placeholder) -->
                 <div class="company-section">
-                     <h2 class="section-title"><i class="fas fa-briefcase"></i> Việc làm đang tuyển</h2>
+                    <h2 class="section-title"><i class="fas fa-briefcase"></i> Việc làm đang tuyển</h2>
                     <div class="section-content">
-                        @if (ViewBag.CompanyJobs != null)
+                        @if (ViewBag.CompanyJobs != null &&
+                                                ((List<QuanLyDoanhNghiep.Models.JobPosition>)ViewBag.CompanyJobs).Any())
                         {
                             foreach (var job in ViewBag.CompanyJobs)
                             {
                                 <div class="job-listing-item">
-                                     <a href="@Url.Action("Details", "JobPosition", new { id = job.PositionID })" class="job-title-link">@job.PositionName</a>
-                                     <p class="job-salary">Lương: @(string.IsNullOrEmpty(job.Salary) ? "Thỏa thuận" : job.Salary)</p>
-@*                                      <p class="job-location">Địa điểm: @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</p>
- *@                                     <span class="job-date">Hạn nộp: @job.EndDate.ToString("dd/MM/yyyy")</span>
+                                    <a href="@Url.Action("Details", "JobPosition", new { id = job.PositionID })"
+                                        class="job-title-link">@job.PositionName</a>
+                                    <p class="job-salary">Lương: @(string.IsNullOrEmpty(job.Salary) ? "Thỏa thuận" : job.Salary)
+                                    </p>
+                                    <span class="job-date">Hạn nộp: @job.EndDate.ToString("dd/MM/yyyy")</span>
                                 </div>
                             }
                         }
                         else
-                        { 
+                        {
                             <p class="text-muted">Công ty hiện chưa có tin tuyển dụng nào.</p>
                         }
                     </div>
+
+                    <!-- Phân trang -->
+                    @if ((ViewBag.TotalPages ?? 1) > 1)
+                    {
+                        <nav aria-label="Job pagination" class="mt-3">
+                            <ul class="pagination justify-content-center">
+                                @{
+                                    int currentPage = ViewBag.CurrentPage ?? 1;
+                                    int totalPages = ViewBag.TotalPages ?? 1;
+                                }
+                                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("Details", new { id = Model.CompanyID, page = currentPage - 1 })">Trước</a>
+                                </li>
+                                @for (int i = 1; i <= totalPages; i++)
+                                {
+                                    <li class="page-item @(i == currentPage ? "active" : "")">
+                                        <a class="page-link"
+                                            href="@Url.Action("Details", new { id = Model.CompanyID, page = i })">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("Details", new { id = Model.CompanyID, page = currentPage + 1 })">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
                 </div>
 
             </div>
             <div class="col-lg-4">
                 <!-- Thông tin liên hệ -->
-                 <div class="company-section company-side-info">
+                <div class="company-section company-side-info">
                     <h3 class="side-section-title">Thông tin liên hệ</h3>
                     <p><i class="fas fa-envelope"></i> <strong>Email:</strong> @Model.CompanyEmail</p>
-                    <p><i class="fas fa-map-marker-alt"></i> <strong>Địa chỉ:</strong> @Model.StreetAddress, @(Model.Ward?.WardName ?? ""), @(Model.District?.DistrictName ?? ""), @(Model.Province?.ProvinceName ?? "")</p>
-                      @* <p><i class="fas fa-globe"></i> <strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p> *@
+                    <p><i class="fas fa-map-marker-alt"></i> <strong>Địa chỉ:</strong> @Model.StreetAddress,
+                        @(Model.Ward?.WardName ?? ""), @(Model.District?.DistrictName ?? ""),
+                        @(Model.Province?.ProvinceName ?? "")</p>
+                    @* <p><i class="fas fa-globe"></i> <strong>Website:</strong> <a href="@Model.Website" target="_blank">@Model.Website</a></p> *@
                 </div>
             </div>
         </div>
-         <div class="text-center mt-4">
-             <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
-         </div>
+        <div class="text-center mt-4">
+            <a asp-action="Index" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại danh sách</a>
+        </div>
     </div>
 </div>
 
@@ -120,23 +156,27 @@
         --info-color: #17a2b8;
         /* Keep topcv colors for mapping if needed, but prefer new ones */
         --topcv-primary: var(--primary-color);
-        --topcv-secondary: var(--text-primary-color); /* Map dark text to new primary text */
+        --topcv-secondary: var(--text-primary-color);
+        /* Map dark text to new primary text */
         --topcv-border: var(--border-color);
         --topcv-bg-light: var(--second-background-color);
         --topcv-text-muted: var(--text-secondary-color);
     }
 
     .company-profile-page {
-        background-color: #f8f9fa; /* Light background for the whole page */
+        background-color: #f8f9fa;
+        /* Light background for the whole page */
         padding-bottom: 40px;
     }
 
     /* Banner Styles */
     .company-banner-container {
         position: relative;
-        height: 250px; /* Adjust height as needed */
+        height: 250px;
+        /* Adjust height as needed */
         color: white;
-        margin-bottom: 80px; /* Space for the logo overlap */
+        margin-bottom: 80px;
+        /* Space for the logo overlap */
     }
 
     .company-banner-bg {
@@ -147,7 +187,8 @@
         height: 100%;
         background-size: cover;
         background-position: center;
-        background-color: #eee; /* Fallback color */
+        background-color: #eee;
+        /* Fallback color */
     }
 
     .company-banner-overlay {
@@ -156,12 +197,14 @@
         left: 0;
         width: 100%;
         height: 100%;
-        background: rgba(0, 0, 0, 0.4); /* Dark overlay */
+        background: rgba(0, 0, 0, 0.4);
+        /* Dark overlay */
     }
 
     .company-banner-content {
         position: absolute;
-        bottom: -60px; /* Overlap bottom */
+        bottom: -60px;
+        /* Overlap bottom */
         left: 0;
         right: 0;
         z-index: 2;
@@ -186,7 +229,8 @@
     }
 
     .company-header-info {
-        color: var(--topcv-secondary); /* Use dark color for text on white/light bg */
+        color: var(--topcv-secondary);
+        /* Use dark color for text on white/light bg */
     }
 
     .company-name-main {
@@ -195,26 +239,36 @@
         margin-bottom: 5px;
         color: var(--topcv-secondary);
     }
-    .company-address-main, .company-website, .company-size {
+
+    .company-address-main,
+    .company-website,
+    .company-size {
         font-size: 15px;
         margin-bottom: 3px;
         color: var(--topcv-text-muted);
     }
-    .company-address-main i, .company-website i, .company-size i {
+
+    .company-address-main i,
+    .company-website i,
+    .company-size i {
         margin-right: 8px;
-        color: #ff6b35; /* Primary color from previous view */
+        color: #ff6b35;
+        /* Primary color from previous view */
         width: 15px;
     }
+
     .company-website a {
         color: var(--topcv-text-muted);
         text-decoration: none;
     }
-     .company-website a:hover {
-         color: #ff6b35;
-         text-decoration: underline;
-     }
 
-    .btn-follow, .btn-edit-company {
+    .company-website a:hover {
+        color: #ff6b35;
+        text-decoration: underline;
+    }
+
+    .btn-follow,
+    .btn-edit-company {
         background-color: #ff6b35;
         color: white;
         border: none;
@@ -223,19 +277,24 @@
         font-weight: 500;
         transition: background-color 0.3s ease;
     }
-    .btn-follow i, .btn-edit-company i {
+
+    .btn-follow i,
+    .btn-edit-company i {
         margin-right: 5px;
     }
 
-    .btn-follow:hover, .btn-edit-company:hover {
+    .btn-follow:hover,
+    .btn-edit-company:hover {
         background-color: #e05a2d;
         color: white;
     }
 
     /* Main Content Styles */
-     .company-content-section {
-        padding-top: 20px; /* Space above content after banner overlap */
+    .company-content-section {
+        padding-top: 20px;
+        /* Space above content after banner overlap */
     }
+
     .company-section {
         background-color: white;
         border-radius: 12px;
@@ -252,15 +311,17 @@
         padding-bottom: 15px;
         border-bottom: 1px solid var(--topcv-border);
     }
-     .section-title i {
-         margin-right: 10px;
-         color: #ff6b35;
-     }
+
+    .section-title i {
+        margin-right: 10px;
+        color: #ff6b35;
+    }
 
     .section-content {
         line-height: 1.7;
         color: var(--topcv-secondary);
     }
+
     .company-description img {
         max-width: 100%;
         height: auto;
@@ -271,35 +332,42 @@
 
     /* Side Info */
     .company-side-info {
-        background-color: white; /* Keep side info background white */
+        background-color: white;
+        /* Keep side info background white */
     }
-     .side-section-title {
-         font-size: 18px;
-         font-weight: 600;
-         color: var(--topcv-secondary);
-         margin-bottom: 15px;
-     }
+
+    .side-section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: var(--topcv-secondary);
+        margin-bottom: 15px;
+    }
+
     .company-side-info p {
         margin-bottom: 12px;
         font-size: 14px;
         color: var(--topcv-secondary);
     }
-     .company-side-info p i {
-         width: 20px;
-         text-align: center;
-         margin-right: 8px;
-         color: #ff6b35;
-     }
-     .company-side-info strong {
-         font-weight: 500;
-     }
-     .company-side-info a {
-         color: #ff6b35;
-         text-decoration: none;
-     }
-     .company-side-info a:hover {
-         text-decoration: underline;
-     }
+
+    .company-side-info p i {
+        width: 20px;
+        text-align: center;
+        margin-right: 8px;
+        color: #ff6b35;
+    }
+
+    .company-side-info strong {
+        font-weight: 500;
+    }
+
+    .company-side-info a {
+        color: #ff6b35;
+        text-decoration: none;
+    }
+
+    .company-side-info a:hover {
+        text-decoration: underline;
+    }
 
     /* Job Listing Placeholder Styles */
     .job-listing-item {
@@ -309,9 +377,11 @@
         border-radius: 8px;
         transition: box-shadow 0.3s ease;
     }
-     .job-listing-item:hover {
-         box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-     }
+
+    .job-listing-item:hover {
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+    }
+
     .job-title-link {
         font-size: 16px;
         font-weight: 600;
@@ -320,17 +390,20 @@
         display: block;
         margin-bottom: 5px;
     }
-     .job-title-link:hover {
-         color: #ff6b35;
-     }
-    .job-salary, .job-location, .job-date {
+
+    .job-title-link:hover {
+        color: #ff6b35;
+    }
+
+    .job-salary,
+    .job-location,
+    .job-date {
         font-size: 14px;
         color: var(--topcv-text-muted);
         margin-bottom: 3px;
     }
-     .job-date {
+
+    .job-date {
         font-style: italic;
-     }
-
-
+    }
 </style>

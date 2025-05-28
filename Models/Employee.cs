@@ -11,6 +11,7 @@ namespace QuanLyDoanhNghiep.Models
         public bool Gender {  get; set; }
         public string PhoneNumber { get; set; }
         public string Email { get; set; }
+        public bool? Status { get; set; }
         [ForeignKey("Company")]
         public int CompanyID { get; set; }
         [ForeignKey("Account")]

@@ -25,7 +25,9 @@ namespace QuanLyDoanhNghiep.Models
         public string CompanyEmail { get; set; }
         public string? CompanyDescription { get; set; }
         public string? CompanyLogo { get; set; }
-        public bool? Status { get; set; }
+        public int? Status { get; set; } // 0: chưa duyệt, 1 đang hoạt động , 2 đã dừng hoạt động
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+
         public virtual ICollection<Employee>? Employees { get; set; }
         public virtual ICollection<JobPosition>? JobPositions { get; set; }
     }

@@ -15,6 +15,7 @@ namespace QuanLyDoanhNghiep.Models
         public int? Honors {  get; set; }
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
+        public string? Khoa { get; set; }
 
         [ForeignKey("Account")]
         public int AccountID { get; set; }

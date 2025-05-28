@@ -1,56 +1,150 @@
 ﻿@model QuanLyDoanhNghiep.Models.Employee
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Thêm nhân viên mới";
 }
+<div class="box"></div>
+<div class="container mt-4">
+    <h2>Thêm nhân viên mới</h2>
+    <hr />
 
-<h1>Create</h1>
+    <div class="row">
+        <div class="col-md-8">
+            <form id="createEmployeeForm">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group mb-3">
+                    <label asp-for="EmployeeID" class="control-label">Mã nhân viên</label>
+                    <input asp-for="EmployeeID" class="form-control" />
+                    <span asp-validation-for="EmployeeID" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="EmployeeName" class="control-label">Họ và tên</label>
+                    <input asp-for="EmployeeName" class="form-control" />
+                    <span asp-validation-for="EmployeeName" class="text-danger"></span>
+                </div>
 
-<h4>Employee</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="EmployeeName" class="control-label"></label>
-                <input asp-for="EmployeeName" class="form-control" />
-                <span asp-validation-for="EmployeeName" class="text-danger"></span>
-            </div>
-            <div class="form-group form-check">
-                <label class="form-check-label">
-                    <input class="form-check-input" asp-for="Gender" /> @Html.DisplayNameFor(model => model.Gender)
-                </label>
-            </div>
-            <div class="form-group">
-                <label asp-for="PhoneNumber" class="control-label"></label>
-                <input asp-for="PhoneNumber" class="form-control" />
-                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Email" class="control-label"></label>
-                <input asp-for="Email" class="form-control" />
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompanyID" class="control-label"></label>
-                <select asp-for="CompanyID" class ="form-control" asp-items="ViewBag.CompanyID"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="AccountID" class="control-label"></label>
-                <select asp-for="AccountID" class ="form-control" asp-items="ViewBag.AccountID"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+                <div class="form-group mb-3">
+                    <label class="control-label">Giới tính</label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="Gender" value="true" id="male" />
+                        <label class="form-check-label" for="male">Nam</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" asp-for="Gender" value="false" id="female" />
+                        <label class="form-check-label" for="female">Nữ</label>
+                    </div>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="PhoneNumber" class="control-label">Số điện thoại</label>
+                    <input asp-for="PhoneNumber" class="form-control" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="control-label">Email</label>
+                    <input asp-for="Email" class="form-control" type="email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label">Tên đăng nhập</label>
+                    <input name="username" class="form-control" required />
+                </div>
+
+                <div class="form-group mb-3">
+                    <label class="control-label">Mật khẩu</label>
+                    <input name="password" class="form-control" type="password" required />
+                </div>
+
+                <input type="hidden" asp-for="CompanyID" value="@ViewBag.CompanyId" />
+
+                <div class="form-group mt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Lưu
+                    </button>
+                    <a asp-action="CompanyEmployees" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <script>
+        $(document).ready(function () {
+            $("#createEmployeeForm").on("submit", function (event) {
+                event.preventDefault();
+
+                // Kiểm tra thông tin tài khoản
+                if (!$('input[name="username"]').val().trim() || !$('input[name="password"]').val().trim()) {
+                    alert('Thông tin tài khoản không được để trống!');
+                    return;
+                }
+
+                // Tạo object chứa thông tin tài khoản
+                var AccountData = {
+                    UserName: $('input[name="username"]').val(),
+                    Password: $('input[name="password"]').val()
+                };
+
+                // Gửi yêu cầu tạo tài khoản
+                $.ajax({
+                    url: "/Account/Create_Account_Employee",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(AccountData),
+                    success: function (result) {
+                        if (result && result.accountID) {
+                            var accountID = result.accountID;
+
+                            // Tạo object chứa thông tin nhân viên
+                            var EmployeeData = {
+                                EmployeeID: $('#EmployeeID').val(),
+                                EmployeeName: $('#EmployeeName').val(),
+                                PhoneNumber: $('#PhoneNumber').val(),
+                                Gender: $('#Gender').val() === "true",
+                                Email: $('#Email').val(),
+                                CompanyID: $('#CompanyID').val(),
+                                AccountID: accountID
+                            };
+
+                            // Gửi yêu cầu tạo nhân viên
+                            $.ajax({
+                                url: "/Employee/Create1",
+                                type: "POST",
+                                contentType: "application/json",
+                                data: JSON.stringify(EmployeeData),
+                                success: function (result) {
+                                    alert("Tạo nhân viên mới thành công!");
+                                    window.location.href = '/Employee/CompanyEmployees';
+                                },
+                                error: function (err) {
+                                    // Nếu tạo nhân viên thất bại, xóa tài khoản đã tạo
+                                    $.ajax({
+                                        url: '/Account/Delete/' + accountID,
+                                        type: 'POST',
+                                        success: function () {
+                                            alert('Không thể tạo nhân viên. Tài khoản đã được xóa.');
+                                        },
+                                        error: function () {
+                                            alert('Không thể xóa tài khoản. Vui lòng kiểm tra!');
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    },
+                    error: function (err) {
+                        alert("Tên đăng nhập đã tồn tại. Vui lòng chọn tên khác.");
+                    }
+                });
+            });
+        });
+    </script>
 }

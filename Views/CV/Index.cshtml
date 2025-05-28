@@ -21,7 +21,7 @@
         </div>
         @if (ViewBag.Role == "2")
         {
-            <button class="btn btn-primary rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#suggestCVModal">
+            <button class="btn btn-apply-now rounded-3 px-4" data-bs-toggle="modal" data-bs-target="#suggestCVModal">
                 <i class="bi bi-lightbulb me-2"></i>Gợi ý CV
             </button>
         }
@@ -402,7 +402,7 @@
                         </small>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100 rounded-3">
+                    <button type="submit" class="btn btn-apply w-100 rounded-3">
                         <i class="bi bi-paper-plane me-2"></i>Gửi CV để gợi ý
                     </button>
                 </form>
@@ -412,6 +412,40 @@
 </div>
 
 <style>
+    .btn-apply-now {
+        background-color: #ff6b35;
+        color: white;
+        padding: 12px 24px;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+
+        .btn-apply-now:hover {
+            background-color: #ff6b35;
+            transform: translateY(-2px);
+        }
+
+    .btn-apply {
+        background-color: #ff6b35;
+        color: white;
+        padding: 12px 30px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+        .btn-apply:hover {
+            background-color: var(--hover-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
     .card {
         transition: transform 0.2s ease-in-out;
         height: 600px; /* Chiều cao cố định cho card */

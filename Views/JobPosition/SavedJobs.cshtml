@@ -1,93 +1,39 @@
 @model IEnumerable<QuanLyDoanhNghiep.Models.SavedJob>
 
 @{
-    ViewData["Title"] = "Vị trí đã lưu";
+    ViewData["Title"] = "Việc làm đã lưu";
 }
 
 <div class="container mt-4">
-    <h2 class="mb-4">Vị trí đã lưu</h2>
+    <h2 class="mb-4">Việc làm đã lưu</h2>
 
     @if (!Model.Any())
     {
         <div class="alert alert-info">
-            Bạn chưa lưu vị trí nào. Hãy tìm kiếm và lưu các vị trí phù hợp với bạn!
+            Bạn chưa lưu tin tuyển dụng nào.
         </div>
     }
     else
     {
-        <div class="row">
-            @foreach (var savedJob in Model)
+        <div class="row row-cols-1 row-cols-md-2 g-4">
+            @foreach (var saved in Model)
             {
-                var job = savedJob.JobPosition;
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <h5 class="card-title">@job.PositionName</h5>
-                                <button class="btn btn-outline-danger btn-sm unsave-job" data-position-id="@job.PositionID">
-                                    <i class="fas fa-bookmark"></i> Bỏ lưu
-                                </button>
-                            </div>
-                            <h6 class="card-subtitle mb-2 text-muted">@job.Company.CompanyName</h6>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-map-marker-alt"></i>
-                                    @string.Join(", ", job.JobLocations.Select(l => l.Province.ProvinceName))
-                                </small>
-                            </p>
-                            <p class="card-text">
-                                <small class="text-muted">
-                                    <i class="fas fa-clock"></i> Đã lưu: @savedJob.SavedDate.ToString("dd/MM/yyyy HH:mm")
-                                </small>
-                            </p>
-                            <p class="card-text">@(job.JobDescription.Length > 200 ? job.JobDescription.Substring(0, 200) + "..." : job.JobDescription)</p>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <a href="@Url.Action("Details", new { id = job.PositionID })" class="btn btn-primary">Xem chi tiết</a>
-                                <span class="badge @(job.PositionType ? "bg-success" : "bg-info")">
-                                    @(job.PositionType ? "Toàn thời gian" : "Thực tập")
-                                </span>
-                            </div>
-                        </div>
+                var job = saved.JobPosition;
+                <div class="col">
+                    <div class="card p-3">
+                        <h5>@job.PositionName</h5>
+                        <div class="text-muted">@job.Company?.CompanyName</div>
+                        <div>Lương: @job.Salary</div>
+                        <a href="@Url.Action("Details", "JobPosition", new { id = job.PositionID })"
+                            class="btn btn-primary btn-sm mt-2">Xem chi tiết</a>
+                        <form asp-action="UnsaveJob" asp-controller="JobPosition" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="positionId" value="@job.PositionID" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm ms-2">Bỏ lưu</button>
+                        </form>
                     </div>
                 </div>
             }
         </div>
     }
 </div>
-
-@section Scripts {
-    <script>
-        $(document).ready(function () {
-            $('.unsave-job').click(function () {
-                var button = $(this);
-                var positionId = button.data('position-id');
-                var card = button.closest('.col-md-6');
-
-                $.ajax({
-                    url: '@Url.Action("UnsaveJob")',
-                    type: 'POST',
-                    data: {
-                        positionId: positionId,
-                        __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
-                    },
-                    success: function (response) {
-                        if (response.success) {
-                            card.fadeOut(400, function () {
-                                $(this).remove();
-                                if ($('.col-md-6').length === 0) {
-                                    location.reload();
-                                }
-                            });
-                            toastr.success(response.message);
-                        } else {
-                            toastr.error(response.message);
-                        }
-                    },
-                    error: function () {
-                        toastr.error('Có lỗi xảy ra khi bỏ lưu vị trí.');
-                    }
-                });
-            });
-        });
-    </script>
-} 

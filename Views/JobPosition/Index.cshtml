@@ -68,12 +68,7 @@
                                             @job.PositionName
                                         </h6>
                                         <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <span class="badge bg-secondary">@job.Salary</span>
-                                            <span class="badge bg-light text-dark">
-                                                <i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "Không rõ")
-                                            </span>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                             </a>
@@ -124,12 +119,7 @@
                                             @job.PositionName
                                         </h6>
                                         <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
-                                        <div class="d-flex flex-wrap gap-2">
-                                            <span class="badge bg-secondary">@job.Salary</span>
-                                            <span class="badge bg-light text-dark">
-                                                <i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "Không rõ")
-                                            </span>
-                                        </div>
+                                       
                                     </div>
                                 </div>
                             </a>
@@ -160,6 +150,32 @@
         </div>
     </div>
 </div>
+<footer>
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-column">
+                <h3>THÔNG TIN LIÊN HỆ</h3>
+                <p>Trung tâm "Việc làm và thực tập sinh viên khoa Công Nghệ Thông Tin</p>
+                <p>Địa điểm: Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà Nội, Hanoi, Vietnam</p>
+                <p>Điện thoại: 096 159 55 99</p>
+                <p>Địa chỉ email: khoa.cntt@dainam.edu.vn</p>
+            </div>
+            <div class="footer-column">
+                <h3>LIÊN KẾT</h3>
+                <a href="#" class="footer-link">Việc làm</a>
+                <a href="#" class="footer-link">Thực tập</a>
+                <a href="#" class="footer-link">Gợi ý việc làm</a>
+                <a href="#" class="footer-link">CV</a>
+            </div>
+            <div class="footer-column">
+                <h3>MẠNG XÃ HỘI</h3>
+                <div class="footer-logo">
+                    <img src="~/img/logo.png" width="200" height="200" />
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
 
 @section Styles {
     <style>

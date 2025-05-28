@@ -33,6 +33,8 @@ namespace QuanLyDoanhNghiep.Models
 
         [Required(ErrorMessage = "Vui lòng chọn ngày kết thúc")]
         public DateTime EndDate { get; set; }
+        public DateTime? CreatedAt { get; set; } = DateTime.Now;
+
 
         [Required(ErrorMessage = "Vui lòng nhập thời gian làm việc")]
         public string TimeWork { get; set; }

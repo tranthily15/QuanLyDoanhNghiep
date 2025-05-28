@@ -106,7 +106,7 @@ namespace QuanLyDoanhNghiep.Controllers
         public async Task<IActionResult> GetFulltime(string keyword, string provinces, string jobType, string salaryRange, int page = 1)
         {
             const int PageSize = 6;
-            
+
             // Build base query
             var query = _context.JobPosition
                 .Include(j => j.Company)
@@ -160,7 +160,7 @@ namespace QuanLyDoanhNghiep.Controllers
         public async Task<IActionResult> GetIntern(string keyword, string provinces, string jobType, string salaryRange, int page = 1)
         {
             const int PageSize = 6;
-            
+
             // Build base query
             var query = _context.JobPosition
                 .Include(j => j.Company)
@@ -737,44 +737,29 @@ namespace QuanLyDoanhNghiep.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SaveJob(int positionId)
         {
-            if (!IsLogin || RoleUser != "2") // Chỉ cho phép sinh viên lưu vị trí
+            var user = await _context.User
+                .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+            if (user == null)
+                return Json(new { success = false, message = "Bạn cần đăng nhập để lưu việc làm." });
+
+            // Kiểm tra đã lưu chưa
+            var existed = await _context.SavedJob.FirstOrDefaultAsync(s => s.UserID == user.ID && s.PositionID == positionId);
+            if (existed != null)
+                return Json(new { success = false, message = "Bạn đã lưu tin này rồi." });
+
+            var savedJob = new SavedJob
             {
-                return Json(new { success = false, message = "Bạn cần đăng nhập với tài khoản sinh viên để lưu vị trí." });
-            }
+                UserID = user.ID,
+                PositionID = positionId,
+                SavedDate = DateTime.Now,
+                IsSaved = true
+            };
 
             try
             {
-                var userId = CurrentID;
-                var existingSavedJob = await _context.SavedJob
-                    .FirstOrDefaultAsync(sj => sj.UserID == userId && sj.PositionID == positionId);
-
-                if (existingSavedJob != null)
-                {
-                    if (existingSavedJob.IsSaved)
-                    {
-                        return Json(new { success = false, message = "Bạn đã lưu vị trí này rồi." });
-                    }
-                    else
-                    {
-                        existingSavedJob.IsSaved = true;
-                        existingSavedJob.SavedDate = DateTime.Now;
-                        _context.Update(existingSavedJob);
-                    }
-                }
-                else
-                {
-                    var savedJob = new SavedJob
-                    {
-                        UserID = userId,
-                        PositionID = positionId,
-                        SavedDate = DateTime.Now,
-                        IsSaved = true
-                    };
-                    _context.SavedJob.Add(savedJob);
-                }
-
+                _context.SavedJob.Add(savedJob);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Đã lưu vị trí thành công!" });
+                return Json(new { success = true, message = "Đã lưu việc làm!" });
             }
             catch (Exception ex)
             {
@@ -828,7 +813,7 @@ namespace QuanLyDoanhNghiep.Controllers
                 .Include(sj => sj.JobPosition)
                     .ThenInclude(jp => jp.JobLocations)
                         .ThenInclude(jl => jl.Province)
-                .Where(sj => sj.UserID == userId)
+                .Where(sj => sj.UserID == userId && sj.IsSaved)
                 .OrderByDescending(sj => sj.SavedDate)
                 .ToListAsync();
 

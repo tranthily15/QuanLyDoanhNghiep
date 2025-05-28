@@ -23,39 +23,85 @@ namespace QuanLyDoanhNghiep.Controllers
         }
 
         // GET: Company
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string searchTerm, string provinceId, int page = 1)
         {
-            ViewBag.Provinces = _context.Province.ToList();
-            return View(await _context.Company
-                .Include(c => c.Ward)
-                .Include(c => c.District)
-                .Include(c => c.Province)
-                .ToListAsync());
+            if (!IsLogin || RoleUser == "1" || RoleUser == "2")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            else
+            {
+                int pageSize = 20;
+                var companies = _context.Company
+                    .Include(c => c.Ward)
+                    .Include(c => c.District)
+                    .Include(c => c.Province)
+                    .AsQueryable();
+
+                // Tìm kiếm theo tên hoặc email công ty
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    companies = companies.Where(c =>
+                        c.CompanyName.Contains(searchTerm) ||
+                        c.CompanyEmail.Contains(searchTerm));
+                }
+
+                // Lọc theo tỉnh/thành phố
+                if (!string.IsNullOrEmpty(provinceId))
+                {
+                    companies = companies.Where(c => c.ProvinceID == provinceId);
+                }
+
+                int totalCompanies = await companies.CountAsync();
+                int totalPages = (int)Math.Ceiling(totalCompanies / (double)pageSize);
+
+                var companiesPaged = await companies
+                    .OrderByDescending(c => c.CompanyID)
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToListAsync();
+
+                ViewBag.Provinces = _context.Province.ToList();
+                ViewBag.SearchTerm = searchTerm;
+                ViewBag.ProvinceId = provinceId;
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+
+                return View(companiesPaged);
+            }
+
         }
 
         // GET: Company/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int? id, int page = 1)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NotFound();
+
             var company = await _context.Company
-                .Include(j => j.Province)
                 .Include(c => c.Ward)
                 .Include(c => c.District)
                 .Include(c => c.Province)
                 .FirstOrDefaultAsync(m => m.CompanyID == id);
-            if (company == null)
-            {
-                return NotFound();
-            }
-            var companyJobs = await _context.JobPosition
-                .Include(j => j.JobLocations)
-                    .ThenInclude(l => l.Province)
-                .Where(j => j.CompanyID == id && j.Status == true && j.EndDate >= DateTime.Now)
+
+            if (company == null) return NotFound();
+
+            int pageSize = 6;
+            var jobsQuery = _context.JobPosition
+                .Where(j => j.CompanyID == id && j.Status == true)
+                .OrderByDescending(j => j.PositionID);
+
+            int totalJobs = await jobsQuery.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalJobs / (double)pageSize);
+
+            var jobsPaged = await jobsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
                 .ToListAsync();
-            ViewBag.CompanyJobs = companyJobs;
+
+            ViewBag.CompanyJobs = jobsPaged;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
             return View(company);
         }
 
@@ -71,7 +117,7 @@ namespace QuanLyDoanhNghiep.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Company company, IFormFile companyLogoFile)
         {
-            company.Status = false;
+            company.Status = 0;
             company.CompanyLogo = "default.png";
             //if(!ModelState.IsValid){
             //    foreach(var error in ModelState.Values.SelectMany(v => v.Errors)){
@@ -110,9 +156,9 @@ namespace QuanLyDoanhNghiep.Controllers
                     }
                     company.CompanyLogo = companyLogoFile.FileName;
 
-                   
+
                 }
-               
+
                 // Lưu thông tin công ty vào CSDL
                 _context.Add(company);
                 await _context.SaveChangesAsync();
@@ -177,13 +223,13 @@ namespace QuanLyDoanhNghiep.Controllers
                 return NotFound();
             }
 
-            company.Status = true;
+            company.Status = 1;
             await _context.SaveChangesAsync();
 
             // Tạo thông báo cho công ty
             // var notification = new Notification
             // {
-                
+
             //     Message = $"Công ty {company.CompanyName} của bạn đã được duyệt thành công. Bạn có thể đăng nhập và sử dụng hệ thống.",
             //     CreatedAt = DateTime.Now,
             //     IsRead = false,
@@ -322,11 +368,11 @@ namespace QuanLyDoanhNghiep.Controllers
                 var districts = await _context.District
                     .Where(d => d.ProvinceID.Equals(provinceId))
                     .Select(d => new { d.DistrictID, d.DistrictName })
-                    .ToListAsync(); 
+                    .ToListAsync();
                 return Json(districts);
 
             }
-                 
+
         }
         public async Task<IActionResult> GetWards(string districtId)
         {
@@ -335,10 +381,71 @@ namespace QuanLyDoanhNghiep.Controllers
                 return Json(new { error = "District ID is required" });
             }
             var wards = await _context.Ward
-                .Where(w => w.DistrictID.Equals(districtId)) 
-                .Select(w => new { w.WardID, w.WardName })              
+                .Where(w => w.DistrictID.Equals(districtId))
+                .Select(w => new { w.WardID, w.WardName })
                 .ToListAsync();
             return Json(wards);
+        }
+
+        // POST: Company/ToggleStatus/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ToggleStatus(int id)
+        {
+            var company = await _context.Company.FindAsync(id);
+            if (company == null)
+            {
+                return NotFound();
+            }
+
+            // Chỉ cho phép bật/tắt nếu đã được duyệt
+            if (company.Status == 1)
+            {
+                // Đang hoạt động -> chuyển sang ngừng hoạt động
+                company.Status = 2;
+
+                // Tắt nhân viên
+                var employees = await _context.Employee
+                    .Where(e => e.CompanyID == company.CompanyID && e.Status == true)
+                    .ToListAsync();
+                foreach (var employee in employees)
+                {
+                    employee.Status = false;
+                }
+                _context.Employee.UpdateRange(employees);
+
+                // Tắt vị trí tuyển dụng
+                var jobs = await _context.JobPosition
+                    .Where(j => j.CompanyID == company.CompanyID && j.Status == true)
+                    .ToListAsync();
+                foreach (var job in jobs)
+                {
+                    job.Status = false;
+                }
+                _context.JobPosition.UpdateRange(jobs);
+            }
+            else if (company.Status == 2)
+            {
+                // Ngừng hoạt động -> chuyển sang hoạt động
+                company.Status = 1;
+
+                // Bật nhân viên
+                var employees = await _context.Employee
+                    .Where(e => e.CompanyID == company.CompanyID && e.Status == false)
+                    .ToListAsync();
+                foreach (var employee in employees)
+                {
+                    employee.Status = true;
+                }
+                _context.Employee.UpdateRange(employees);
+
+                // (Không tự động bật lại vị trí tuyển dụng)
+            }
+            // Nếu Status == 0 (chưa duyệt) thì không làm gì
+
+            _context.Update(company);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

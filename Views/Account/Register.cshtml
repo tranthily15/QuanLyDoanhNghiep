@@ -1,17 +1,17 @@
 ﻿@model QuanLyDoanhNghiep.Models.Account
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Đăng ký tài khoản";
     ViewData["CSS"] = Url.Content("~/css/login.css");
     Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
 <div class="login-container">
-    <h1 class="form-title">Create Account</h1>
+    <h1 class="form-title">Đăng ký tài khoản nhân viên</h1>
     <form id="createAccountForm" class="login-form">
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-id-card"></i>
-                <input type="text" id="EmployeeID" name="EmployeeID" placeholder="Employee ID" class="form-control" required />
+                <input type="text" id="EmployeeID" name="EmployeeID" placeholder="Mã nhân viên" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
@@ -19,7 +19,7 @@
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-user"></i>
-                <input type="text" id="EmployeeName" name="EmployeeName" placeholder="Employee Name" class="form-control" required />
+                <input type="text" id="EmployeeName" name="EmployeeName" placeholder="Tên nhân viên" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
@@ -27,7 +27,7 @@
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-phone"></i>
-                <input type="text" id="PhoneNumber" name="PhoneNumber" placeholder="Phone Number" class="form-control" required />
+                <input type="text" id="PhoneNumber" name="PhoneNumber" placeholder="Số điện thoại" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
@@ -37,8 +37,8 @@
                 <i class="fas fa-venus-mars"></i>
                 <select id="Gender" name="Gender" class="form-control" required>
                     <option value="" disabled selected>Select Gender</option>
-                    <option value="false">Male</option>
-                    <option value="true">Female</option>
+                    <option value="false">Nam</option>
+                    <option value="true">Nữ</option>
                 </select>
                 <span class="text-danger">*</span>
             </div>
@@ -55,7 +55,7 @@
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-building"></i>
-                <input type="text" id="CompanyID" name="CompanyID" placeholder="Company ID" class="form-control" required />
+                <input type="text" id="CompanyID" name="CompanyID" placeholder="Mã công ty" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
@@ -63,7 +63,7 @@
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-user-circle"></i>
-                <input type="text" id="UserName" name="UserName" placeholder="Username" class="form-control" required />
+                <input type="text" id="UserName" name="UserName" placeholder="Tên tài khoản" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
@@ -71,15 +71,15 @@
         <div class="form-group">
             <div class="input-group">
                 <i class="fas fa-lock"></i>
-                <input type="password" id="Password" name="Password" placeholder="Password" class="form-control" required />
+                <input type="password" id="Password" name="Password" placeholder="Mật khẩu" class="form-control" required />
                 <span class="text-danger">*</span>
             </div>
         </div>
 
-        <button type="submit" class="login-button">Register</button>
+        <button type="submit" class="login-button">Đăng ký</button>
         
         <div class="form-footer">
-            <p>Already have an account? <a href="@Url.Action("Login", "Account")" class="forgot-password">Login</a></p>
+            <p>Bạn đã có tài khoản? <a href="@Url.Action("Login", "Account")" class="forgot-password">Đăng nhập</a></p>
         </div>
     </form>
 </div>
@@ -129,14 +129,14 @@
 }
 
 .form-control:focus {
-    border-color: #ff4b6c;
+    border-color: #ff6b35;
     outline: none;
 }
 
 .login-button {
     width: 100%;
     padding: 12px;
-    background: #ff4b6c;
+    background: #ff6b35;
     color: white;
     border: none;
     border-radius: 5px;
@@ -147,7 +147,7 @@
 }
 
 .login-button:hover {
-    background: #ff3356;
+    background: #ff6b35;
 }
 
 .form-footer {
@@ -157,17 +157,17 @@
 }
 
 .form-footer a {
-    color: #ff4b6c;
+    color: #ff6b35;
     text-decoration: none;
     transition: color 0.3s;
 }
 
 .form-footer a:hover {
-    color: #ff3356;
+    color: #ff6b35;
 }
 
 body {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/background.jpg');
+    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('@Url.Content("~/img/background.jpg")');
     background-size: cover;
     background-position: center;
     min-height: 100vh;
@@ -179,7 +179,7 @@ body {
 }
 
 .text-danger {
-    color: #dc3545;
+    color: #ff6b35;
     font-size: 14px;
     margin-top: 5px;
     display: block;

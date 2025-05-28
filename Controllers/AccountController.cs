@@ -66,6 +66,14 @@ namespace QuanLyDoanhNghiep.Controllers
                 ModelState.AddModelError("", "Tên đăng nhập không đúng");
                 return View(model);
             }
+            // kiểm tra xem người dùng có là nhân viên bị đóng trạng thái không 
+            var employee = await _context.Employee
+                .FirstOrDefaultAsync(m => m.Account.UserName == model.UserName && m.Status == false);
+            if (employee != null)
+            {
+                ModelState.AddModelError("", "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.");
+                return View(model);
+            }
 
             // Kiểm tra mật khẩu
             if (!VerifyPassword(loginUser.Password, model.Password))

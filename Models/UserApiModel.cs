@@ -14,6 +14,7 @@
         public int? AccountID { get; set; }
         public string UserName { get; set; }  // Dữ liệu có thể chứa UserName trong API
         public string Password { get; set; }  // Dữ liệu có thể chứa Password trong API
+        public string? Khoa { get; set; }
     }
 }
 

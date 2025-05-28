@@ -1,13 +1,50 @@
 @model IEnumerable<QuanLyDoanhNghiep.Models.JobPosition>
+@using Newtonsoft.Json.Linq
 
 @{
     ViewData["Title"] = "Gợi ý công việc";
     Layout = "~/Views/Shared/_Layout.cshtml";
+    var sectionMap = new Dictionary<string, string>
+{
+{ "Contact", "Liên hệ" },
+{ "Skills", "Kỹ năng" },
+{ "Experience", "Kinh nghiệm" },
+{ "Education", "Học vấn" }
+};
 }
-
+<div class="box"></div>
 <div class="container mt-5">
-    <h2 class="text-primary mb-4">Gợi ý công việc phù hợp</h2>
-    <hr />
+    <h2 class="mb-4" style="color: #ff9800; font-weight: bold;">
+        <i class="fas fa-briefcase"></i> Gợi ý công việc phù hợp
+    </h2>
+    <hr style="border-top: 2px solid #ff9800;" />
+
+    @if (ViewBag.CVSections != null)
+    {
+        var cvSections = ViewBag.CVSections as JObject;
+        <div class="alert" style="background: #fff3e0; border: 1.5px solid #ff9800;">
+            <h5 style="color: #ff9800; font-weight: bold;">
+                <i class="fas fa-id-card"></i> Thông tin CV đã đọc được
+            </h5>
+            @foreach (var section in cvSections.Properties())
+            {
+                var sectionKey = section.Name;
+                var sectionName = sectionMap.ContainsKey(sectionKey) ? sectionMap[sectionKey] : sectionKey;
+                var sectionList = section.Value as JArray;
+                if (sectionList != null && sectionList.Count > 0)
+                {
+                    <strong style="color: #fd7e14;">@sectionName:</strong>
+                    <div style="white-space: pre-wrap; margin-bottom: 1em;">
+                        @foreach (var item in sectionList)
+                        {
+                            @item.ToString()
+                            <br />
+                        }
+                    </div>
+                }
+            }
+        </div>
+    }
 
     @if (Model != null && Model.Any())
     {
@@ -15,32 +52,37 @@
             @foreach (var job in Model)
             {
                 <div class="col">
-                    <div class="card h-100 shadow-sm hover-card">
+                    <div class="card h-100 shadow-sm hover-card border-orange">
                         <div class="card-body">
-                            <h5 class="card-title text-primary">@job.PositionName</h5>
+                            <h5 class="card-title" style="color: #ff9800;">@job.PositionName</h5>
                             <h6 class="card-subtitle mb-2 text-muted">@job.Company.CompanyName</h6>
                             <div class="card-text">
-                                <p class="mb-2"><strong>Mô tả:</strong> @(job.JobDescription?.Length > 100 ? job.JobDescription.Substring(0, 100) + "..." : job.JobDescription)</p>
-                                <p class="mb-2"><strong>Yêu cầu:</strong> @(job.JobRequirements?.Length > 100 ? job.JobRequirements.Substring(0, 100) + "..." : job.JobRequirements)</p>
-                                <div class="d-flex justify-content-between text-muted small">
-                                    <span><i class="fas fa-calendar-alt"></i> Bắt đầu: @job.StartDate.ToString("dd/MM/yyyy")</span>
-                                    <span><i class="fas fa-calendar-check"></i> Kết thúc: @job.EndDate.ToString("dd/MM/yyyy")</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent border-top-0">
-                            <a asp-controller="JobPosition" asp-action="Details" asp-route-id="@job.PositionID" class="btn btn-primary w-100">
-                                Xem chi tiết
-                            </a>
+                                <p class="mb-2"><strong>Mô tả:</strong> @(job.JobDescription?.Length > 100 ?
+                                                                job.JobDescription.Substring(0, 100) + "..." : job.JobDescription)</p>
+                        <p class="mb-2"><strong>Yêu cầu:</strong> @(job.JobRequirements?.Length > 100 ?
+                                                        job.JobRequirements.Substring(0, 100) + "..." : job.JobRequirements)</p>
+                        <div class="d-flex justify-content-between text-muted small">
+                            <span><i class="fas fa-calendar-alt"></i> Bắt đầu:
+                                @job.StartDate.ToString("dd/MM/yyyy")</span>
+                            <span><i class="fas fa-calendar-check"></i> Kết thúc:
+                                @job.EndDate.ToString("dd/MM/yyyy")</span>
                         </div>
                     </div>
                 </div>
-            }
+                <div class="card-footer bg-transparent border-top-0">
+                    <a asp-controller="JobPosition" asp-action="Details" asp-route-id="@job.PositionID"
+                        class="btn btn-orange w-100">
+                        Xem chi tiết
+                    </a>
+                </div>
+            </div>
+        </div>
+                }
         </div>
     }
     else
     {
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" style="border: 1.5px solid #ff9800; background: #fff3e0; color: #ff9800;">
             Không tìm thấy công việc phù hợp.
         </div>
     }
@@ -53,12 +95,30 @@
 </div>
 
 <style>
+    .border-orange {
+        border: 2px solid #ff9800 !important;
+    }
+
+    .btn-orange {
+        background-color: #ff9800;
+        color: #fff;
+        border: none;
+        transition: background 0.2s;
+    }
+
+    .btn-orange:hover,
+    .btn-orange:focus {
+        background-color: #fd7e14;
+        color: #fff;
+    }
+
     .hover-card {
         transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
     }
-    
+
     .hover-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+        box-shadow: 0 0.5rem 1rem rgba(255, 152, 0, 0.15) !important;
+        border-color: #fd7e14 !important;
     }
 </style>

@@ -22,12 +22,12 @@ namespace QuanLyDoanhNghiep.Controllers
         }
         public IActionResult Index()
         {
-            if (!IsLogin || RoleUser == "2" || RoleUser =="1")
+            if (!IsLogin || RoleUser == "2" || RoleUser == "1")
             {
                 return RedirectToAction("Login", "Account");
             }
             ViewData["Title"] = "Trang chủ Admin";
-            
+
             // Thống kê CV
             var cvList = _context.CV.ToList();
             var summaryCV = new Dictionary<string, int>
@@ -41,11 +41,12 @@ namespace QuanLyDoanhNghiep.Controllers
 
             // Thống kê JobPosition
             var jobList = _context.JobPosition.ToList();
+            var today = DateTime.Today;
             var summaryJob = new Dictionary<string, int>
             {
                 { "TotalJobCount", jobList.Count },
                 { "ActiveJobCount", jobList.Count(j => j.Status == true) },
-                { "NewJobsToday", jobList.Count(j => j.StartDate.Date == DateTime.Today) }
+                { "NewJobsToday", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date.Equals(today)) }
             };
             ViewBag.job = summaryJob;
 
@@ -65,9 +66,55 @@ namespace QuanLyDoanhNghiep.Controllers
             };
             ViewBag.user = summaryUser;
 
+            // Thống kê Company
+            var companyList = _context.Company
+                .Include(c => c.Employees)
+                .Include(c => c.JobPositions)
+                .ToList();
+
+            var summaryCompany = new Dictionary<string, int>
+            {
+                { "TotalCompanyCount", companyList.Count },
+                { "ActiveCompanyCount", companyList.Count(c => c.Status == 1) }, // công ty đang hoạt động
+                { "NewCompaniesToday", companyList.Count(c => c.CreatedAt.HasValue && c.CreatedAt.Value.Date.Equals(today)) },
+                { "CompaniesWithJobs", companyList.Count(c => c.JobPositions.Any()) },
+                { "CompaniesWithEmployees", companyList.Count(c => c.Employees.Any()) }
+            };
+            ViewBag.company = summaryCompany;
+
+            // Thống kê chi tiết về công ty
+            var companyDetails = companyList.Select(c => new
+            {
+                CompanyName = c.CompanyName,
+                EmployeeCount = c.Employees.Count,
+                ActiveJobCount = c.JobPositions.Count(j => j.Status == true),
+                TotalJobCount = c.JobPositions.Count,
+                TotalCVCount = _context.CV.Count(cv => cv.JobPosition.CompanyID == c.CompanyID),
+                LastActivity = c.JobPositions.Any() ? c.JobPositions.Max(j => j.CreatedAt) : c.CreatedAt
+            })
+            .OrderByDescending(c => c.LastActivity)
+            .Take(5)
+            .ToList();
+
+            ViewBag.topCompanies = companyDetails;
+
+            // Thống kê theo thời gian
+            var thisWeekStart = today.AddDays(-(int)today.DayOfWeek);
+            var thisMonthStart = new DateTime(today.Year, today.Month, 1);
+
+            var timeBasedStats = new Dictionary<string, int>
+            {
+                { "CVsToday", cvList.Count(c => c.SubmissionDate?.Date.Equals(today) == true) },
+                { "CVsThisWeek", cvList.Count(c => c.SubmissionDate >= thisWeekStart) },
+                { "CVsThisMonth", cvList.Count(c => c.SubmissionDate >= thisMonthStart) },
+                { "JobsPostedThisWeek", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisWeekStart) },
+                { "JobsPostedThisMonth", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisMonthStart) }
+            };
+            ViewBag.timeStats = timeBasedStats;
+
             return View();
         }
-        public async Task<IActionResult> Index_User()
+        public async Task<IActionResult> Index_User(string searchString, int page = 1)
         {
             using (var scope = _serviceScopeFactory.CreateScope())
             {
@@ -75,8 +122,43 @@ namespace QuanLyDoanhNghiep.Controllers
                 await syncService.SyncDataAsync();
             }
 
-            var quanLyDoanhNghiepDBContext = _context.User.Include(u => u.Account);
-            return View(await quanLyDoanhNghiepDBContext.ToListAsync());
+            int pageSize = 30;
+            var users = _context.User.Include(u => u.Account).AsQueryable();
+
+            // // Lọc theo khóa
+            // if (!string.IsNullOrEmpty(khoaFilter))
+            // {
+            //     users = users.Where(u => u.Khoa == khoaFilter);
+            // }
+
+            // Tìm kiếm theo tên, số điện thoại, mã sinh viên, email
+            if (!string.IsNullOrEmpty(searchString))
+            {
+                users = users.Where(u =>
+                    u.FullName.Contains(searchString) ||
+                    u.PhoneNumber.Contains(searchString) ||
+                    u.ID.ToString().Contains(searchString) ||
+                    u.Khoa.Contains(searchString) ||
+                    u.Email.Contains(searchString)
+                );
+            }
+
+            // Lấy danh sách các khóa để hiển thị dropdown
+            ViewBag.SearchString = searchString;
+
+            int totalUsers = await users.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
+
+            var usersPaged = await users
+                .OrderBy(u => u.Khoa)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+
+            return View(usersPaged);
         }
 
         public async Task<IActionResult> Index_Employee()
@@ -87,7 +169,7 @@ namespace QuanLyDoanhNghiep.Controllers
             }
 
             var companyId = int.Parse(CurrentCompanyID);
-            
+
             // Thống kê CV cho công ty
             var cvList = await _context.CV
                 .Include(c => c.JobPosition)
@@ -115,7 +197,7 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "TotalJobCount", jobList.Count },
                 { "ActiveJobCount", jobList.Count(j => j.Status == true) },
                 { "InactiveJobCount", jobList.Count(j => j.Status == false) },
-                { "NewJobsToday", jobList.Count(j => j.StartDate.Date == DateTime.Today) },
+                { "NewJobsToday", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date == DateTime.Today) },
                 { "InternPositions", jobList.Count(j => !j.PositionType) },
                 { "EmployeePositions", jobList.Count(j => j.PositionType) },
                 { "ExpiredJobs", jobList.Count(j => j.EndDate < DateTime.Today) }
@@ -132,20 +214,20 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "CVsToday", cvList.Count(c => c.SubmissionDate?.Date == today) },
                 { "CVsThisWeek", cvList.Count(c => c.SubmissionDate >= thisWeekStart) },
                 { "CVsThisMonth", cvList.Count(c => c.SubmissionDate >= thisMonthStart) },
-                { "JobsPostedThisWeek", jobList.Count(j => j.StartDate >= thisWeekStart) },
-                { "JobsPostedThisMonth", jobList.Count(j => j.StartDate >= thisMonthStart) }
+                { "JobsPostedThisWeek", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisWeekStart) },
+                { "JobsPostedThisMonth", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisMonthStart) }
             };
             ViewBag.timeStats = timeBasedStats;
-            
+
             // --- Logic for CV Trend Chart (Last 28 Days) ---
             var startDate = today.AddDays(-27); // Start date for the 28-day period
             var dateRange = Enumerable.Range(0, 28).Select(i => startDate.AddDays(i)).ToList();
 
             // Query CVs submitted within the last 28 days for the specific company
-            var recentCVs = _context.CV 
+            var recentCVs = _context.CV
                 .Where(cv => cv.JobPosition.CompanyID == companyId && // Filter by company
                              cv.SubmissionDate.HasValue && // Ensure SubmissionDate is not null
-                             cv.SubmissionDate.Value >= startDate && 
+                             cv.SubmissionDate.Value >= startDate &&
                              cv.SubmissionDate.Value <= today)
                 .ToList();
 
@@ -174,8 +256,8 @@ namespace QuanLyDoanhNghiep.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-           var user = await _context.User
-                .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+            var user = await _context.User
+                 .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
 
             // Thống kê CV của sinh viên
             var cvList = await _context.CV
@@ -202,7 +284,7 @@ namespace QuanLyDoanhNghiep.Controllers
             var summaryJob = new Dictionary<string, int>
             {
                 { "TotalActiveJobs", jobList.Count },
-                { "NewJobsToday", jobList.Count(j => j.StartDate.Date == DateTime.Today) },
+                { "NewJobsToday", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date == DateTime.Today) },
                 { "InternJobs", jobList.Count(j => !j.PositionType) },
                 { "EmployeeJobs", jobList.Count(j => j.PositionType) },
                 { "JobsClosingSoon", jobList.Count(j => j.EndDate <= DateTime.Today.AddDays(7)) }
@@ -219,8 +301,8 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "CVsSubmittedToday", cvList.Count(c => c.SubmissionDate?.Date == today) },
                 { "CVsSubmittedThisWeek", cvList.Count(c => c.SubmissionDate >= thisWeekStart) },
                 { "CVsSubmittedThisMonth", cvList.Count(c => c.SubmissionDate >= thisMonthStart) },
-                { "NewJobsThisWeek", jobList.Count(j => j.StartDate >= thisWeekStart) },
-                { "NewJobsThisMonth", jobList.Count(j => j.StartDate >= thisMonthStart) }
+                { "NewJobsThisWeek", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisWeekStart) },
+                { "NewJobsThisMonth", jobList.Count(j => j.CreatedAt.HasValue && j.CreatedAt.Value.Date >= thisMonthStart) }
             };
             ViewBag.timeStats = timeBasedStats;
 
