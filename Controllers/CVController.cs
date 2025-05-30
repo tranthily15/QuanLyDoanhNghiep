@@ -61,6 +61,7 @@ namespace QuanLyDoanhNghiep.Controllers
                 ViewBag.AcceptedCVs = studentCVs.Where(c => c.Status == 1).ToList();
                 ViewBag.RejectedCVs = studentCVs.Where(c => c.Status == 2).ToList();
 
+
                 ViewBag.Student = user;
 
                 return View(studentCVs);
@@ -301,7 +302,6 @@ namespace QuanLyDoanhNghiep.Controllers
             {
                 await ResumeFile.CopyToAsync(stream);
             }
-
             // Gửi dữ liệu đến Python API
             var apiUrl = "http://localhost:5000/api/process-cv";
             using (var client = new HttpClient())
@@ -341,7 +341,7 @@ namespace QuanLyDoanhNghiep.Controllers
                         .ToListAsync();
 
                     ViewBag.CVSections = responseData["allSections"];
-
+                    ViewBag.filePath = $"/uploads/cvs_suggested/{fileName}";
                     return View("SuggestedJobs", matchedJobPositions);
                 }
                 else
@@ -551,6 +551,52 @@ namespace QuanLyDoanhNghiep.Controllers
             return _context.CV.Any(e => e.CV_ID == id);
         }
 
+        public async Task<IActionResult> ByJob(int id, int pendingPage = 1, int acceptedPage = 1, int rejectedPage = 1)
+        {
+            if (!IsLogin || RoleUser != "1")
+                return RedirectToAction("Login", "Account");
+
+            const int pageSize = 5;
+
+            // Lấy thông tin vị trí tuyển dụng
+            var job = await _context.JobPosition
+                .Include(j => j.Company)
+                .FirstOrDefaultAsync(j => j.PositionID == id);
+
+            if (job == null)
+                return NotFound();
+
+            // Lấy tất cả CV ứng tuyển vào vị trí này
+            var cvs = await _context.CV
+                .Include(c => c.User)
+                .Include(c => c.JobPosition)
+                    .ThenInclude(j => j.Company)
+                .Where(c => c.PositionID == id)
+                .OrderByDescending(c => c.CV_ID)
+                .ToListAsync();
+
+            // Chia theo trạng thái
+            var pendingCVs = cvs.Where(c => c.Status == 0).ToList();
+            var acceptedCVs = cvs.Where(c => c.Status == 1).ToList();
+            var rejectedCVs = cvs.Where(c => c.Status == 2).ToList();
+
+            ViewBag.PendingCVs = pendingCVs.Skip((pendingPage - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.AcceptedCVs = acceptedCVs.Skip((acceptedPage - 1) * pageSize).Take(pageSize).ToList();
+            ViewBag.RejectedCVs = rejectedCVs.Skip((rejectedPage - 1) * pageSize).Take(pageSize).ToList();
+
+            ViewBag.PendingTotal = pendingCVs.Count;
+            ViewBag.AcceptedTotal = acceptedCVs.Count;
+            ViewBag.RejectedTotal = rejectedCVs.Count;
+
+            ViewBag.PendingPage = pendingPage;
+            ViewBag.AcceptedPage = acceptedPage;
+            ViewBag.RejectedPage = rejectedPage;
+            ViewBag.PageSize = pageSize;
+
+            ViewBag.Job = job;
+
+            return View("CVByJob", cvs);
+        }
 
     }
 }

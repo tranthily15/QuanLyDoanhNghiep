@@ -149,26 +149,7 @@ select.form-control {
     cursor: pointer;
 }
 
-.login-button {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 5px;
-    background: linear-gradient(to right, #f37423, #f9a65f);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    margin-top: 20px;
-}
 
-.login-button:hover {
-    background: linear-gradient(to right, #f9a65f, #f37423);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(243, 116, 35, 0.3);
-}
 
 .login-button:active {
     transform: translateY(0);
@@ -311,3 +292,22 @@ footer a {
     color: #3c97bf;
     text-decoration: none;
 }
+/* nút  submit*/
+.btn-apply-now {
+    background-color: #ff6b35;
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+    .btn-apply-now:hover {
+        background-color: #ff6b35; /* vẫn giữ màu nền */
+        color: white; /* đảm bảo chữ vẫn màu trắng */
+        transform: translateY(-2px);
+    }

@@ -85,17 +85,18 @@ namespace QuanLyDoanhNghiep.Controllers
             // Thống kê chi tiết về công ty
             var companyDetails = companyList.Select(c => new
             {
+                CompanyID = c.CompanyID,
                 CompanyName = c.CompanyName,
                 EmployeeCount = c.Employees.Count,
                 ActiveJobCount = c.JobPositions.Count(j => j.Status == true),
                 TotalJobCount = c.JobPositions.Count,
                 TotalCVCount = _context.CV.Count(cv => cv.JobPosition.CompanyID == c.CompanyID),
-                LastActivity = c.JobPositions.Any() ? c.JobPositions.Max(j => j.CreatedAt) : c.CreatedAt
             })
-            .OrderByDescending(c => c.LastActivity)
+            .OrderByDescending(c => c.TotalCVCount)
+            .ThenByDescending(c => c.TotalJobCount)
+            .ThenByDescending(c => c.EmployeeCount)
             .Take(5)
             .ToList();
-
             ViewBag.topCompanies = companyDetails;
 
             // Thống kê theo thời gian
@@ -112,10 +113,28 @@ namespace QuanLyDoanhNghiep.Controllers
             };
             ViewBag.timeStats = timeBasedStats;
 
+            // Thống kê top vị trí có nhiều ứng viên nhất
+            var topJobs = jobList
+                .Select(j => new
+                {
+                    PositionName = j.PositionName,
+                    Vacancies = j.Vacancies,
+                    EndDate = j.EndDate,
+                    Applicants = cvList.Count(c => c.PositionID == j.PositionID)
+                })
+                .OrderByDescending(j => j.Applicants)
+                .Take(5)
+                .ToList();
+            ViewBag.TopJobs = topJobs;
+
             return View();
         }
         public async Task<IActionResult> Index_User(string searchString, int page = 1)
         {
+            if (!IsLogin || RoleUser == "2" || RoleUser == "1")
+            {
+                return RedirectToAction("Login", "Account");
+            }
             using (var scope = _serviceScopeFactory.CreateScope())
             {
                 var syncService = scope.ServiceProvider.GetRequiredService<SyncDataService>();
@@ -123,7 +142,10 @@ namespace QuanLyDoanhNghiep.Controllers
             }
 
             int pageSize = 30;
-            var users = _context.User.Include(u => u.Account).AsQueryable();
+            var users = _context.User
+            .Include(u => u.CVs)
+            .Include(u => u.Account)
+            .AsQueryable();
 
             // // Lọc theo khóa
             // if (!string.IsNullOrEmpty(khoaFilter))
@@ -203,7 +225,19 @@ namespace QuanLyDoanhNghiep.Controllers
                 { "ExpiredJobs", jobList.Count(j => j.EndDate < DateTime.Today) }
             };
             ViewBag.job = summaryJob;
-
+            // Lấy top 5 vị trí có nhiều ứng viên nhất
+            var topJobPositions = jobList
+                .Select(j => new
+                {
+                    PositionName = j.PositionName,
+                    Vacancies = j.Vacancies,
+                    EndDate = j.EndDate,
+                    ApplicantsCount = j.ApplicantsCount
+                })
+                .OrderByDescending(j => j.ApplicantsCount)
+                .Take(5)
+                .ToList();
+            ViewBag.TopJobPositions = topJobPositions;
             // Thống kê theo thời gian
             var today = DateTime.Today;
             var thisWeekStart = today.AddDays(-(int)today.DayOfWeek);
@@ -245,6 +279,7 @@ namespace QuanLyDoanhNghiep.Controllers
             ViewBag.CVTrendData = cvTrendData;
 
             // --- End of CV Trend Chart Logic ---
+
 
             return View();
         }

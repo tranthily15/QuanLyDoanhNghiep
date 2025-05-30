@@ -1,10 +1,22 @@
 ﻿@{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    ViewData["Title"] = "Thống kê tổng quan";
+    ViewData["Title"] = "Bảng điều khiển hệ thống";
+    int rank = 1;
 }
 
 <div class="box"></div>
-<div class="box"></div>
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Bảng điều khiển hệ thống
+            </li>
+        </ol>
+    </nav>
+</div>
 <div class="dashboard-container">
     <div class="container-fluid">
         <!-- Thống kê tổng quan Section -->
@@ -12,7 +24,8 @@
             <div class="section-header">
                 <h4>
                     <i class="fas fa-chart-line"></i> Thống kê tổng quan
-                    <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê tổng quan hệ thống"></i>
+                    <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                        title="Thống kê tổng quan hệ thống"></i>
                 </h4>
             </div>
             <div class="row stats-row">
@@ -71,7 +84,8 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-file-alt"></i> Thống kê CV
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Phân bố trạng thái CV toàn hệ thống"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Phân bố trạng thái CV toàn hệ thống"></i>
                         </h4>
                     </div>
                     <div class="chart-section">
@@ -91,7 +105,8 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-briefcase"></i> Thống kê việc làm
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Số lượng việc làm và việc làm mới"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Số lượng việc làm và việc làm mới"></i>
                         </h4>
                     </div>
                     <div class="chart-section">
@@ -113,7 +128,8 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-users"></i> Thống kê người dùng
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Phân bố người dùng theo vai trò"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Phân bố người dùng theo vai trò"></i>
                         </h4>
                     </div>
                     <div class="chart-section">
@@ -136,7 +152,8 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-building"></i> Thống kê công ty
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê tổng quan về các công ty"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Thống kê tổng quan về các công ty"></i>
                         </h4>
                     </div>
                     <div class="row stats-row">
@@ -196,29 +213,36 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-trophy"></i> Top công ty hoạt động
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Top 5 công ty có hoạt động gần đây nhất"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Top 5 công ty có hoạt động gần đây nhất"></i>
                         </h4>
                     </div>
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
+                                    <th>STT</th>
                                     <th>Công ty</th>
-                                    <th>Nhân viên</th>
-                                    <th>Vị trí đang tuyển</th>
                                     <th>CV đã nhận</th>
+                                    <th>Vị trí đang tuyển</th>
+                                    <th>Nhân viên</th>
                                 </tr>
                             </thead>
                             <tbody>
+
                                 @foreach (var company in ViewBag.topCompanies)
                                 {
                                     <tr>
-                                        <td>@company.CompanyName</td>
-                                        <td>@company.EmployeeCount</td>
-                                        <td>@company.ActiveJobCount</td>
+                                        <td>@(rank++)</td>
+                                        <td><a asp-action="Details" asp-controller="Company" asp-route-id="@company.CompanyID"
+                                                class="text-dark">@company.CompanyName</a>
+                                        </td>
                                         <td>@company.TotalCVCount</td>
+                                        <td>@company.ActiveJobCount</td>
+                                        <td>@company.EmployeeCount</td>
                                     </tr>
                                 }
+
                             </tbody>
                         </table>
                     </div>
@@ -240,7 +264,7 @@
         background: white;
         border-radius: 12px;
         padding: 25px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         margin-bottom: 25px;
     }
 
@@ -282,7 +306,7 @@
 
     .stat-box:hover {
         transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
     .stat-icon {
@@ -300,12 +324,29 @@
         color: white;
     }
 
-    .stat-icon.blue { background: #1a73e8; }
-    .stat-icon.green { background: #00b14f; }
-    .stat-icon.yellow { background: #fbbc04; }
-    .stat-icon.red { background: #ea4335; }
-    .stat-icon.purple { background: #6f42c1; }
-    .stat-icon.orange { background: #fd7e14; }
+    .stat-icon.blue {
+        background: #1a73e8;
+    }
+
+    .stat-icon.green {
+        background: #00b14f;
+    }
+
+    .stat-icon.yellow {
+        background: #fbbc04;
+    }
+
+    .stat-icon.red {
+        background: #ea4335;
+    }
+
+    .stat-icon.purple {
+        background: #6f42c1;
+    }
+
+    .stat-icon.orange {
+        background: #fd7e14;
+    }
 
     .stat-content h5 {
         font-size: 24px;

@@ -1,9 +1,18 @@
 @{
-    ViewData["Title"] = "Trang chủ Sinh viên";
+    ViewData["Title"] = "Thống kê người dùng";
 }
 
 <div class="box"> </div>
-<div class="box"> </div>
+<nav aria-label="breadcrumb ms-1 mt-2">
+    <ol class="breadcrumb ">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Thống kê nguời dùng
+        </li>
+    </ol>
+</nav>
 @if (ViewBag.Student != null)
 {
     var student = ViewBag.Student;
@@ -11,9 +20,9 @@
         <div class="profile-header">
             <div class="profile-avatar">
                 @{
-                    var initials = !string.IsNullOrEmpty(student.FullName) 
-                        ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
-                        : "SV";
+                    var initials = !string.IsNullOrEmpty(student.FullName)
+                    ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
+                    : "SV";
                 }
                 <div class="avatar-placeholder">@initials</div>
             </div>
@@ -55,7 +64,8 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-file-alt"></i> Thống kê CV của bạn
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê CV đã nộp và trạng thái"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Thống kê CV đã nộp và trạng thái"></i>
                         </h4>
                     </div>
                     <div class="row stats-row mb-4">
@@ -119,21 +129,25 @@
                     <div class="section-header">
                         <h4>
                             <i class="fas fa-history"></i> Thống kê theo thời gian
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Số liệu CV theo thời gian"></i>
+                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
+                                title="Số liệu CV theo thời gian"></i>
                         </h4>
                     </div>
                     <ul class="list-group list-group-flush">
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp hôm nay
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedToday"] ?? 0)</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedToday"] ??
+                                                                0)</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp tuần này
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisWeek"] ?? 0)</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisWeek"] ??
+                                                                0)</span>
                         </li>
                         <li class="list-group-item d-flex justify-content-between align-items-center">
                             CV nộp tháng này
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisMonth"] ?? 0)</span>
+                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisMonth"] ??
+                                                                0)</span>
                         </li>
                     </ul>
                 </div>
@@ -143,273 +157,308 @@
 </div>
 
 <style>
-.dashboard-container {
-    background-color: #f8f9fa;
-    min-height: calc(100vh - 70px); /* Adjust based on header height */
-    padding: 30px 0;
-}
+    .dashboard-container {
+        background-color: #f8f9fa;
+        min-height: calc(100vh - 70px);
+        /* Adjust based on header height */
+        padding: 30px 0;
+    }
 
-/* Section Card Styles */
-.section-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
-}
+    /* Section Card Styles */
+    .section-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+    }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-}
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.section-header h4 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d2d2d;
-    margin: 0;
-}
-.section-header h4 i:first-child {
-    margin-right: 8px;
-    color: #ff6b35; /* Example color */
-}
+    .section-header h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2d2d2d;
+        margin: 0;
+    }
 
-
-/* Stats Styles */
-.stats-row {
-    margin: 0 -10px; /* Counteract padding on cols */
-}
-
-.stat-box {
-    display: flex;
-    align-items: center;
-    padding: 15px; /* Slightly smaller padding */
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin: 10px; /* Add margin for spacing */
-    border: 1px solid #e9ecef;
-    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-}
-.stat-box:hover {
-     transform: translateY(-3px);
-     box-shadow: 0 4px 8px rgba(0,0,0,0.08);
-}
+    .section-header h4 i:first-child {
+        margin-right: 8px;
+        color: #ff6b35;
+        /* Example color */
+    }
 
 
-.stat-icon {
-    width: 45px; /* Slightly smaller icon */
-    height: 45px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-}
+    /* Stats Styles */
+    .stats-row {
+        margin: 0 -10px;
+        /* Counteract padding on cols */
+    }
 
-.stat-icon i {
-    font-size: 18px; /* Slightly smaller icon font */
-    color: white;
-}
+    .stat-box {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        /* Slightly smaller padding */
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin: 10px;
+        /* Add margin for spacing */
+        border: 1px solid #e9ecef;
+        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+    }
 
-/* Icon Colors (Match Employee Dashboard) */
-.stat-icon.blue { background: #1a73e8; }
-.stat-icon.green { background: #00b14f; }
-.stat-icon.yellow { background: #fbbc04; }
-.stat-icon.red { background: #ea4335; }
-.stat-icon.purple { background: #673ab7; } /* Add more if needed */
-.stat-icon.teal { background: #009688; }
-
-
-.stat-content h5 {
-    font-size: 22px; /* Slightly smaller */
-    font-weight: 700;
-    color: #2d2d2d;
-    margin: 0;
-}
-
-.stat-content p {
-    font-size: 13px; /* Slightly smaller */
-    color: #6c757d;
-    margin: 4px 0 0;
-}
+    .stat-box:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
+    }
 
 
-/* Chart Styles */
-.chart-section {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
-    margin-top: 20px; /* Add some top margin */
-}
+    .stat-icon {
+        width: 45px;
+        /* Slightly smaller icon */
+        height: 45px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
 
-.chart-header {
-    margin-bottom: 15px;
-    color: #6c757d;
-    font-size: 14px;
-}
+    .stat-icon i {
+        font-size: 18px;
+        /* Slightly smaller icon font */
+        color: white;
+    }
 
-.chart-container {
-    position: relative;
-    height: 280px; /* Default height */
-}
+    /* Icon Colors (Match Employee Dashboard) */
+    .stat-icon.blue {
+        background: #1a73e8;
+    }
 
-/* List Group Styles */
-.list-group {
-    padding-top: 10px;
-}
-.list-group-item {
-    border: none;
-    padding: 12px 0; /* Adjust padding */
-    background-color: transparent; /* Inherit background */
-}
-.list-group-item:not(:last-child) {
-    border-bottom: 1px solid #e9ecef;
-}
+    .stat-icon.green {
+        background: #00b14f;
+    }
+
+    .stat-icon.yellow {
+        background: #fbbc04;
+    }
+
+    .stat-icon.red {
+        background: #ea4335;
+    }
+
+    .stat-icon.purple {
+        background: #673ab7;
+    }
+
+    /* Add more if needed */
+    .stat-icon.teal {
+        background: #009688;
+    }
 
 
-.badge {
-    font-size: 13px;
-    padding: 6px 10px;
-}
+    .stat-content h5 {
+        font-size: 22px;
+        /* Slightly smaller */
+        font-weight: 700;
+        color: #2d2d2d;
+        margin: 0;
+    }
 
-.student-profile-card {
-    background: white;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    transition: transform 0.3s ease;
-}
+    .stat-content p {
+        font-size: 13px;
+        /* Slightly smaller */
+        color: #6c757d;
+        margin: 4px 0 0;
+    }
 
-.student-profile-card:hover {
-    transform: translateY(-5px);
-}
 
-.profile-header {
-    padding: 2rem;
-    display: flex;
-    align-items: center;
-    gap: 2rem;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-}
+    /* Chart Styles */
+    .chart-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 20px;
+        /* Add some top margin */
+    }
 
-.profile-avatar {
-    flex-shrink: 0;
-}
+    .chart-header {
+        margin-bottom: 15px;
+        color: #6c757d;
+        font-size: 14px;
+    }
 
-.profile-image {
-    width: 80px;
-    height: 80px;
-    border-radius: 50%;
-    object-fit: cover;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    border: 3px solid white;
-}
+    .chart-container {
+        position: relative;
+        height: 280px;
+        /* Default height */
+    }
 
-.profile-info {
-    flex: 1;
-}
+    /* List Group Styles */
+    .list-group {
+        padding-top: 10px;
+    }
 
-.profile-name {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #2d2d2d;
-    margin-bottom: 0.5rem;
-}
+    .list-group-item {
+        border: none;
+        padding: 12px 0;
+        /* Adjust padding */
+        background-color: transparent;
+        /* Inherit background */
+    }
 
-.profile-stats {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 1rem;
-}
+    .list-group-item:not(:last-child) {
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.stat-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    color: #6c757d;
-    font-size: 0.9rem;
-}
 
-.stat-item i {
-    color: #ff6b35;
-}
+    .badge {
+        font-size: 13px;
+        padding: 6px 10px;
+    }
 
-.profile-contact {
-    padding: 1.5rem 2rem;
-    display: flex;
-    gap: 2rem;
-    border-top: 1px solid #e9ecef;
-    background: white;
-}
+    .student-profile-card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        overflow: hidden;
+        transition: transform 0.3s ease;
+    }
 
-.contact-item {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    color: #6c757d;
-}
+    .student-profile-card:hover {
+        transform: translateY(-5px);
+    }
 
-.contact-item i {
-    color: #ff6b35;
-    font-size: 1.1rem;
-}
+    .profile-header {
+        padding: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    }
 
-.avatar-placeholder {
-    width: 80px;
-    height: 80px;
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8f6b 100%);
-    color: white;
-    font-size: 2rem;
-    font-weight: 700;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
-}
+    .profile-avatar {
+        flex-shrink: 0;
+    }
+
+    .profile-image {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        object-fit: cover;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        border: 3px solid white;
+    }
+
+    .profile-info {
+        flex: 1;
+    }
+
+    .profile-name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-stats {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+        font-size: 0.9rem;
+    }
+
+    .stat-item i {
+        color: #ff6b35;
+    }
+
+    .profile-contact {
+        padding: 1.5rem 2rem;
+        display: flex;
+        gap: 2rem;
+        border-top: 1px solid #e9ecef;
+        background: white;
+    }
+
+    .contact-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: #6c757d;
+    }
+
+    .contact-item i {
+        color: #ff6b35;
+        font-size: 1.1rem;
+    }
+
+    .avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8f6b 100%);
+        color: white;
+        font-size: 2rem;
+        font-weight: 700;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+    }
 </style>
 
 @section Scripts {
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // CV Status Chart
-    const cvStatusCtx = document.getElementById('cvStatusChart').getContext('2d');
-    new Chart(cvStatusCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Đang chờ', 'Đã duyệt', 'Từ chối'],
-            datasets: [{
-                label: 'Số lượng CV',
-                data: [
-                    @(ViewBag.cv?["PendingCount"] ?? 0),
-                    @(ViewBag.cv?["AcceptedCount"] ?? 0),
-                    @(ViewBag.cv?["RejectedCount"] ?? 0)
-                ],
-                backgroundColor: ['#fbbc04', '#00b14f', '#ea4335']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                title: {
-                    display: false
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // CV Status Chart
+        const cvStatusCtx = document.getElementById('cvStatusChart').getContext('2d');
+        new Chart(cvStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đang chờ', 'Đã duyệt', 'Từ chối'],
+                datasets: [{
+                    label: 'Số lượng CV',
+                    data: [
+                        @(ViewBag.cv?["PendingCount"] ?? 0),
+                        @(ViewBag.cv?["AcceptedCount"] ?? 0),
+                        @(ViewBag.cv?["RejectedCount"] ?? 0)
+                    ],
+                    backgroundColor: ['#fbbc04', '#00b14f', '#ea4335']
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: false
+                    }
                 }
             }
-        }
-    });
+        });
 
-    // Initialize Bootstrap tooltips
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
-} 
+        // Initialize Bootstrap tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl)
+        })
+    </script>
+}

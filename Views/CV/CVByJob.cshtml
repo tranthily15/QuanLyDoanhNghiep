@@ -1,0 +1,397 @@
+@model IEnumerable<QuanLyDoanhNghiep.Models.CV>
+@{
+    var job = ViewBag.Job as QuanLyDoanhNghiep.Models.JobPosition;
+    int pendingPage = ViewBag.PendingPage ?? 1;
+    int acceptedPage = ViewBag.AcceptedPage ?? 1;
+    int rejectedPage = ViewBag.RejectedPage ?? 1;
+    int pageSize = ViewBag.PageSize ?? 5;
+    int pendingTotal = ViewBag.PendingTotal ?? 0;
+    int acceptedTotal = ViewBag.AcceptedTotal ?? 0;
+    int rejectedTotal = ViewBag.RejectedTotal ?? 0;
+    int pendingTotalPages = (int)Math.Ceiling((double)pendingTotal / pageSize);
+    int acceptedTotalPages = (int)Math.Ceiling((double)acceptedTotal / pageSize);
+    int rejectedTotalPages = (int)Math.Ceiling((double)rejectedTotal / pageSize);
+}
+<div class="box"></div>
+<!-- Breadcrumb -->
+@* <div class="breadcrumb-container"> *@
+<div class="container-fluid py-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("ActiveJobs", "JobPosition")">Quản lý vị trí tuyển dụng</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                @job.PositionName
+            </li>
+        </ol>
+    </nav>
+</div>
+@* </div> *@
+<div class="container-fluid py-4">
+    <!-- Thông tin vị trí tuyển dụng -->
+    <a href="@Url.Action("Details", "JobPosition", new { id = job.PositionID })" class="text-decoration-none text-dark">
+        <div class="card shadow-sm mb-4 border-0">
+            <div class="card-body d-flex flex-column flex-md-row align-items-md-center">
+                <div class="me-md-4 mb-3 mb-md-0">
+                    <img src="~/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")"
+                        alt="@job.Company?.CompanyName" class="rounded shadow-sm"
+                        style="width: 80px; height: 80px; object-fit: cover; background: #f8f9fa;">
+                </div>
+                <div class="flex-grow-1">
+                    <h3 class="fw-bold mb-2 position-name text-truncate text-dark" title="@job.PositionName"
+                        data-bs-toggle="tooltip">
+                        @job.PositionName
+                    </h3>
+                    <div class="mb-2 text-muted">
+                        <i class="bi bi-building me-1"></i>@job.Company?.CompanyName
+                    </div>
+                    <div class="row g-2">
+                        <div class="col-auto">
+                            <span class="badge text-muted px-3 py-2 fs-6">
+                                <i class="bi bi-people me-1"></i>
+                                Số lượng tuyển: <strong>@(job.Vacancies ?? "Không giới hạn")</strong>
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge text-muted px-3 py-2 fs-6">
+                                <i class="bi bi-cash-stack me-1"></i>
+                                Lương: <strong>@(string.IsNullOrEmpty(job.Salary) ? "Thỏa thuận" : job.Salary)</strong>
+                            </span>
+                        </div>
+                        <div class="col-auto">
+                            <span class="badge text-muted px-3 py-2 fs-6">
+                                <i class="bi bi-calendar-event me-1"></i>
+                                Hạn nộp: <strong>@job.EndDate.ToString("dd/MM/yyyy")</strong>
+                            </span>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+    </a>
+    <div class="row g-4">
+        <!-- Đang chờ duyệt -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-clock text-warning me-2"></i>Đang chờ duyệt
+                        </h5>
+                        <span class="badge bg-warning rounded-pill">@ViewBag.PendingTotal</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush cv-list">
+                        @foreach (var cv in ViewBag.PendingCVs as List<QuanLyDoanhNghiep.Models.CV>)
+                        {
+                            <div class="list-group-item border-0 px-4 py-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 text-truncate">@cv.User.FullName</h6>
+                                        <p class="text-muted small mb-0">@cv.User.Email</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                    </small>
+                                    <a href="@Url.Action("Details", "CV", new { id = cv.CV_ID })"
+                                        class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        @if ((ViewBag.PendingCVs as List<QuanLyDoanhNghiep.Models.CV>).Count == 0)
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">Không có CV đang chờ duyệt</p>
+                            </div>
+                        }
+                    </div>
+                    <!-- Phân trang -->
+                    @if (pendingTotalPages > 1)
+                    {
+                        <nav>
+                            <ul class="pagination justify-content-center mt-3">
+                                <li class="page-item @(pendingPage == 1 ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage - 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })">Trước</a>
+                                </li>
+                                @for (int i = 1; i <= pendingTotalPages; i++)
+                                {
+                                    <li class="page-item @(i == pendingPage ? "active" : "")">
+                                        <a class="page-link"
+                                            href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = i, acceptedPage = acceptedPage, rejectedPage = rejectedPage })">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(pendingPage == pendingTotalPages ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage + 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+        <!-- Đã chấp nhận -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-check-circle text-success me-2"></i>Đã chấp nhận
+                        </h5>
+                        <span class="badge bg-success rounded-pill">@ViewBag.AcceptedTotal</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush cv-list">
+                        @foreach (var cv in ViewBag.AcceptedCVs as List<QuanLyDoanhNghiep.Models.CV>)
+                        {
+                            <div class="list-group-item border-0 px-4 py-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 text-truncate">@cv.User.FullName</h6>
+                                        <p class="text-muted small mb-0">@cv.User.Email</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                    </small>
+                                    <a href="@Url.Action("Details", "CV", new { id = cv.CV_ID })"
+                                        class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        @if ((ViewBag.AcceptedCVs as List<QuanLyDoanhNghiep.Models.CV>).Count == 0)
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">Chưa có CV nào được chấp nhận</p>
+                            </div>
+                        }
+                    </div>
+                    <!-- Phân trang -->
+                    @if (acceptedTotalPages > 1)
+                    {
+                        <nav>
+                            <ul class="pagination justify-content-center mt-3">
+                                <li class="page-item @(acceptedPage == 1 ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage - 1, rejectedPage = rejectedPage })">Trước</a>
+                                </li>
+                                @for (int i = 1; i <= acceptedTotalPages; i++)
+                                {
+                                    <li class="page-item @(i == acceptedPage ? "active" : "")">
+                                        <a class="page-link"
+                                            href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = i, rejectedPage = rejectedPage })">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(acceptedPage == acceptedTotalPages ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage + 1, rejectedPage = rejectedPage })">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+        <!-- Đã từ chối -->
+        <div class="col-md-4">
+            <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="bi bi-x-circle text-danger me-2"></i>Đã từ chối
+                        </h5>
+                        <span class="badge bg-danger rounded-pill">@ViewBag.RejectedTotal</span>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush cv-list">
+                        @foreach (var cv in ViewBag.RejectedCVs as List<QuanLyDoanhNghiep.Models.CV>)
+                        {
+                            <div class="list-group-item border-0 px-4 py-3">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-1 text-truncate">@cv.User.FullName</h6>
+                                        <p class="text-muted small mb-0">@cv.User.Email</p>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-calendar me-1"></i>
+                                        @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                    </small>
+                                    <a href="@Url.Action("Details", "CV", new { id = cv.CV_ID })"
+                                        class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <i class="bi bi-eye me-1"></i>Chi tiết
+                                    </a>
+                                </div>
+                            </div>
+                        }
+                        @if ((ViewBag.RejectedCVs as List<QuanLyDoanhNghiep.Models.CV>).Count == 0)
+                        {
+                            <div class="text-center py-4">
+                                <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                <p class="text-muted mt-2 mb-0">Chưa có CV nào bị từ chối</p>
+                            </div>
+                        }
+                    </div>
+                    <!-- Phân trang -->
+                    @if (rejectedTotalPages > 1)
+                    {
+                        <nav>
+                            <ul class="pagination justify-content-center mt-3">
+                                <li class="page-item @(rejectedPage == 1 ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage - 1 })">Trước</a>
+                                </li>
+                                @for (int i = 1; i <= rejectedTotalPages; i++)
+                                {
+                                    <li class="page-item @(i == rejectedPage ? "active" : "")">
+                                        <a class="page-link"
+                                            href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = i })">@i</a>
+                                    </li>
+                                }
+                                <li class="page-item @(rejectedPage == rejectedTotalPages ? "disabled" : "")">
+                                    <a class="page-link"
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage + 1 })">Sau</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    /* Đặt đoạn này vào cuối file CVByJob.cshtml hoặc trong <style> riêng */
+@* .card {
+    transition: transform 0.2s ease-in-out;
+    height: 600px;
+    display: flex;
+    flex-direction: column;
+    border-radius: 18px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
+}
+.card-header {
+    flex-shrink: 0;
+    border-radius: 18px 18px 0 0;
+    background: linear-gradient(90deg, #f8fafc 60%, #f1f5f9 100%);
+} *@
+.card-body {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    .cv-list {
+        height: 100%;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #dee2e6 #fff;
+    }
+
+    .cv-list::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .cv-list::-webkit-scrollbar-track {
+        background: #fff;
+    }
+
+    .cv-list::-webkit-scrollbar-thumb {
+        background-color: #dee2e6;
+        border-radius: 3px;
+    }
+
+    .list-group-item {
+        transition: background-color 0.2s ease-in-out;
+        border-radius: 12px;
+        margin-bottom: 10px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+    }
+
+    .list-group-item:hover {
+        background-color: #f8f9fa;
+        box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+    }
+
+    .badge {
+        font-weight: 500;
+        padding: 0.5em 0.8em;
+        font-size: 1rem;
+    }
+
+    .btn-outline-primary {
+        border-radius: 20px;
+        border-width: 1.5px;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-outline-primary:hover {
+        background: #1a73e8;
+        color: #fff;
+        border-color: #1a73e8;
+        transform: translateY(-1px);
+    }
+
+    .table> :not(caption)>*>* {
+        padding: 1rem;
+    }
+
+    .text-muted {
+        color: #94a3b8 !important;
+    }
+
+    .section-header h4 {
+        font-weight: 700;
+        color: #1a202c;
+    }
+
+    .section-header i {
+        color: #f37423;
+        margin-right: 6px;
+    }
+
+    .pagination .page-link {
+        border-radius: 50% !important;
+        margin: 0 2px;
+        color: #1a73e8;
+        border: none;
+        background: #f1f8ff;
+        transition: background 0.2s, color 0.2s;
+    }
+
+    .pagination .page-item.active .page-link,
+    .pagination .page-link:hover {
+        background: #1a73e8;
+        color: #fff;
+    }
+
+    .pagination .page-item.disabled .page-link {
+        background: #e9ecef;
+        color: #b0b0b0;
+    }
+</style>

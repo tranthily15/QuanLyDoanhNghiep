@@ -56,7 +56,41 @@ header .navbar-nav a:hover {
     min-height: 100vh;
 }
 
+/* Breadcrumb Styles */
+.breadcrumb-container {
+    background-color: #f8f9fa;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
 
+.breadcrumb {
+    margin-bottom: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+}
+
+    .breadcrumb-item a {
+        color: rgb(177, 121, 0);
+        text-decoration: none;
+    }
+
+        .breadcrumb-item a:hover {
+            color: rgb(177, 121, 0);
+            text-decoration: underline;
+        }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #6c757d;
+    }
 /* css footer */
 .footer {
     position: relative;
@@ -120,19 +154,94 @@ header .navbar-nav a:hover {
         text-align: center;
     }
 }
-
-/*.notification-count {
-    position: absolute;
-    top: -6px;
-    right: -8px;
-    color: red;
-    font-size: 0.75rem;
-    font-weight: 500;
-    line-height: 1;
-    padding: 0;
-    background: none;
+/* nút  submit*/
+.btn-apply-now {
+    background-color: #ff6b35;
+    color: white;
+    padding: 12px 24px;
     border: none;
-    border-radius: 0;
-    box-shadow: none;
-}*/
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: all 0.3s ease;
+}
+
+    .btn-apply-now:hover {
+        background-color: #ff6b35; /* vẫn giữ màu nền */
+        color: white; /* đảm bảo chữ vẫn màu trắng */
+        transform: translateY(-2px);
+    }
+/* bút chỉnh sửa*/
+.btn-edit {
+    background-color: white;
+    color: #ff6b35;
+    border: 2px solid #ff6b35;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-edit:hover {
+        background-color: #ff6b35;
+        color: white;
+    }
+/* bút quay lại*/
+.btn-exit {
+    background-color: white;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-exit:hover {
+        background-color: #6c757d;
+        color: white;
+    }
+/* bút xóa*/
+.btn-delete {
+    background-color: white;
+    color: #dc3545;
+    border: 2px solid #dc3545;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-delete:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+/* bút thêm mới*/
+.btn-add {
+    background-color: white;
+    color: #198754;
+    border: 2px solid #198754;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-add:hover {
+        background-color: #198754;
+        color: white;
+    }
+/*thẻ card */
+.job-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: none;
+    border-radius: 10px;
+}
+
+    .job-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important;
+    }
 

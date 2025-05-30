@@ -1,8 +1,19 @@
 @{
-    ViewData["Title"] = "Trang chủ Nhân viên";
+    ViewData["Title"] = "Thống kê nhân viên";
+    var topJobs = ViewBag.TopJobs as IEnumerable<dynamic>;
 }
 <div class="box"> </div>
-<div class="box"> </div>
+<!-- Breadcrumb -->
+<nav aria-label="breadcrumb ms-1 mt-2">
+    <ol class="breadcrumb ">
+        <li class="breadcrumb-item">
+            <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+            Thống kê doanh nghiệp
+        </li>
+    </ol>
+</nav>
 <div class="dashboard-container">
     <!-- Banner Section -->
     <!-- <div class="banner-section mb-4">
@@ -38,12 +49,12 @@
 
     <!-- Main Content -->
     <div class="container-fluid">
-        <!-- Hiệu quả tuyển dụng Section -->
+        <!-- Thống kê tổng quan -->
         <div class="section-card mb-4">
             <div class="section-header">
                 <h4>
-                    Hiệu quả tuyển dụng
-                    <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê hiệu quả tuyển dụng"></i>
+                    Thống kê tổng quan
+                    <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip" title="Thống kê tổng quan"></i>
                 </h4>
             </div>
             <div class="row stats-row">
@@ -55,474 +66,551 @@
                             </div>
                             <div class="stat-content">
                                 <h5>@ViewBag.job["ActiveJobCount"]</h5>
-                                <p>Chiến dịch đang mở</p>
+                                <p>Vị trí việc làm</p>
                             </div>
                         </div>
                     </a>
                 </div>
-                
-                <div class="col-md-3">
-                    <a href="@Url.Action("Index", "CV")" class="stat-box-link">
-                    <div class="stat-box">
-                        <div class="stat-icon green">
-                            <i class="fas fa-user-check"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h5>@ViewBag.cv["AcceptedCount"]</h5>
-                            <p>CV tiếp nhận</p>
-                        </div>
-                    </div>
-                    </a>
-                </div>
-                <!-- <div class="col-md-3">
-                    <div class="stat-box">
-                        <div class="stat-icon yellow">
-                            <i class="fas fa-file-alt"></i>
-                        </div>
-                        <div class="stat-content">
-                            <h5>@ViewBag.job["TotalJobCount"]</h5>
-                            <p>Tin tuyển dụng hiển thị</p>
-                        </div>
-                    </div>
-                </div> -->
+
                 <div class="col-md-3">
                     <a href="@Url.Action("Index", "CV")" class="stat-box-link">
                         <div class="stat-box">
-                            <div class="stat-icon red">
-                                <i class="fas fa-user-plus"></i>
+                            <div class="stat-icon green">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h5>@ViewBag.cv["TotalCVCount"]</h5>
+                                <p>CV đã nhận</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="@Url.Action("Index", "CV")" class="stat-box-link">
+                        <div class="stat-box">
+                            <div class="stat-icon yellow">
+                                <i class="fas fa-file-alt"></i>
                             </div>
                             <div class="stat-content">
                                 <h5>@ViewBag.cv["PendingCount"]</h5>
-                                <p>CV ứng tuyển mới</p>
+                                <p>CV chờ duyệt</p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+                <div class="col-md-3">
+                    <a href="@Url.Action("Index", "CV")" class="stat-box-link">
+
+                        <div class="stat-box">
+                            <div class="stat-icon yellow">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="stat-content">
+                                <h5>@ViewBag.cv["RejectedCount"]</h5>
+                                <p>CV từ chối</p>
                             </div>
                         </div>
                     </a>
                 </div>
             </div>
 
-            <!-- Chart Section -->
-            <div class="chart-section mt-4">
-                <div class="chart-header">
-                    <span>Kết quả CV tiếp nhận 28 ngày qua</span>
+        </div>
+
+        <!-- Chart Section -->
+        <div class="chart-section mt-4">
+            <div class="chart-header">
+                <span>Kết quả CV tiếp nhận 28 ngày qua</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="cvTrendChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Biểu đồ CV theo trạng thái và cột vị trí -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-white border-0 fw-bold fs-5">
+                        <i class="fas fa-chart-pie me-2"></i>Biểu đồ CV theo trạng thái
+                    </div>
+                    <div class="card-body">
+                        <canvas id="cvChart" height="180"></canvas>
+                    </div>
                 </div>
-                <div class="chart-container">
-                    <canvas id="cvTrendChart"></canvas>
+            </div>
+            <div class="col-md-6">
+                <div class="card shadow border-0 h-100">
+                    <div class="card-header bg-white border-0 fw-bold fs-5">
+                        <i class="fas fa-chart-bar me-2"></i>Thống kê loại hình công việc
+                    </div>
+                    <div class="card-body">
+                        <canvas id="jobChart" height="180"></canvas>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Company Info Section -->
-        <div class="row">
-            <div class="col-md-8">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h4>Thống kê chi tiết</h4>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="chart-container">
-                                <canvas id="cvChart"></canvas>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="chart-container">
-                                <canvas id="jobChart"></canvas>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+        <!-- Top 5 Jobs Section -->
+        <div class="section-card mb-4">
+            <div class="section-header">
+                <h4>
+                    Top 5 vị trí việc làm có nhiều ứng viên nhất
+                </h4>
             </div>
-            <div class="col-md-4">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h4>Thông tin công ty</h4>
-                    </div>
-                    <div class="company-info">
-                        <div class="company-header">
-                            <img src="/images/company-logo.png" alt="Company Logo" class="company-logo" />
-                            <div class="company-details">
-                                <h5>@ViewBag.CompanyName</h5>
-                                <p>Mã NTD: @ViewBag.CompanyId</p>
-                            </div>
-                            <span class="member-badge">MEMBER</span>
-                        </div>
-                        <div class="membership-levels mt-3">
-                            <div class="level-row">
-                                <span>Member</span>
-                                <span>Silver</span>
-                                <span>Gold</span>
-                                <span>Platinum</span>
-                            </div>
-                            <div class="level-points">
-                                <span>0</span>
-                                <span>300</span>
-                                <span>800</span>
-                                <span>1500</span>
-                            </div>
-                            <div class="progress">
-                                <div class="progress-bar" style="width: 25%"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="table-responsive">
+                <table class="table table-bordered align-middle">
+                    <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Vị trí</th>
+                            <th>Số lượng tuyển</th>
+                            <th>Ngày kết thúc</th>
+                            <th>Số ứng viên</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (ViewBag.TopJobPositions != null)
+                        {
+                            int index = 0;
+                            foreach (var job in ViewBag.TopJobPositions)
+                            {
+                                <tr>
+                                    <td>@(++index)</td>
+                                    <td>@job.PositionName</td>
+                                    <td>@job.Vacancies</td>
+                                    <td>@(job.EndDate != null ? ((DateTime)job.EndDate).ToString("dd/MM/yyyy") : "-")</td>
+                                    <td>@job.ApplicantsCount</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="4" class="text-center text-muted">Không có dữ liệu</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>
+
+
 </div>
 
 <style>
-.dashboard-container {
-    background-color: #f8f9fa;
-    min-height: 100vh;
-    padding: 20px 0;
-}
+    .dashboard-container {
+        background-color: #f8f9fa;
+        min-height: 100vh;
+        padding: 20px 0;
+    }
 
-/* Banner Styles */
-.banner-section {
-    margin: -20px 0 30px;
-}
+    /* Banner Styles */
+    .banner-section {
+        margin: -20px 0 30px;
+    }
 
-.banner-card {
-    background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
-    border-radius: 12px;
-    padding: 30px;
-    color: white;
-    display: flex;
-    align-items: center;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-}
+    .banner-card {
+        background: linear-gradient(135deg, #ff6b35 0%, #ff8c5a 100%);
+        border-radius: 12px;
+        padding: 30px;
+        color: white;
+        display: flex;
+        align-items: center;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+    }
 
-.banner-card.blue {
-    background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-}
+    .banner-card.blue {
+        background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+    }
 
-.banner-content {
-    flex: 1;
-    z-index: 1;
-}
+    .banner-content {
+        flex: 1;
+        z-index: 1;
+    }
 
-.banner-content h3 {
-    font-size: 24px;
-    font-weight: 700;
-    margin-bottom: 15px;
-}
+    .banner-content h3 {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 15px;
+    }
 
-.banner-content p {
-    font-size: 16px;
-    opacity: 0.9;
-    margin-bottom: 20px;
-    max-width: 80%;
-}
+    .banner-content p {
+        font-size: 16px;
+        opacity: 0.9;
+        margin-bottom: 20px;
+        max-width: 80%;
+    }
 
-.banner-image {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    width: 200px;
-    height: 200px;
-    opacity: 0.9;
-}
+    .banner-image {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 200px;
+        height: 200px;
+        opacity: 0.9;
+    }
 
-/* Section Card Styles */
-.section-card {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    margin-bottom: 25px;
-}
+    /* Section Card Styles */
+    .section-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        margin-bottom: 25px;
+    }
 
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
 
-.section-header h4 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #2d2d2d;
-    margin: 0;
-}
+    .section-header h4 {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2d2d2d;
+        margin: 0;
+    }
 
-/* Stats Styles */
-.stats-row {
-    margin: 0 -10px;
-}
+    /* Stats Styles */
+    .stats-row {
+        margin: 0 -10px;
+    }
 
-.stat-box {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-    margin: 10px;
-}
+    .stat-box {
+        display: flex;
+        align-items: center;
+        padding: 20px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin: 10px;
+    }
 
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-right: 15px;
-}
+    .stat-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 15px;
+    }
 
-.stat-icon i {
-    font-size: 20px;
-    color: white;
-}
+    .stat-icon i {
+        font-size: 20px;
+        color: white;
+    }
 
-.stat-icon.blue { background: #1a73e8; }
-.stat-icon.green { background: #00b14f; }
-.stat-icon.yellow { background: #fbbc04; }
-.stat-icon.red { background: #ea4335; }
+    .stat-icon.blue {
+        background: #1a73e8;
+    }
 
-.stat-content h5 {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2d2d2d;
-    margin: 0;
-}
+    .stat-icon.green {
+        background: #00b14f;
+    }
 
-.stat-content p {
-    font-size: 14px;
-    color: #6c757d;
-    margin: 5px 0 0;
-}
+    .stat-icon.yellow {
+        background: #fbbc04;
+    }
 
-/* Chart Styles */
-.chart-section {
-    background: #f8f9fa;
-    border-radius: 8px;
-    padding: 20px;
-}
+    .stat-icon.red {
+        background: #ea4335;
+    }
 
-.chart-header {
-    margin-bottom: 15px;
-    color: #6c757d;
-    font-size: 14px;
-}
+    .stat-content h5 {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2d2d2d;
+        margin: 0;
+    }
 
-.chart-container {
-    position: relative;
-    height: 300px;
-}
+    .stat-content p {
+        font-size: 14px;
+        color: #6c757d;
+        margin: 5px 0 0;
+    }
 
-/* Company Info Styles */
-.company-info {
-    padding: 20px;
-}
+    /* Chart Styles */
+    .chart-section {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 20px;
+    }
 
-.company-header {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-}
+    .chart-header {
+        margin-bottom: 15px;
+        color: #6c757d;
+        font-size: 14px;
+    }
 
-.company-logo {
-    width: 60px;
-    height: 60px;
-    border-radius: 8px;
-    object-fit: cover;
-}
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
 
-.company-details h5 {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-}
+    /* Company Info Styles */
+    .company-info {
+        padding: 20px;
+    }
 
-.company-details p {
-    margin: 5px 0 0;
-    font-size: 14px;
-    color: #6c757d;
-}
+    .company-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
 
-.member-badge {
-    background: #e8f7ef;
-    color: #00b14f;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    font-weight: 600;
-}
+    .company-logo {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        object-fit: cover;
+    }
 
-.membership-levels {
-    padding: 20px 0;
-}
+    .company-details h5 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+    }
 
-.level-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 14px;
-    color: #6c757d;
-}
+    .company-details p {
+        margin: 5px 0 0;
+        font-size: 14px;
+        color: #6c757d;
+    }
 
-.level-points {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    font-size: 12px;
-    color: #2d2d2d;
-}
+    .member-badge {
+        background: #e8f7ef;
+        color: #00b14f;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 600;
+    }
 
-.progress {
-    height: 6px;
-    background: #e9ecef;
-    border-radius: 3px;
-}
+    .membership-levels {
+        padding: 20px 0;
+    }
 
-.progress-bar {
-    background: #00b14f;
-    border-radius: 3px;
-}
+    .level-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 14px;
+        color: #6c757d;
+    }
 
-/* Make stat box clickable */
-.stat-box-link {
-    text-decoration: none;
-    color: inherit; /* Inherit text color */
-    display: block; /* Make the link take up the column space */
-    transition: transform 0.2s ease-in-out;
-}
+    .level-points {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 12px;
+        color: #2d2d2d;
+    }
 
-.stat-box-link:hover .stat-box {
-    transform: translateY(-3px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
+    .progress {
+        height: 6px;
+        background: #e9ecef;
+        border-radius: 3px;
+    }
+
+    .progress-bar {
+        background: #00b14f;
+        border-radius: 3px;
+    }
+
+    /* Make stat box clickable */
+    .stat-box-link {
+        text-decoration: none;
+        color: inherit;
+        /* Inherit text color */
+        display: block;
+        /* Make the link take up the column space */
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .stat-box-link:hover .stat-box {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
 </style>
 
 @section Scripts {
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // CV Trend Chart
-    const cvTrendCtx = document.getElementById('cvTrendChart').getContext('2d');
-    new Chart(cvTrendCtx, {
-        type: 'bar',
-        data: {
-            labels: @Html.Raw(Json.Serialize(ViewBag.CVTrendLabels)),
-            datasets: [{
-                label: 'CV tiếp nhận',
-                data: @Html.Raw(Json.Serialize(ViewBag.CVTrendData)),
-                backgroundColor: '#00b14f',
-                borderRadius: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // CV Trend Chart
+        const cvTrendCtx = document.getElementById('cvTrendChart').getContext('2d');
+        new Chart(cvTrendCtx, {
+            type: 'bar',
+            data: {
+                labels: @Html.Raw(Json.Serialize(ViewBag.CVTrendLabels)),
+                datasets: [{
+                    label: 'CV tiếp nhận',
+                    data: @Html.Raw(Json.Serialize(ViewBag.CVTrendData)),
+                    backgroundColor: '#00b14f',
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            title: function (tooltipItems) {
+                                return tooltipItems[0].label;
+                            }
+                        }
+                    }
                 },
-                tooltip: {
-                    callbacks: {
-                        title: function(tooltipItems) {
-                            return tooltipItems[0].label;
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
                         }
                     }
                 }
+            }
+        });
+
+        // Biểu đồ tròn phân bố trạng thái CV
+        const cvCtx = document.getElementById('cvChart').getContext('2d');
+        new Chart(cvCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ xử lý', 'Đã duyệt', 'Từ chối', 'Thực tập sinh', 'Nhân viên'],
+                datasets: [{
+                    data: [
+                                                                                                                                            @ViewBag.cv["PendingCount"],
+                                                                                                                                            @ViewBag.cv["AcceptedCount"],
+                                                                                                                                            @ViewBag.cv["RejectedCount"],
+                                                                                                                                            @ViewBag.cv["InternCount"],
+                        @ViewBag.cv["EmployeeCount"]
+                    ],
+                    backgroundColor: ['#fbbc04', '#00b14f', '#ea4335', '#1a73e8', '#34a853']
+                }]
             },
-            scales: {
-                x: {
-                    grid: {
-                        display: false
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Phân bố CV theo trạng thái'
                     }
                 }
             }
-        }
-    });
+        });
 
-    // CV Distribution Chart
-    const cvCtx = document.getElementById('cvChart').getContext('2d');
-    new Chart(cvCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Chờ xử lý', 'Đã duyệt', 'Từ chối', 'Thực tập sinh', 'Nhân viên'],
-            datasets: [{
-                data: [
-                    @ViewBag.cv["PendingCount"],
-                    @ViewBag.cv["AcceptedCount"],
-                    @ViewBag.cv["RejectedCount"],
-                    @ViewBag.cv["InternCount"],
-                    @ViewBag.cv["EmployeeCount"]
-                ],
-                backgroundColor: ['#fbbc04', '#00b14f', '#ea4335', '#1a73e8', '#34a853']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
-                },
-                title: {
-                    display: true,
-                    text: 'Phân bố CV theo trạng thái'
-                }
-            }
-        }
-    });
-
-    // Job Distribution Chart
-    const jobCtx = document.getElementById('jobChart').getContext('2d');
-    new Chart(jobCtx, {
-        type: 'bar',
-        data: {
-            labels: ['Đang tuyển', 'Không HĐ', 'Thực tập', 'Nhân viên', 'Hết hạn'],
-            datasets: [{
-                label: 'Số lượng',
-                data: [
-                    @ViewBag.job["ActiveJobCount"],
-                    @ViewBag.job["InactiveJobCount"],
-                    @ViewBag.job["InternPositions"],
-                    @ViewBag.job["EmployeePositions"],
-                    @ViewBag.job["ExpiredJobs"]
-                ],
-                backgroundColor: ['#00b14f', '#6c757d', '#fbbc04', '#1a73e8', '#ea4335']
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                },
-                title: {
-                    display: true,
-                    text: 'Thống kê loại hình công việc'
-                }
+        // Biểu đồ cột phân bố loại hình công việc
+        const jobCtx = document.getElementById('jobChart').getContext('2d');
+        new Chart(jobCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Đang tuyển', 'Không HĐ', 'Thực tập', 'Nhân viên', 'Hết hạn'],
+                datasets: [{
+                    label: 'Số lượng',
+                    data: [
+                                                                                                                                            @ViewBag.job["ActiveJobCount"],
+                                                                                                                                            @ViewBag.job["InactiveJobCount"],
+                                                                                                                                            @ViewBag.job["InternPositions"],
+                                                                                                                                            @ViewBag.job["EmployeePositions"],
+                        @ViewBag.job["ExpiredJobs"]
+                    ],
+                    backgroundColor: ['#00b14f', '#6c757d', '#fbbc04', '#1a73e8', '#ea4335']
+                }]
             },
-            scales: {
-                x: {
-                    grid: {
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
                         display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Thống kê loại hình công việc'
                     }
                 },
-                y: {
-                    beginAtZero: true
+                scales: {
+                    x: {
+                        grid: {
+                            display: false
+                        }
+                    },
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
 
-    // Initialize Bootstrap tooltips if you have them
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-        return new bootstrap.Tooltip(tooltipTriggerEl)
-    })
-</script>
+        // Biểu đồ tròn trạng thái CV
+        const cvStatusPie = document.getElementById('cvStatusPie').getContext('2d');
+        new Chart(cvStatusPie, {
+            type: 'doughnut',
+            data: {
+                labels: ['Chờ duyệt', 'Đã duyệt', 'Từ chối'],
+                datasets: [{
+                    data: [
+                                                                                            @ViewBag.cv["PendingCount"],
+                                                                                            @ViewBag.cv["AcceptedCount"],
+                        @ViewBag.cv["RejectedCount"]
+                    ],
+                    backgroundColor: ['#fbbc04', '#00b14f', '#ea4335']
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' },
+                    title: { display: false }
+                }
+            }
+        });
+
+        // Biểu đồ cột vị trí Nhân viên & Thực tập
+        const jobTypeBar = document.getElementById('jobTypeBar').getContext('2d');
+        new Chart(jobTypeBar, {
+            type: 'bar',
+            data: {
+                labels: ['Vị trí Nhân viên', 'Vị trí Thực tập'],
+                datasets: [{
+                    label: 'Số lượng',
+                    data: [
+                                                                                            @ViewBag.job["EmployeePositions"],
+                        @ViewBag.job["InternPositions"]
+                    ],
+                    backgroundColor: ['#1a73e8', '#fbbc04'],
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { display: false },
+                    title: { display: false }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: { beginAtZero: true }
+                }
+            }
+        });
+    </script>
 }

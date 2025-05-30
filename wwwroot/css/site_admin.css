@@ -94,6 +94,7 @@ body.admin-body {
     /* padding is handled in layout */
     width: calc(100% - 250px);
     flex-grow: 1;
+
 }
 
 /* Optional: Style cards and charts within admin */
@@ -172,3 +173,39 @@ body.admin-body {
     background-color: #dc3545;
     color: #fff;
 }
+
+/* Breadcrumb Styles */
+.breadcrumb-container {
+    background-color: #f8f9fa;
+    padding: 12px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.breadcrumb {
+    margin-bottom: 0;
+    background-color: transparent;
+    padding: 0;
+}
+
+.breadcrumb-item {
+    font-size: 14px;
+}
+
+    .breadcrumb-item a {
+        color: rgb(177, 121, 0);
+        text-decoration: none;
+    }
+
+        .breadcrumb-item a:hover {
+            color: rgb(177, 121, 0);
+            text-decoration: underline;
+        }
+
+    .breadcrumb-item.active {
+        color: #6c757d;
+    }
+
+    .breadcrumb-item + .breadcrumb-item::before {
+        content: ">";
+        color: #6c757d;
+    }

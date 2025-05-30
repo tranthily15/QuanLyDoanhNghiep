@@ -4,9 +4,8 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<div class="box"></div>
-<div class="single-image-container bg-white">
-    <img src="~/img/anhindex.jpg" 
+<div class="single-image-container bg-white mt-20">
+    <img src="~/img/anhindex.jpg"
          alt="Thông tin việc làm"
          style="width: 100%; height: 100%;">
 </div>
@@ -22,8 +21,8 @@
                     <span class="input-group-text bg-white border-end-0 rounded-start-3">
                         <i class="bi bi-briefcase text-muted"></i>
                     </span>
-                    <input type="text" id="keyword" name="keyword" class="form-control border-start-0 rounded-end-3" 
-                           placeholder="Nhập vị trí công việc, kỹ năng hoặc tên công ty..." 
+                    <input type="text" id="keyword" name="keyword" class="form-control border-start-0 rounded-end-3"
+                           placeholder="Nhập vị trí công việc, kỹ năng hoặc tên công ty..."
                            value="@Model.Keyword">
                 </div>
             </div>
@@ -35,7 +34,7 @@
                     <option value="">Tất cả địa điểm</option>
                     @foreach (var p in ViewBag.Provinces)
                     {
-                        <option value="@p.ProvinceID" >@p.ProvinceName</option>
+                        <option value="@p.ProvinceID">@p.ProvinceName</option>
                     }
                 </select>
             </div>
@@ -55,20 +54,18 @@
                     @foreach (var job in Model.FullTimeJobs)
                     {
                         <div class="col">
-                            <a href="/JobPosition/Details/@job.PositionID" class="text-decoration-none">
-                                <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center h-100">
-                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:85px; height:85px;">
-                                        <img src="/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")" 
-                                             alt="@job.Company?.CompanyName" 
-                                             style="width:100%; height:100%; object-fit:contain; display:block;">
+                            <a asp-action="Details" asp-route-id="@job.PositionID" class="text-decoration-none text-dark position-relative">
+                                <div class="card job-card shadow-sm p-4 d-flex flex-row align-items-center">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
+                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
                                     </div>
                                     <div class="ms-3 flex-grow-1 overflow-hidden">
-                                        <h6 class="fw-bold mb-2 position-name text-truncate text-dark" 
-                                            title="@job.PositionName" data-bs-toggle="tooltip">
-                                            @job.PositionName
-                                        </h6>
+                                        <h6 class="fw-bold mb-2 position-name text-truncate" title="@job.PositionName" data-bs-toggle="tooltip">@job.PositionName</h6>
                                         <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
-                                        
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="badge bg-secondary">@job.Salary</span>
+                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
@@ -83,14 +80,14 @@
             @if (Model.TotalFullTimePages > 1)
             {
                 <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage - 1, internshipPage = Model.InternshipPage })" 
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage - 1, internshipPage = Model.InternshipPage })"
                        class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == 1 ? "disabled" : "")">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                     <span class="text-muted">
                         <strong>@Model.FullTimePage</strong> / @Model.TotalFullTimePages trang
                     </span>
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage + 1, internshipPage = Model.InternshipPage })" 
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage + 1, internshipPage = Model.InternshipPage })"
                        class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == Model.TotalFullTimePages ? "disabled" : "")">
                         <i class="bi bi-chevron-right"></i>
                     </a>
@@ -106,20 +103,18 @@
                     @foreach (var job in Model.Internships)
                     {
                         <div class="col">
-                            <a href="/JobPosition/Details/@job.PositionID" class="text-decoration-none">
-                                <div class="card job-card shadow-sm p-3 d-flex flex-row align-items-center h-100">
-                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:85px; height:85px;">
-                                        <img src="/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")" 
-                                             alt="@job.Company?.CompanyName" 
-                                             style="width:100%; height:100%; object-fit:contain; display:block;">
+                            <a asp-action="Details" asp-route-id="@job.PositionID" class="text-decoration-none text-dark position-relative">
+                                <div class="card job-card shadow-sm p-4 d-flex flex-row align-items-center">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
+                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
                                     </div>
                                     <div class="ms-3 flex-grow-1 overflow-hidden">
-                                        <h6 class="fw-bold mb-2 position-name text-truncate text-dark" 
-                                            title="@job.PositionName" data-bs-toggle="tooltip">
-                                            @job.PositionName
-                                        </h6>
+                                        <h6 class="fw-bold mb-2 position-name text-truncate" title="@job.PositionName" data-bs-toggle="tooltip">@job.PositionName</h6>
                                         <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
-                                       
+                                        <div class="d-flex flex-wrap gap-2">
+                                            <span class="badge bg-secondary">@job.Salary</span>
+                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                        </div>
                                     </div>
                                 </div>
                             </a>
@@ -134,14 +129,14 @@
             @if (Model.TotalInternshipPages > 1)
             {
                 <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage - 1, fulltimePage = Model.FullTimePage })" 
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage - 1, fulltimePage = Model.FullTimePage })"
                        class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == 1 ? "disabled" : "")">
                         <i class="bi bi-chevron-left"></i>
                     </a>
                     <span class="text-muted">
                         <strong>@Model.InternshipPage</strong> / @Model.TotalInternshipPages trang
                     </span>
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage + 1, fulltimePage = Model.FullTimePage })" 
+                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage + 1, fulltimePage = Model.FullTimePage })"
                        class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == Model.TotalInternshipPages ? "disabled" : "")">
                         <i class="bi bi-chevron-right"></i>
                     </a>
@@ -199,10 +194,10 @@
             font-size: 0.95rem;
         }
 
-        .form-control:focus, .form-select:focus {
-            border-color: #86b7fe;
-            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-        }
+            .form-control:focus, .form-select:focus {
+                border-color: #86b7fe;
+                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+            }
 
         .btn-primary {
             padding: 0.6rem 1.5rem;
@@ -210,10 +205,10 @@
             transition: all 0.2s ease-in-out;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
+            .btn-primary:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            }
 
         .highlighted-text {
             color: #2c3e50;
@@ -222,17 +217,17 @@
             padding-left: 15px;
         }
 
-        .highlighted-text::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 4px;
-            height: 70%;
+            .highlighted-text::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 4px;
+                height: 70%;
                 background-color: #ff9220;
-            border-radius: 2px;
-        }
+                border-radius: 2px;
+            }
 
         .job-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -240,10 +235,10 @@
             border-radius: 10px;
         }
 
-        .job-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 .5rem 1rem rgba(0,0,0,.1)!important;
-        }
+            .job-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important;
+            }
     </style>
 }
 

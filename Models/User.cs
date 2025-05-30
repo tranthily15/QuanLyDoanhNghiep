@@ -23,5 +23,8 @@ namespace QuanLyDoanhNghiep.Models
         public string? avt { get; set; } = "/img/avt/default-avatar.png";
 
         public virtual ICollection<SavedJob> SavedJobs { get; set; }
+        public virtual ICollection<CV> CVs { get; set; }
+        [NotMapped]
+        public int CVCount => CVs?.Count ?? 0;
     }
 }

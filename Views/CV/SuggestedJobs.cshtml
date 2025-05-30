@@ -5,120 +5,196 @@
     ViewData["Title"] = "Gợi ý công việc";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var sectionMap = new Dictionary<string, string>
-{
-{ "Contact", "Liên hệ" },
-{ "Skills", "Kỹ năng" },
-{ "Experience", "Kinh nghiệm" },
-{ "Education", "Học vấn" }
-};
+    {
+        { "Contact", "Liên hệ" },
+        { "Skills", "Kỹ năng" },
+        { "Experience", "Kinh nghiệm" },
+        { "Education", "Học vấn" }
+    };
+    var pdfUrl = ViewBag.filePath;
 }
 <div class="box"></div>
-<div class="container mt-5">
-    <h2 class="mb-4" style="color: #ff9800; font-weight: bold;">
-        <i class="fas fa-briefcase"></i> Gợi ý công việc phù hợp
-    </h2>
-    <hr style="border-top: 2px solid #ff9800;" />
+<!-- Breadcrumb -->
+<div class="container-fluid mt-1">
+    <nav aria-label="breadcrumb ">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("ActiveJobs", "JobPosition")">Quản lý vị trí ứng tuyển</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Gợi ý vị trí tuyển dụng
+            </li>
+        </ol>
+    </nav>
+</div>
 
-    @if (ViewBag.CVSections != null)
-    {
-        var cvSections = ViewBag.CVSections as JObject;
-        <div class="alert" style="background: #fff3e0; border: 1.5px solid #ff9800;">
-            <h5 style="color: #ff9800; font-weight: bold;">
-                <i class="fas fa-id-card"></i> Thông tin CV đã đọc được
-            </h5>
-            @foreach (var section in cvSections.Properties())
-            {
-                var sectionKey = section.Name;
-                var sectionName = sectionMap.ContainsKey(sectionKey) ? sectionMap[sectionKey] : sectionKey;
-                var sectionList = section.Value as JArray;
-                if (sectionList != null && sectionList.Count > 0)
-                {
-                    <strong style="color: #fd7e14;">@sectionName:</strong>
-                    <div style="white-space: pre-wrap; margin-bottom: 1em;">
-                        @foreach (var item in sectionList)
-                        {
-                            @item.ToString()
-                            <br />
-                        }
-                    </div>
-                }
-            }
-        </div>
-    }
-
-    @if (Model != null && Model.Any())
-    {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (var job in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm hover-card border-orange">
-                        <div class="card-body">
-                            <h5 class="card-title" style="color: #ff9800;">@job.PositionName</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">@job.Company.CompanyName</h6>
-                            <div class="card-text">
-                                <p class="mb-2"><strong>Mô tả:</strong> @(job.JobDescription?.Length > 100 ?
-                                                                job.JobDescription.Substring(0, 100) + "..." : job.JobDescription)</p>
-                        <p class="mb-2"><strong>Yêu cầu:</strong> @(job.JobRequirements?.Length > 100 ?
-                                                        job.JobRequirements.Substring(0, 100) + "..." : job.JobRequirements)</p>
-                        <div class="d-flex justify-content-between text-muted small">
-                            <span><i class="fas fa-calendar-alt"></i> Bắt đầu:
-                                @job.StartDate.ToString("dd/MM/yyyy")</span>
-                            <span><i class="fas fa-calendar-check"></i> Kết thúc:
-                                @job.EndDate.ToString("dd/MM/yyyy")</span>
-                        </div>
-                    </div>
+<div class="container my-5">
+    <div class="row g-4">
+        <!-- Bên trái: Xem CV PDF -->
+        <div class="col-lg-6">
+            <div class="bg-white rounded-4 shadow-sm p-3 h-100 d-flex flex-column">
+                <h5 class="mb-3 fw-bold text-primary"><i class="bi bi-file-earmark-pdf me-2"></i>Xem CV PDF</h5>
+                <div class="cv-preview-container mb-3">
+                    @if (!string.IsNullOrEmpty(pdfUrl))
+                    {
+                        <embed src="@pdfUrl" type="application/pdf" class="pdf-viewer" />
+                    }
+                    else
+                    {
+                        <div class="alert alert-warning m-0">Không tìm thấy file CV.</div>
+                    }
                 </div>
-                <div class="card-footer bg-transparent border-top-0">
-                    <a asp-controller="JobPosition" asp-action="Details" asp-route-id="@job.PositionID"
-                        class="btn btn-orange w-100">
-                        Xem chi tiết
+                <div class="text-center mt-2">
+                    <a href="@pdfUrl" target="_blank" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-box-arrow-up-right"></i> Mở CV toàn màn hình @pdfUrl
                     </a>
                 </div>
             </div>
         </div>
+        <!-- Bên phải: Thông tin CV & Danh sách việc làm -->
+        <div class="col-lg-6">
+            <div class="bg-white rounded-4 shadow-sm p-4 mb-4">
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-person-vcard me-2"></i>Thông tin đã đọc từ CV</h5>
+                @if (ViewBag.CVSections != null)
+                {
+                    var cvSections = ViewBag.CVSections as JObject;
+                    <div>
+                        @foreach (var section in cvSections.Properties())
+                        {
+                            var sectionList = section.Value as JArray;
+                            if (sectionList != null && sectionList.Count > 0)
+                            {
+                                foreach (var item in sectionList)
+                                {
+                                    <div class="text-muted small mb-1">@item.ToString()</div>
+                                }
+                            }
+                        }
+                    </div>
                 }
+                else
+                {
+                    <div class="alert alert-info">Không có thông tin từ CV.</div>
+                }
+            </div>
+            <div>
+                <h5 class="fw-bold mb-3 text-primary"><i class="bi bi-briefcase me-2"></i>Vị trí việc làm phù hợp</h5>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="saved-job-list">
+                        @foreach (var job in Model)
+                        {
+                            <div class="saved-job-card bg-white d-flex px-4 py-3 mb-4 align-items-center">
+                                <div class="job-logo flex-shrink-0 me-4">
+                                    <img src="/img/CompanyLogo/@(job.Company?.CompanyLogo ?? "default.png")" alt="Logo"
+                                         class="img-fluid" style="max-width:64px;max-height:64px;">
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <a href="@Url.Action("Details", "JobPosition", new { id = job.PositionID })"
+                                           class="job-title fw-bold text-decoration-none text-truncate text-dark fs-5"
+                                           title="@job.PositionName">
+                                            @job.PositionName
+                                        </a>
+                                    </div>
+                                    <div class="text-muted mb-1">@job.Company?.CompanyName</div>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <span class="badge bg-secondary">@job.Salary</span>
+                                        <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i>
+                                            @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                    </div>
+                                    <div class="mb-2 small text-secondary">
+                                        Hạn nộp: @job.EndDate.ToString("dd/MM/yyyy")
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="alert alert-warning">Không tìm thấy công việc phù hợp.</div>
+                }
+            </div>
         </div>
-    }
-    else
-    {
-        <div class="alert alert-warning" style="border: 1.5px solid #ff9800; background: #fff3e0; color: #ff9800;">
-            Không tìm thấy công việc phù hợp.
-        </div>
-    }
-
-    <div class="mt-4">
-        <a asp-action="Index" class="btn btn-secondary">
-            <i class="fas fa-arrow-left"></i> Quay lại
-        </a>
     </div>
 </div>
-
 <style>
-    .border-orange {
-        border: 2px solid #ff9800 !important;
-    }
+.cv-pdf-viewer {
+    background: #f8fafc;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(26,115,232,0.06);
+    padding: 8px;
+}
 
-    .btn-orange {
-        background-color: #ff9800;
-        color: #fff;
-        border: none;
-        transition: background 0.2s;
-    }
+.saved-job-card {
+    background: #f6fcff;
+    border: 1.5px solid #1a73e8;
+    border-radius: 1.2rem;
+    box-shadow: 0 2px 12px rgba(26,115,232,0.06);
+    transition: box-shadow 0.18s, border-color 0.18s;
+    min-height: 110px;
+}
 
-    .btn-orange:hover,
-    .btn-orange:focus {
-        background-color: #fd7e14;
-        color: #fff;
-    }
+.saved-job-card:hover {
+    border-color: #f37423;
+    box-shadow: 0 4px 18px rgba(243,116,35,0.10);
+}
 
-    .hover-card {
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
+.job-logo {
+    background: #fff;
+    border: 1.5px solid #e3e3e3;
+    border-radius: 12px;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 0.5rem 1rem rgba(255, 152, 0, 0.15) !important;
-        border-color: #fd7e14 !important;
-    }
+.job-title {
+    color: #1a73e8;
+    font-weight: 700;
+    font-size: 1.15rem;
+    transition: color 0.18s;
+}
+
+.job-title:hover {
+    color: #f37423;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background: #1a73e8;
+    border: none;
+}
+
+.btn-primary:hover, .btn-primary:focus {
+    background: #f37423;
+    color: #fff;
+}
+
+.badge {
+    font-size: 0.95rem;
+    border-radius: 0.7rem;
+    padding: 0.4em 0.9em;
+}
+
+.cv-preview-container {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    height: 600px;
+    overflow: hidden;
+    position: relative;
+}
+
+.pdf-viewer {
+    width: 100%;
+    height: 100%;
+    border: none;
+}
 </style>

@@ -4,7 +4,36 @@
     ViewData["Title"] = ViewBag.Role == "2" ? "CV của tôi" : "Quản lý CV";
 }
 <div class="box"></div>
-
+@if (ViewBag.Role == "2") // sinh viên
+{
+    <div class="container-fluid py-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Quản lý vị trí ứng tuyển
+                </li>
+            </ol>
+        </nav>
+    </div>
+}
+@if (ViewBag.Role == "1") // nhân viên
+{
+    <div class="container-fluid py-2">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("Index_Employee", "DashBoard")">Thống kê doanh nghiệp</a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Quản lý ứng viên
+                </li>
+            </ol>
+        </nav>
+    </div>
+}
 <div class="container-fluid py-4">
     @if (TempData["SuccessMessage"] != null)
     {
@@ -14,7 +43,7 @@
         </div>
     }
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    @* <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
             <h2 class="mb-1">@ViewData["Title"]</h2>
             <p class="text-muted mb-0">Quản lý và theo dõi trạng thái CV của bạn</p>
@@ -25,7 +54,7 @@
                 <i class="bi bi-lightbulb me-2"></i>Gợi ý CV
             </button>
         }
-    </div>
+    </div> *@
 
     @if (ViewBag.Role == "2")
     {
@@ -33,13 +62,14 @@
         @if (ViewBag.Student != null)
         {
             var student = ViewBag.Student;
+            <!-- Thông tin sinh viên -->
             <div class="student-profile-card mb-4">
                 <div class="profile-header">
                     <div class="profile-avatar">
                         @{
-                            var initials = !string.IsNullOrEmpty(student.FullName) 
-                                ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
-                                : "SV";
+                            var initials = !string.IsNullOrEmpty(student.FullName)
+                            ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
+                            : "SV";
                         }
                         <div class="avatar-placeholder">@initials</div>
                     </div>
@@ -47,182 +77,91 @@
                         <h4 class="profile-name">@(student.FullName ?? "Sinh viên")</h4>
                         <div class="profile-stats">
                             <div class="stat-item">
-                                <i class="fas fa-file-alt"></i>
-                                <span>@(ViewBag.cv?["TotalCVCount"] ?? 0) CV đã nộp</span>
+                                <i class="fas fa-envelope"></i>
+                                <span>@(student.Email ?? "Chưa cập nhật")</span>
                             </div>
                             <div class="stat-item">
-                                <i class="fas fa-check-circle"></i>
-                                <span>@(ViewBag.cv?["AcceptedCount"] ?? 0) CV được chấp nhận</span>
+                                <i class="fas fa-phone"></i>
+                                <span>@(student.PhoneNumber ?? "Chưa cập nhật")</span>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="profile-contact">
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <span>@(student.Email ?? "Chưa cập nhật")</span>
-                    </div>
+                    @* <div class="contact-item">
+                       <i class="fas fa-envelope"></i>
+                        <span>@(student.Email ?? "Chưa cập nhật")</span> *@
+                    <button class="btn btn-apply-now rounded-3 px-4 mt-3" data-bs-toggle="modal"
+                        data-bs-target="#suggestCVModal">
+                        <i class="bi bi-lightbulb me-2"></i>Gợi ý CV
+                    </button>
+                    @* </div>
                     <div class="contact-item">
                         <i class="fas fa-phone"></i>
                         <span>@(student.PhoneNumber ?? "Chưa cập nhật")</span>
-                    </div>
+                    </div> *@
                 </div>
             </div>
         }
+        <!-- Danh sách CV theo trạng thái -->
         <div class="row g-4">
-            <!-- CV đang chờ duyệt -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="bi bi-clock text-warning me-2"></i>Đang chờ duyệt
-                            </h5>
-                            <span class="badge bg-warning rounded-pill">@ViewBag.PendingCVs.Count</span>
+            @foreach (var group in new[] { ("Đang chờ duyệt", ViewBag.PendingCVs, "warning"), ("Đã chấp nhận",
+                ViewBag.AcceptedCVs, "success"), ("Đã từ chối", ViewBag.RejectedCVs, "danger") })
+            {
+                <div class="col-md-4">
+                    <div class="card h-100 border-0 shadow-sm">
+                        <div class="card-header bg-white border-0 py-3">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">
+                                    <i class="bi bi-circle-fill text-@group.Item3 me-2"></i>@group.Item1
+                                </h5>
+                                <span class="badge bg-@group.Item3 rounded-pill">@group.Item2.Count</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush cv-list">
-                            @foreach (var cv in ViewBag.PendingCVs)
-                            {
-                                <div class="list-group-item border-0 px-4 py-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                        <div class="card-body p-0">
+                            <div class="list-group list-group-flush cv-list">
+                                @foreach (var cv in group.Item2)
+                                {
+                                    <div class="list-group-item border-0 px-4 py-3">
+                                        <div class="d-flex align-items-center mb-2">
+                                            <div class="flex-shrink-0 me-3">
+                                                <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")"
+                                                    class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                            </div>
+                                            <div class="flex-grow-1">
+                                                <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
+                                                <p class="text-muted small mb-0">@cv.JobPosition.Company.CompanyName</p>
+                                            </div>
                                         </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
-                                            <p class="text-muted small mb-0">@cv.JobPosition.Company.CompanyName</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="bi bi-calendar me-1"></i>
-                                            @cv.SubmissionDate?.ToString("dd/MM/yyyy")
-                                        </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
-                                            <i class="bi bi-eye me-1"></i>Chi tiết
-                                        </a>
-                                    </div>
-                                </div>
-                            }
-                            @if (ViewBag.PendingCVs.Count == 0)
-                            {
-                                <div class="text-center py-4">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mt-2 mb-0">Chưa có CV nào đang chờ duyệt</p>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- CV đã chấp nhận -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="bi bi-check-circle text-success me-2"></i>Đã chấp nhận
-                            </h5>
-                            <span class="badge bg-success rounded-pill">@ViewBag.AcceptedCVs.Count</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush cv-list">
-                            @foreach (var cv in ViewBag.AcceptedCVs)
-                            {
-                                <div class="list-group-item border-0 px-4 py-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
-                                            <p class="text-muted small mb-0">@cv.JobPosition.Company.CompanyName</p>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <small class="text-muted">
+                                                <i class="bi bi-calendar me-1"></i>
+                                                @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                            </small>
+                                            <a href="@Url.Action("Details", new { id = cv.CV_ID })"
+                                                class="btn btn-outline-primary btn-sm rounded-pill">
+                                                <i class="bi bi-eye me-1"></i>Chi tiết
+                                            </a>
                                         </div>
                                     </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="bi bi-calendar me-1"></i>
-                                            @cv.SubmissionDate?.ToString("dd/MM/yyyy")
-                                        </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
-                                            <i class="bi bi-eye me-1"></i>Chi tiết
-                                        </a>
+                                }
+                                @if (group.Item2.Count == 0)
+                                {
+                                    <div class="text-center py-4">
+                                        <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
+                                        <p class="text-muted mt-2 mb-0">Chưa có CV nào @group.Item1.ToLower()</p>
                                     </div>
-                                </div>
-                            }
-                            @if (ViewBag.AcceptedCVs.Count == 0)
-                            {
-                                <div class="text-center py-4">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mt-2 mb-0">Chưa có CV nào được chấp nhận</p>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- CV đã từ chối -->
-            <div class="col-md-4">
-                <div class="card h-100 border-0 shadow-sm">
-                    <div class="card-header bg-white border-0 py-3">
-                        <div class="d-flex justify-content-between align-items-center">
-                            <h5 class="mb-0">
-                                <i class="bi bi-x-circle text-danger me-2"></i>Đã từ chối
-                            </h5>
-                            <span class="badge bg-danger rounded-pill">@ViewBag.RejectedCVs.Count</span>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush cv-list">
-                            @foreach (var cv in ViewBag.RejectedCVs)
-                            {
-                                <div class="list-group-item border-0 px-4 py-3">
-                                    <div class="d-flex align-items-center mb-2">
-                                        <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
-                                        </div>
-                                        <div class="flex-grow-1">
-                                            <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
-                                            <p class="text-muted small mb-0">@cv.JobPosition.Company.CompanyName</p>
-                                        </div>
-                                    </div>
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">
-                                            <i class="bi bi-calendar me-1"></i>
-                                            @cv.SubmissionDate?.ToString("dd/MM/yyyy")
-                                        </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
-                                            <i class="bi bi-eye me-1"></i>Chi tiết
-                                        </a>
-                                    </div>
-                                </div>
-                            }
-                            @if (ViewBag.RejectedCVs.Count == 0)
-                            {
-                                <div class="text-center py-4">
-                                    <i class="bi bi-inbox text-muted" style="font-size: 2rem;"></i>
-                                    <p class="text-muted mt-2 mb-0">Chưa có CV nào bị từ chối</p>
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
+            }
         </div>
     }
     else
     {
+
         <!-- Giao diện cho nhân viên -->
         <div class="row g-4">
             <!-- CV đang chờ duyệt -->
@@ -243,8 +182,8 @@
                                 <div class="list-group-item border-0 px-4 py-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")"
+                                                class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
@@ -256,8 +195,8 @@
                                             <i class="bi bi-calendar me-1"></i>
                                             @cv.SubmissionDate?.ToString("dd/MM/yyyy")
                                         </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })"
+                                            class="btn btn-outline-primary btn-sm rounded-pill">
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
                                     </div>
@@ -293,8 +232,8 @@
                                 <div class="list-group-item border-0 px-4 py-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")"
+                                                class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
@@ -306,8 +245,8 @@
                                             <i class="bi bi-calendar me-1"></i>
                                             @cv.SubmissionDate?.ToString("dd/MM/yyyy")
                                         </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })"
+                                            class="btn btn-outline-primary btn-sm rounded-pill">
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
                                     </div>
@@ -343,12 +282,12 @@
                                 <div class="list-group-item border-0 px-4 py-3">
                                     <div class="d-flex align-items-center mb-2">
                                         <div class="flex-shrink-0 me-3">
-                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")" 
-                                                 class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
+                                            <img src="/img/CompanyLogo/@(cv.JobPosition.Company?.CompanyLogo ?? "default.png")"
+                                                class="rounded" style="width: 48px; height: 48px; object-fit: cover;">
                                         </div>
                                         <div class="flex-grow-1">
                                             <h6 class="mb-1 text-truncate">@cv.JobPosition.PositionName</h6>
-                                            <p class="text-muted small mb-0">@cv.User.FullName</p>
+                                            <p class="text-muted small mb-0">@cv.JobPosition.Company.CompanyName</p>
                                         </div>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
@@ -356,8 +295,8 @@
                                             <i class="bi bi-calendar me-1"></i>
                                             @cv.SubmissionDate?.ToString("dd/MM/yyyy")
                                         </small>
-                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })" 
-                                           class="btn btn-outline-primary btn-sm rounded-pill">
+                                        <a href="@Url.Action("Details", new { id = cv.CV_ID })"
+                                            class="btn btn-outline-primary btn-sm rounded-pill">
                                             <i class="bi bi-eye me-1"></i>Chi tiết
                                         </a>
                                     </div>
@@ -394,8 +333,7 @@
                         <label class="form-label">
                             <i class="bi bi-file-earmark-arrow-up me-2"></i>Tải lên CV
                         </label>
-                        <input type="file" class="form-control" name="ResumeFile" required
-                               accept=".pdf,.doc,.docx" />
+                        <input type="file" class="form-control" name="ResumeFile" required accept=".pdf,.doc,.docx" />
                         <small class="text-muted">
                             <i class="bi bi-info-circle me-1"></i>
                             Hỗ trợ định dạng: PDF, DOC, DOCX (Tối đa 5MB)
@@ -425,10 +363,10 @@
         transition: all 0.3s ease;
     }
 
-        .btn-apply-now:hover {
-            background-color: #ff6b35;
-            transform: translateY(-2px);
-        }
+    .btn-apply-now:hover {
+        background-color: #ff6b35;
+        transform: translateY(-2px);
+    }
 
     .btn-apply {
         background-color: #ff6b35;
@@ -440,30 +378,33 @@
         transition: all 0.3s ease;
     }
 
-        .btn-apply:hover {
-            background-color: var(--hover-color);
-            color: white;
-            transform: translateY(-2px);
-        }
+    .btn-apply:hover {
+        background-color: var(--hover-color);
+        color: white;
+        transform: translateY(-2px);
+    }
 
     .card {
         transition: transform 0.2s ease-in-out;
-        height: 600px; /* Chiều cao cố định cho card */
+        height: 600px;
+        /* Chiều cao cố định cho card */
         display: flex;
         flex-direction: column;
     }
-    
+
     .card:hover {
         transform: translateY(-2px);
     }
 
     .card-header {
-        flex-shrink: 0; /* Ngăn header co lại */
+        flex-shrink: 0;
+        /* Ngăn header co lại */
     }
 
     .card-body {
         flex: 1;
-        overflow: hidden; /* Ẩn overflow của body */
+        overflow: hidden;
+        /* Ẩn overflow của body */
     }
 
     .cv-list {
@@ -514,7 +455,7 @@
         background-color: #f8f9fa;
     }
 
-    .table > :not(caption) > * > * {
+    .table> :not(caption)>*>* {
         padding: 1rem;
     }
 

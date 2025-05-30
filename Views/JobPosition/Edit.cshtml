@@ -5,6 +5,26 @@
     var provinces = ViewBag.Provinces as List<Province> ?? new List<Province>();
 }
 <div class="box"></div>
+@* <div class="breadcrumb-container"> *@
+<div class="container py-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            @if (ViewBag.Role == "1" && ViewBag.CurrentCompanyID.Equals(Model.CompanyID.ToString()))
+            {
+                <li class="breadcrumb-item">
+                    <a href="@Url.Action("ActiveJobs", "JobPosition")">Quản lý vị trí tuyển dụng</a>
+                </li>
+            }
+            <li class="breadcrumb-item active" aria-current="page">
+                @Model.PositionName
+            </li>
+        </ol>
+    </nav>
+</div>
+@* </div> *@
 <div class="container mt-5">
     @if (!ViewData.ModelState.IsValid)
     {
@@ -125,34 +145,44 @@
                                         var location = Model.JobLocations[i];
                                         <div class="job-location-item card mb-3" data-location-id="@location.JobLocationID">
                                             <div class="card-body">
-                                                <input type="hidden" name="JobLocations[@i].LocationID" value="@location.JobLocationID" />
+                                                <input type="hidden" name="JobLocations[@i].LocationID"
+                                                    value="@location.JobLocationID" />
                                                 <div class="mb-3">
                                                     <label class="form-label">Tỉnh/Thành phố</label>
-                                                    <select class="form-select province-dropdown" name="JobLocations[@i].ProvinceID" required data-selected="@location.ProvinceID">
+                                                    <select class="form-select province-dropdown"
+                                                        name="JobLocations[@i].ProvinceID" required
+                                                        data-selected="@location.ProvinceID">
                                                         <option value="">-- Chọn tỉnh/thành phố --</option>
                                                         @foreach (var province in provinces)
                                                         {
-                                                            <option value="@province.ProvinceID" selected="@(location.ProvinceID == province.ProvinceID ? "selected" : null)">@province.ProvinceName</option>
+                                                            <option value="@province.ProvinceID"
+                                                                selected="@(location.ProvinceID == province.ProvinceID ? "selected" : null)">
+                                                                @province.ProvinceName</option>
                                                         }
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Quận/Huyện</label>
-                                                    <select class="form-select district-dropdown" name="JobLocations[@i].DistrictID" required data-selected="@location.DistrictID">
+                                                    <select class="form-select district-dropdown"
+                                                        name="JobLocations[@i].DistrictID" required
+                                                        data-selected="@location.DistrictID">
                                                         <option value="">-- Chọn quận/huyện --</option>
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Phường/Xã</label>
-                                                    <select class="form-select ward-dropdown" name="JobLocations[@i].WardID" required data-selected="@location.WardID">
+                                                    <select class="form-select ward-dropdown" name="JobLocations[@i].WardID"
+                                                        required data-selected="@location.WardID">
                                                         <option value="">-- Chọn phường/xã --</option>
                                                     </select>
                                                 </div>
                                                 <div class="mb-3">
                                                     <label class="form-label">Địa chỉ cụ thể</label>
-                                                    <input type="text" class="form-control" name="JobLocations[@i].Street" value="@location.Street" required />
+                                                    <input type="text" class="form-control" name="JobLocations[@i].Street"
+                                                        value="@location.Street" required />
                                                 </div>
-                                                <button type="button" class="btn btn-danger remove-location" data-location-id="@location.JobLocationID">
+                                                <button type="button" class="btn btn-danger remove-location"
+                                                    data-location-id="@location.JobLocationID">
                                                     <i class="fas fa-trash-alt"></i> Xóa địa chỉ
                                                 </button>
                                             </div>
@@ -522,14 +552,14 @@
                         firstLocation = provinceText;
                     }
                     var locationHtml = `
-                            <div class="location-item">
-                                <i class="fas fa-map-marker-alt"></i>
-                                <div class="location-content">
-                                    <p class="street">${street}</p>
-                                    <p class="area">${wardText}, ${districtText}, ${provinceText}</p>
-                                </div>
-                            </div>
-                        `;
+                                        <div class="location-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <div class="location-content">
+                                                <p class="street">${street}</p>
+                                                <p class="area">${wardText}, ${districtText}, ${provinceText}</p>
+                                            </div>
+                                        </div>
+                                    `;
                     locations.push(locationHtml);
                 }
             });

@@ -30,15 +30,14 @@ namespace QuanLyDoanhNghiep.Controllers
                 {
                     var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
                     var notifications = await _context.Notification
-                        .Where(n => 
-                                (n.UserRole == "2" && n.UserID.Equals(user.ID))) // Thông báo cho sinh viên                           
+                        .Where(n => (n.UserRole == "2" && n.UserID.Equals(user.ID))) // Thông báo cho sinh viên                           
                         .OrderByDescending(n => n.CreatedAt)
                         .ToListAsync();
                     return View(notifications);
                 }
                 if (RoleUser == "1")
                 {
-                   
+
                     var employee = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
                     var notifications = await _context.Notification
                         .Where(n => n.UserRole == "1" && n.EmployeeID.Equals(employee.EmployeeID)) // Thông báo cho nhân viên
@@ -179,16 +178,25 @@ namespace QuanLyDoanhNghiep.Controllers
                 return Json(new { success = false });
             }
 
-            if (!int.TryParse(CurrentID, out int currentID))
+            string realId = null;
+            if (RoleUser == "2")
             {
-                return Json(new { success = false });
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user != null) realId = user.ID;
+                else return Json(new { success = false });
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp != null) realId = emp.EmployeeID;
+                else return Json(new { success = false });
             }
 
             var notifications = await _context.Notification
                 .Where(n => n.UserRole == RoleUser &&
                            !n.IsRead &&
-                           ((n.UserRole == "2" && n.UserID.Equals(currentID)) ||
-                            (n.UserRole == "1" && n.EmployeeID.Equals(currentID)) ||
+                           ((n.UserRole == "2" && n.UserID == realId) ||
+                            (n.UserRole == "1" && n.EmployeeID == realId) ||
                             (n.UserRole == "0")))
                 .ToListAsync();
 
@@ -205,31 +213,13 @@ namespace QuanLyDoanhNghiep.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (!IsLogin)
-            {
+            var notification = await _context.Notification.FindAsync(id);
+            if (notification == null)
                 return Json(new { success = false });
-            }
 
-            if (!int.TryParse(CurrentID, out int currentID))
-            {
-                return Json(new { success = false });
-            }
-
-            var notification = await _context.Notification
-                .FirstOrDefaultAsync(n => n.NotificationID == id &&
-                                        n.UserRole == RoleUser &&
-                                        ((n.UserRole == "2" && n.UserID.Equals(currentID)) ||
-                                         (n.UserRole == "1" && n.EmployeeID.Equals(currentID)) ||
-                                         (n.UserRole == "0")));
-
-            if (notification != null)
-            {
-                _context.Notification.Remove(notification);
-                await _context.SaveChangesAsync();
-                return Json(new { success = true });
-            }
-
-            return Json(new { success = false });
+            _context.Notification.Remove(notification);
+            await _context.SaveChangesAsync();
+            return Json(new { success = true });
         }
 
         // POST: Notification/DeleteAll
@@ -241,16 +231,25 @@ namespace QuanLyDoanhNghiep.Controllers
                 return Json(new { success = false });
             }
 
-            if (!int.TryParse(CurrentID, out int currentID))
+            string realId = null;
+            if (RoleUser == "2")
             {
-                return Json(new { success = false });
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user != null) realId = user.ID;
+                else return Json(new { success = false });
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp != null) realId = emp.EmployeeID;
+                else return Json(new { success = false });
             }
 
             var notifications = await _context.Notification
                 .Where(n => n.UserRole == RoleUser &&
-                           ((n.UserRole == "2" && n.UserID.Equals(currentID)) ||
-                            (n.UserRole == "1" && n.EmployeeID.Equals(currentID)) ||
-                            (n.UserRole == "0")))
+                   ((n.UserRole == "2" && n.UserID == realId) ||
+                    (n.UserRole == "1" && n.EmployeeID == realId) ||
+                    (n.UserRole == "0")))
                 .ToListAsync();
 
             _context.Notification.RemoveRange(notifications);
@@ -372,6 +371,96 @@ namespace QuanLyDoanhNghiep.Controllers
 
             // Nếu không có đường dẫn, quay về trang thông báo
             return RedirectToAction(nameof(Index));
+        }
+
+        // GET: Notification/GetPagedNotifications
+        [HttpGet]
+        public async Task<IActionResult> GetPagedNotifications(int skip = 0, int take = 5)
+        {
+            if (!IsLogin)
+                return Json(new { notifications = new object[0], hasMore = false });
+
+            string realId = null;
+            if (RoleUser == "2")
+            {
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user != null) realId = user.ID;
+                else return Json(new { notifications = new object[0], hasMore = false });
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp != null) realId = emp.EmployeeID;
+                else return Json(new { notifications = new object[0], hasMore = false });
+            }
+
+            var query = _context.Notification
+                .Where(n => n.UserRole == RoleUser &&
+                            ((n.UserRole == "2" && n.UserID == realId) ||
+                             (n.UserRole == "1" && n.EmployeeID == realId) ||
+                             (n.UserRole == "0")))
+                .OrderBy(n => n.IsRead).ThenByDescending(n => n.CreatedAt);
+
+            var notifications = await query
+                .Skip(skip)
+                .Take(take)
+                .Select(n => new
+                {
+                    notificationID = n.NotificationID,
+                    message = n.Message,
+                    createdAt = n.CreatedAt,
+                    isRead = n.IsRead,
+                    notificationPath = n.NotificationPath
+                })
+                .ToListAsync();
+
+            var totalCount = await query.CountAsync();
+            var hasMore = skip + take < totalCount;
+
+            return Json(new { notifications, hasMore });
+        }
+
+        // GET: Notification/GetAllNotifications
+        [HttpGet]
+        public async Task<IActionResult> GetAllNotifications()
+        {
+            if (!IsLogin)
+                return Json(new { notifications = new object[0] });
+
+            IQueryable<Notification> query = _context.Notification.AsQueryable();
+
+            if (RoleUser == "2")
+            {
+                var user = await _context.User.FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
+                if (user == null) return Json(new { notifications = new object[0] });
+                query = query.Where(n => n.UserRole == "2" && n.UserID == user.ID);
+            }
+            else if (RoleUser == "1")
+            {
+                var emp = await _context.Employee.FirstOrDefaultAsync(e => e.AccountID.ToString().Equals(CurrentID));
+                if (emp == null) return Json(new { notifications = new object[0] });
+                query = query.Where(n => n.UserRole == "1" && n.EmployeeID == emp.EmployeeID);
+            }
+            else if (RoleUser == "0")
+            {
+                // Admin: lấy tất cả thông báo dành cho admin
+                query = query.Where(n => n.UserRole == "0");
+            }
+
+            var notifications = await query
+                .OrderBy(n => n.IsRead)
+                .ThenByDescending(n => n.CreatedAt)
+                .Select(n => new
+                {
+                    notificationID = n.NotificationID,
+                    message = n.Message,
+                    createdAt = n.CreatedAt,
+                    isRead = n.IsRead,
+                    notificationPath = n.NotificationPath
+                })
+                .ToListAsync();
+
+            return Json(new { notifications });
         }
     }
 }

@@ -1,11 +1,25 @@
 ﻿@model QuanLyDoanhNghiep.Models.JobPosition
 
 @{
-    ViewData["Title"] = "Tạo vị trí tuyển dụng";
+    ViewData["Title"] = "Đăng tin tuyển dụng";
 }
 
 <div class="box"></div>
-<div class="box"></div>
+<!-- Breadcrumb -->
+@* <div class="breadcrumb-container"> *@
+<div class="container py-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Đăng tin tuyển dụng
+            </li>
+        </ol>
+    </nav>
+</div>
+@* </div> *@
 
 <div class="container mt-5">
     @if (!ViewData.ModelState.IsValid)
@@ -29,15 +43,17 @@
                         <h4 class="card-title mb-4">Thông tin vị trí tuyển dụng</h4>
 
                         <div class="form-group mb-3">
-                            <label asp-for="PositionName" class="form-label fw-bold">Tên vị trí ứng tuyển <span class="text-danger">*</span></label>
+                            <label asp-for="PositionName" class="form-label fw-bold">Tên vị trí ứng tuyển <span
+                                    class="text-danger">*</span></label>
                             <input asp-for="PositionName" class="form-select" required />
                             <span asp-validation-for="PositionName" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="PositionType" class="form-label fw-bold">Loại vị trí ứng tuyển <span class="text-danger">*</span></label>
+                            <label asp-for="PositionType" class="form-label fw-bold">Loại vị trí ứng tuyển <span
+                                    class="text-danger">*</span></label>
                             <select asp-for="PositionType" class="form-select" required>
-                                
+
                                 <option value="">-- Chọn loại vị trí --</option>
                                 <option value="false">Vị trí thực tập</option>
                                 <option value="true">Vị trí nhân viên</option>
@@ -48,14 +64,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="Vacancies" class="form-label fw-bold">Số lượng tuyển <span class="text-danger">*</span></label>
+                                    <label asp-for="Vacancies" class="form-label fw-bold">Số lượng tuyển <span
+                                            class="text-danger">*</span></label>
                                     <input asp-for="Vacancies" class="form-select" type="number" min="1" required />
                                     <span asp-validation-for="Vacancies" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="TimeWork" class="form-label fw-bold">Thời gian làm việc <span class="text-danger">*</span></label>
+                                    <label asp-for="TimeWork" class="form-label fw-bold">Thời gian làm việc <span
+                                            class="text-danger">*</span></label>
                                     <input asp-for="TimeWork" class="form-select" required />
                                     <span asp-validation-for="TimeWork" class="text-danger"></span>
                                 </div>
@@ -63,7 +81,8 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="Salary" class="form-label fw-bold">Mức lương <span class="text-danger">*</span></label>
+                            <label asp-for="Salary" class="form-label fw-bold">Mức lương <span
+                                    class="text-danger">*</span></label>
                             <input asp-for="Salary" class="form-select" required />
                             <span asp-validation-for="Salary" class="text-danger"></span>
                         </div>
@@ -71,14 +90,16 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu <span class="text-danger">*</span></label>
+                                    <label asp-for="StartDate" class="form-label fw-bold">Ngày bắt đầu <span
+                                            class="text-danger">*</span></label>
                                     <input asp-for="StartDate" type="datetime-local" class="form-select" required />
                                     <span asp-validation-for="StartDate" class="text-danger"></span>
                                 </div>
                             </div>
                             <div class="col-md-6">
                                 <div class="form-group mb-3">
-                                    <label asp-for="EndDate" class="form-label fw-bold">Ngày kết thúc <span class="text-danger">*</span></label>
+                                    <label asp-for="EndDate" class="form-label fw-bold">Ngày kết thúc <span
+                                            class="text-danger">*</span></label>
                                     <input asp-for="EndDate" type="datetime-local" class="form-select" required />
                                     <span asp-validation-for="EndDate" class="text-danger"></span>
                                 </div>
@@ -86,45 +107,53 @@
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobDescription" class="form-label fw-bold">Mô tả công việc <span class="text-danger">*</span></label>
+                            <label asp-for="JobDescription" class="form-label fw-bold">Mô tả công việc <span
+                                    class="text-danger">*</span></label>
                             <div id="editor-job-description" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobDescription" id="jobDescription" required />
                             <span asp-validation-for="JobDescription" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc <span class="text-danger">*</span></label>
+                            <label asp-for="JobRequirements" class="form-label fw-bold">Yêu cầu công việc <span
+                                    class="text-danger">*</span></label>
                             <div id="editor-job-requirements" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobRequirements" id="jobRequirements" required />
                             <span asp-validation-for="JobRequirements" class="text-danger"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="JobBenefits" class="form-label fw-bold">Quyền lợi <span class="text-danger">*</span></label>
+                            <label asp-for="JobBenefits" class="form-label fw-bold">Quyền lợi <span
+                                    class="text-danger">*</span></label>
                             <div id="editor-job-benefits" class="quill-editor"></div>
                             <input type="hidden" asp-for="JobBenefits" id="jobBenefits" required />
                             <span asp-validation-for="JobBenefits" class="text-danger"></span>
                         </div>
-                        <div class="form-group mb-3">
-                            <label asp-for="CategoryID" class="form-label fw-bold">Nhóm vị trí CNTT <span class="text-danger">*</span></label>
+                       @*  <div class="form-group mb-3">
+                            <label asp-for="CategoryID" class="form-label fw-bold">Nhóm vị trí CNTT <span
+                                    class="text-danger">*</span></label>
                             <select asp-for="CategoryID" class="form-select" asp-items="ViewBag.Categories">
                                 <option value="">-- Chọn nhóm vị trí --</option>
                             </select>
                             <span asp-validation-for="CategoryID" class="text-danger"></span>
-                        </div>
+                        </div> *@
 
                         <div class="form-group mb-4">
-                            <label class="form-label fw-bold">Địa chỉ tuyển dụng <span class="text-danger">*</span></label>
+                            <label class="form-label fw-bold">Địa chỉ tuyển dụng <span
+                                    class="text-danger">*</span></label>
+                            
                             <div id="jobLocations">
                                 <div class="job-location-item card mb-3">
                                     <div class="card-body">
                                         <div class="mb-3">
                                             <label class="form-label">Địa chỉ cụ thể</label>
-                                            <input type="text" class="form-select" name="JobLocations[0].Street" required />
+                                            <input type="text" class="form-select" name="JobLocations[0].Street"
+                                                required />
                                         </div>
                                         <div class="mb-3">
                                             <label class="form-label">Tỉnh/Thành phố</label>
-                                            <select class="form-select province-dropdown" name="JobLocations[0].ProvinceID" required>
+                                            <select class="form-select province-dropdown"
+                                                name="JobLocations[0].ProvinceID" required>
                                                 <option value="">-- Chọn tỉnh/thành phố --</option>
                                                 @foreach (var province in ViewBag.Provinces)
                                                 {
@@ -135,7 +164,8 @@
 
                                         <div class="mb-3">
                                             <label class="form-label">Quận/Huyện</label>
-                                            <select class="form-select district-dropdown" name="JobLocations[0].DistrictID" >
+                                            <select class="form-select district-dropdown"
+                                                name="JobLocations[0].DistrictID">
                                                 <option value="">-- Chọn quận/huyện --</option>
                                             </select>
                                         </div>
@@ -147,23 +177,24 @@
                                             </select>
                                         </div>
 
-                                        <button type="button" class="btn btn-danger remove-location">
-                                            <i class="fas fa-trash-alt"></i> Xóa địa chỉ
+                                        <button type="button" class="btn btn-delete-address remove-location">
+                                            <i class="fas fa-trash-alt" title="Xóa địa chỉ"></i> Xóa địa chỉ
                                         </button>
                                     </div>
                                 </div>
                             </div>
-
-                            <button type="button" class="btn btn-success" id="addLocation">
-                                <i class="fas fa-plus"></i> Thêm địa chỉ
+                            <button type="button" class="btn btn-add-address" id="addLocation">
+                                <i class="fas fa-plus" title="Thêm địa chỉ"></i> Thêm địa chỉ
                             </button>
+                            
                         </div>
 
                         <div class="form-footer text-end">
-                            <button type="button" class="btn btn-secondary me-2" onclick="window.location.href='@Url.Action("Index", "JobPosition")'">
+                            <button type="button" class="btn btn-exit me-2"
+                                onclick="window.location.href='@Url.Action("Index", "JobPosition")'">
                                 <i class="fas fa-times"></i> Đóng
                             </button>
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-edit">
                                 <i class="fas fa-save"></i> Lưu
                             </button>
                         </div>
@@ -176,11 +207,11 @@
                 <div class="card shadow-sm preview-container">
                     <div class="card-body">
                         <h4 class="card-title mb-4">Xem trước thông tin tuyển dụng</h4>
-                        
+
                         <div class="preview-content">
                             <!-- Job Title and Basic Info -->
                             <h1 id="preview-position-name" class="job-title mb-4"></h1>
-                            
+
                             <!-- Job Overview Cards -->
                             <div class="job-overview-cards mb-4">
                                 <div class="overview-card">
@@ -271,7 +302,9 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script>
         var quillDescription = new Quill('#editor-job-description', { theme: 'snow' });
@@ -285,42 +318,42 @@
             $('#preview-vacancies').text($('#Vacancies').val() || '0');
             $('#preview-time-work').text($('#TimeWork').val() || 'Chưa cập nhật');
             $('#preview-salary').text($('#Salary').val() || 'Thỏa thuận');
-            
+
             // Format datetime for preview
             var startDate = new Date($('#StartDate').val());
             var endDate = new Date($('#EndDate').val());
-            
+
             $('#preview-description').html(quillDescription.root.innerHTML);
             $('#preview-requirements').html(quillRequirements.root.innerHTML);
             $('#preview-benefits').html(quillBenefits.root.innerHTML);
-            
+
             // Update locations preview
             var locations = [];
             var firstLocation = '';
-            $('.job-location-item').each(function(index) {
+            $('.job-location-item').each(function (index) {
                 var province = $(this).find('.province-dropdown option:selected').text();
                 var district = $(this).find('.district-dropdown option:selected').text();
                 var ward = $(this).find('.ward-dropdown option:selected').text();
                 var street = $(this).find('input[name$=".Street"]').val();
-                
-                if(province && district && ward && street) {
-                    if(index === 0) {
+
+                if (province && district && ward && street) {
+                    if (index === 0) {
                         firstLocation = province;
                     }
-                    
+
                     var locationHtml = `
-                        <div class="location-item">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="location-content">
-                                <p class="street">${street}</p>
-                                <p class="area">${ward}, ${district}, ${province}</p>
-                            </div>
-                        </div>
-                    `;
+                                        <div class="location-item">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                            <div class="location-content">
+                                                <p class="street">${street}</p>
+                                                <p class="area">${ward}, ${district}, ${province}</p>
+                                            </div>
+                                        </div>
+                                    `;
                     locations.push(locationHtml);
                 }
             });
-            
+
             $('#preview-locations-short').text(firstLocation || 'Chưa cập nhật');
             $('#preview-locations').html(locations.join(''));
         }
@@ -349,9 +382,9 @@
 
         // Handle dynamic location fields
         var locationIndex = 1;
-        $('#addLocation').click(function() {
+        $('#addLocation').click(function () {
             var newLocation = $('.job-location-item').first().clone();
-            newLocation.find('select, input').each(function() {
+            newLocation.find('select, input').each(function () {
                 var name = $(this).attr('name');
                 if (name) {
                     $(this).attr('name', name.replace('[0]', '[' + locationIndex + ']'));
@@ -362,24 +395,24 @@
             locationIndex++;
         });
 
-        $(document).on('click', '.remove-location', function() {
+        $(document).on('click', '.remove-location', function () {
             if ($('.job-location-item').length > 1) {
                 $(this).closest('.job-location-item').remove();
             }
         });
 
         // Handle cascading dropdowns
-        $('.province-dropdown').change(function() {
+        $('.province-dropdown').change(function () {
             var provinceId = $(this).val();
             var districtDropdown = $(this).closest('.job-location-item').find('.district-dropdown');
             var wardDropdown = $(this).closest('.job-location-item').find('.ward-dropdown');
-            
+
             districtDropdown.empty().append('<option value="">-- Chọn quận/huyện --</option>');
             wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
-            
+
             if (provinceId) {
-                $.get('/JobPosition/GetDistricts', { provinceId: provinceId }, function(districts) {
-                    districts.forEach(function(district) {
+                $.get('/JobPosition/GetDistricts', { provinceId: provinceId }, function (districts) {
+                    districts.forEach(function (district) {
                         districtDropdown.append($('<option></option>')
                             .attr('value', district.districtID)
                             .text(district.districtName));
@@ -388,15 +421,15 @@
             }
         });
 
-        $('.district-dropdown').change(function() {
+        $('.district-dropdown').change(function () {
             var districtId = $(this).val();
             var wardDropdown = $(this).closest('.job-location-item').find('.ward-dropdown');
-            
+
             wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
-            
+
             if (districtId) {
-                $.get('/JobPosition/GetWards', { districtId: districtId }, function(wards) {
-                    wards.forEach(function(ward) {
+                $.get('/JobPosition/GetWards', { districtId: districtId }, function (wards) {
+                    wards.forEach(function (ward) {
                         wardDropdown.append($('<option></option>')
                             .attr('value', ward.wardID)
                             .text(ward.wardName));
@@ -406,10 +439,10 @@
         });
 
         // Update hidden fields before form submission
-        $('#jobPositionForm').submit(function() {
+        $('#jobPositionForm').submit(function () {
             // Validate Quill editors
-            if (quillDescription.root.innerHTML === '<p><br></p>' || 
-                quillRequirements.root.innerHTML === '<p><br></p>' || 
+            if (quillDescription.root.innerHTML === '<p><br></p>' ||
+                quillRequirements.root.innerHTML === '<p><br></p>' ||
                 quillBenefits.root.innerHTML === '<p><br></p>') {
                 alert('Vui lòng điền đầy đủ thông tin mô tả, yêu cầu và quyền lợi.');
                 return false;
@@ -432,170 +465,200 @@
 }
 
 <style>
-/* Existing styles */
-/* Preview Styles */
-.preview-container {
-    position: sticky;
-    top: 20px;
-}
+    /* Existing styles */
+    /* Preview Styles */
+    .preview-container {
+        position: sticky;
+        top: 20px;
+    }
 
-.content-section {
-    background: white;
-    border-radius: 12px;
-    padding: 25px;
-    margin-bottom: 25px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
+    .content-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
 
-.section-title {
-    color: #2d2d2d;
-    font-size: 20px;
-    font-weight: 600;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
-    border-bottom: 1px solid #e9ecef;
-}
+    .section-title {
+        color: #2d2d2d;
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.job-overview-cards {
-    display: flex;
-    gap: 20px;
-    flex-wrap: wrap;
-}
+    .job-overview-cards {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+    }
 
-.overview-card {
-    flex: 1;
-    min-width: 200px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 15px;
-    background-color: #f8f9fa;
-    border-radius: 8px;
-    border: 1px solid #e9ecef;
-}
+    .overview-card {
+        flex: 1;
+        min-width: 200px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
 
-.overview-card .icon-wrapper {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    background-color: #e8f7ef;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    .overview-card .icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: #e8f7ef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-.overview-card .icon-wrapper i {
-    color: #ff6b35;
-    font-size: 18px;
-}
+    .overview-card .icon-wrapper i {
+        color: #ff6b35;
+        font-size: 18px;
+    }
 
-.overview-card .info {
-    flex: 1;
-}
+    .overview-card .info {
+        flex: 1;
+    }
 
-.overview-card .info label {
-    display: block;
-    font-size: 13px;
-    color: #6c757d;
-    margin-bottom: 4px;
-}
+    .overview-card .info label {
+        display: block;
+        font-size: 13px;
+        color: #6c757d;
+        margin-bottom: 4px;
+    }
 
-.overview-card .info span {
-    display: block;
-    font-weight: 600;
-    color: #2d2d2d;
-}
+    .overview-card .info span {
+        display: block;
+        font-weight: 600;
+        color: #2d2d2d;
+    }
 
-.overview-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 20px;
-}
+    .overview-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        margin-bottom: 20px;
+    }
 
-.overview-item i {
-    color: #ff6b35;
-    font-size: 20px;
-    width: 24px;
-}
+    .overview-item i {
+        color: #ff6b35;
+        font-size: 20px;
+        width: 24px;
+    }
 
-.item-content {
-    flex: 1;
-}
+    .item-content {
+        flex: 1;
+    }
 
-.item-content label {
-    display: block;
-    color: #6c757d;
-    font-size: 14px;
-    margin-bottom: 5px;
-}
+    .item-content label {
+        display: block;
+        color: #6c757d;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
 
-.item-content span {
-    color: #2d2d2d;
-    font-weight: 500;
-}
+    .item-content span {
+        color: #2d2d2d;
+        font-weight: 500;
+    }
 
-.location-list {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
+    .location-list {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
 
-.location-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-    padding: 15px;
-    border-bottom: 1px solid #e9ecef;
-}
+    .location-item {
+        display: flex;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
 
-.location-item:last-child {
-    border-bottom: none;
-}
+    .location-item:last-child {
+        border-bottom: none;
+    }
 
-.location-item i {
-    color: #ff6b35;
-}
+    .location-item i {
+        color: #ff6b35;
+    }
 
-.location-content .street {
-    font-weight: 500;
-    margin-bottom: 5px;
-}
+    .location-content .street {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
 
-.location-content .area {
-    color: #6c757d;
-    font-size: 14px;
-    margin: 0;
-}
+    .location-content .area {
+        color: #6c757d;
+        font-size: 14px;
+        margin: 0;
+    }
 
-.job-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #2d2d2d;
-    margin-bottom: 20px;
-}
+    .job-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2d2d2d;
+        margin-bottom: 20px;
+    }
 
-.section-content {
-    color: #2d2d2d;
-    line-height: 1.6;
-}
+    .section-content {
+        color: #2d2d2d;
+        line-height: 1.6;
+    }
 
-.benefits-section ul {
-    list-style: none;
-    padding: 0;
-}
+    .benefits-section ul {
+        list-style: none;
+        padding: 0;
+    }
 
-.benefits-section li {
-    padding-left: 25px;
-    position: relative;
-    margin-bottom: 12px;
-}
+    .benefits-section li {
+        padding-left: 25px;
+        position: relative;
+        margin-bottom: 12px;
+    }
 
-.benefits-section li:before {
-    content: '✓';
-    color: #ff6b35;
-    position: absolute;
-    left: 0;
-    font-weight: bold;
-}
+    .benefits-section li:before {
+        content: '✓';
+        color: #ff6b35;
+        position: absolute;
+        left: 0;
+        font-weight: bold;
+    }
+    /* bút xóa*/
+    .btn-delete-address {
+        background-color: white;
+        color: #dc3545;
+        border: 2px solid #dc3545;
+        padding: 10px 10px;
+        border-radius: 8px;
+        /* font-weight: 600; */
+        transition: all 0.3s ease;
+    }
+
+        .btn-delete-address:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+    /* bút thêm mới*/
+    .btn-add-address {
+        background-color: white;
+        color: #198754;
+        border: 2px solid #198754;
+        padding: 10px 10px;
+        border-radius: 8px;
+        /* font-weight: 600; */
+        transition: all 0.3s ease;
+    }
+
+        .btn-add-address:hover {
+            background-color: #198754;
+            color: white;
+        }
 </style>

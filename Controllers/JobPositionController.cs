@@ -39,10 +39,10 @@ namespace QuanLyDoanhNghiep.Controllers
                     baseQuery = baseQuery.Where(j => j.JobLocations.Any(l => provinceIds.Contains(l.ProvinceID)));
                 }
 
-                if (IsLogin && RoleUser == "1")
-                {
-                    baseQuery = baseQuery.Where(j => j.Company.CompanyID == int.Parse(CurrentCompanyID));
-                }
+                // if (IsLogin && RoleUser == "1")// doanh nghiệpnghiệp
+                // {
+                //     baseQuery = baseQuery.Where(j => j.Company.CompanyID == int.Parse(CurrentCompanyID));
+                // }
 
                 // Lấy full danh sách (để tính tổng số trang)
                 var internshipQuery = baseQuery.Where(j => !j.PositionType);
@@ -75,7 +75,7 @@ namespace QuanLyDoanhNghiep.Controllers
                     TotalFullTimePages = (int)Math.Ceiling((double)totalFulltime / PageSize)
                 };
 
-                ViewBag.Role = RoleUser;
+                // ViewBag.Role = RoleUser;
                 ViewBag.Provinces = await _context.Province.ToListAsync();
 
                 return View(model);
@@ -96,7 +96,7 @@ namespace QuanLyDoanhNghiep.Controllers
                     TotalInternshipPages = 0,
                     TotalFullTimePages = 0
                 };
-                ViewBag.Role = RoleUser;
+                // ViewBag.Role = RoleUser;
                 ViewBag.Provinces = await _context.Province.ToListAsync();
                 return View(model);
             }
@@ -280,20 +280,20 @@ namespace QuanLyDoanhNghiep.Controllers
 
             if (!IsLogin)
             {
-                ViewBag.IsLogin = IsLogin;
-                ViewBag.RoleUser = RoleUser;
                 return View(jobPosition);
             }
             else if (IsLogin && RoleUser == "2") // sinh viên
             {
-                ViewBag.IsLogin = IsLogin;
-                ViewBag.RoleUser = RoleUser;
                 var user = await _context.User
                     .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
                 ViewBag.User = user;
                 // Kiểm tra xem vị trí đã được lưu chưa
                 ViewBag.IsSaved = await _context.SavedJob
                     .AnyAsync(sj => sj.UserID == user.ID && sj.PositionID == id && sj.IsSaved);
+                return View(jobPosition);
+            }
+            else if (IsLogin && RoleUser == "1") // doanh nghiệp
+            {
                 return View(jobPosition);
             }
             else
@@ -588,6 +588,7 @@ namespace QuanLyDoanhNghiep.Controllers
 
             // Fetch ALL jobs for the company, let the View handle filtering for display
             var jobs = await _context.JobPosition
+                .Include(j => j.CVs)
                 .Where(j => j.CompanyID == companyId) // Get all jobs for this company
                 .OrderByDescending(j => j.Status) // Active jobs first
                 .ThenByDescending(j => j.EndDate) // Then by end date (for inactive jobs)
@@ -746,27 +747,57 @@ namespace QuanLyDoanhNghiep.Controllers
 
             // Kiểm tra đã lưu chưa
             var existed = await _context.SavedJob.FirstOrDefaultAsync(s => s.UserID == user.ID && s.PositionID == positionId);
-            if (existed != null)
-                return Json(new { success = false, message = "Bạn đã lưu tin này rồi." });
-
-            var savedJob = new SavedJob
+            if (existed == null) // chưa lưu lần nào
             {
-                UserID = user.ID,
-                PositionID = positionId,
-                SavedDate = DateTime.Now,
-                IsSaved = true
-            };
-
-            try
+                var savedJob = new SavedJob
+                {
+                    UserID = user.ID,
+                    PositionID = positionId,
+                    SavedDate = DateTime.Now,
+                    IsSaved = true
+                };
+                try
+                {
+                    _context.SavedJob.Add(savedJob);
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = "Đã lưu việc làm!" });
+                }
+                catch (Exception ex)
+                {
+                    return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+                }
+            }
+            else
             {
-                _context.SavedJob.Add(savedJob);
+                existed.IsSaved = true;
+                existed.SavedDate = DateTime.Now;
+                _context.SavedJob.Update(existed);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message = "Đã lưu việc làm!" });
+                return Json(new { success = true, message ="đã lưu việc làm"});
             }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
-            }
+            //if (existed != null)
+            //{
+            //    if (!existed.IsSaved)
+            //    {
+            //        existed.IsSaved = true;
+            //        existed.SavedDate = DateTime.Now;
+            //        _context.Update(existed);
+            //        await _context.SaveChangesAsync();
+            //    }
+            //    else
+            //    {
+            //        return Json(new { success = false, message = "Bạn đã lưu tin này rồi." });
+            //    }
+            //}
+            //var savedJob = new SavedJob
+            //{
+            //    UserID = user.ID,
+            //    PositionID = positionId,
+            //    SavedDate = DateTime.Now,
+            //    IsSaved = true
+            //};
+
+           
         }
 
         [HttpPost]

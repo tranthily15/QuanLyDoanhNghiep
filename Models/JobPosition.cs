@@ -53,5 +53,14 @@ namespace QuanLyDoanhNghiep.Models
         public List<JobLocation> JobLocations { get; set; } = new List<JobLocation>();
         public virtual ICollection<CV>? CVs { get; set; }
 
+        [NotMapped]
+        public int ApplicantsCount
+        {
+            get
+            {
+                return CVs?.Count ?? 0;
+            }
+        }
+
     }
 }

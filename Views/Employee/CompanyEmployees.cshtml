@@ -4,12 +4,25 @@
     ViewData["Title"] = "Danh sách nhân viên";
 }
 <div class="box"></div>
+<div class="container py-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Details", "Company", new { id = ViewBag.CurrentCompanyID })">Thông tin công ty</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Quản lý nhân viên
+            </li>
+        </ol>
+    </nav>
+</div>
 <div class="container mt-4">
-    <h2>Danh sách nhân viên</h2>
-
     <p>
         <a asp-action="Create" class="btn btn-apply-now">
-            <i class="fas fa-plus"></i> 
+            <i class="fas fa-plus" title="Thêm mới nhân viên"></i>
         </a>
     </p>
 
@@ -34,7 +47,7 @@
                         <td>@item.PhoneNumber</td>
                         <td>@item.Email</td>
                         <td>@item.Account?.UserName</td>
-                       @*  <td>
+                        @*  <td>
                             <a asp-action="Details" asp-route-id="@item.EmployeeID" class="btn btn-info btn-sm">
                                 <i class="fas fa-info-circle"></i> Chi tiết
                             </a>
@@ -44,7 +57,7 @@
             </tbody>
         </table>
     </div>
-</div> 
+</div>
 <style>
     .btn-apply-now {
         background-color: #ff6b35;
@@ -59,8 +72,8 @@
         transition: all 0.3s ease;
     }
 
-        .btn-apply-now:hover {
-            background-color: #ff6b35;
-            transform: translateY(-2px);
-        }
+    .btn-apply-now:hover {
+        background-color: #ff6b35;
+        transform: translateY(-2px);
+    }
 </style>
