@@ -43,7 +43,7 @@ namespace QuanLyDoanhNghiep.Services
                         UserRole = "1",
                         IsRead = false,
                         EmployeeID = e.EmployeeID, // Gửi cho tất cả nhân viên của công ty
-                        NotificationPath = $"/JobPostion/Details/{job.PositionID}"
+                        NotificationPath = $"/JobPosition/Details/{job.PositionID}"
                     };
                     _context.Notification.Add(notification);
                 }

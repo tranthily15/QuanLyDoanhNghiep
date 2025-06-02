@@ -5,186 +5,89 @@
     Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="login-container">
-    <h1 class="form-title">Đăng ký tài khoản nhân viên</h1>
-    <form id="createAccountForm" class="login-form">
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-id-card"></i>
-                <input type="text" id="EmployeeID" name="EmployeeID" placeholder="Mã nhân viên" class="form-control" required />
-                <span class="text-danger">*</span>
+<div class="login-bg">
+    <div class="card shadow-sm border-0 rounded-4 p-5 mx-auto modern-register-card">
+        <div class="text-center mb-4">
+            <a asp-action="Index" asp-controller="JobPosition">
+                <img src="~/img/logo.png" alt="Logo" style="height:56px;" class="mb-2" />
+            </a>
+            <h2 class="fw-bold text-navy mb-2 modern-title">Đăng ký tài khoản nhân viên</h2>
+            <div class="text-muted mb-3 modern-subtitle">Tạo tài khoản để sử dụng hệ thống</div>
+        </div>
+        <form id="createAccountForm" class="login-form">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-id-card"></i></span>
+                            <input type="text" id="EmployeeID" name="EmployeeID" placeholder="Mã nhân viên(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-user"></i></span>
+                            <input type="text" id="EmployeeName" name="EmployeeName" placeholder="Tên nhân viên(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-phone"></i></span>
+                            <input type="text" id="PhoneNumber" name="PhoneNumber" placeholder="Số điện thoại(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-venus-mars"></i></span>
+                            <select id="Gender" name="Gender" class="form-control modern-input" required>
+                                <option value="" disabled selected>Chọn giới tính(*)</option>
+                                <option value="false">Nam</option>
+                                <option value="true">Nữ</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-envelope"></i></span>
+                            <input type="email" id="Email" name="Email" placeholder="Email(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-building"></i></span>
+                            <input type="text" id="CompanyID" name="CompanyID" placeholder="Mã công ty(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-user-circle"></i></span>
+                            <input type="text" id="UserName" name="UserName" placeholder="Tên tài khoản(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                    <div class="modern-group mb-2">
+                        <div class="input-group">
+                            <span class="input-group-text modern-icon"><i class="fas fa-lock"></i></span>
+                            <input type="password" id="Password" name="Password" placeholder="Mật khẩu(*)"
+                                class="form-control modern-input" required />
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" id="EmployeeName" name="EmployeeName" placeholder="Tên nhân viên" class="form-control" required />
-                <span class="text-danger">*</span>
+            <button type="submit" class="btn modern-btn w-100 py-2 fs-5 mt-4 mb-2">Đăng ký</button>
+            <div class="form-footer mt-2">
+                <p>Bạn đã có tài khoản? <a href="@Url.Action("Login", "Account")" class="forgot-password">Đăng nhập</a>
+                </p>
             </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-phone"></i>
-                <input type="text" id="PhoneNumber" name="PhoneNumber" placeholder="Số điện thoại" class="form-control" required />
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-venus-mars"></i>
-                <select id="Gender" name="Gender" class="form-control" required>
-                    <option value="" disabled selected>Select Gender</option>
-                    <option value="false">Nam</option>
-                    <option value="true">Nữ</option>
-                </select>
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-envelope"></i>
-                <input type="email" id="Email" name="Email" placeholder="Email" class="form-control" required />
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-building"></i>
-                <input type="text" id="CompanyID" name="CompanyID" placeholder="Mã công ty" class="form-control" required />
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-user-circle"></i>
-                <input type="text" id="UserName" name="UserName" placeholder="Tên tài khoản" class="form-control" required />
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" id="Password" name="Password" placeholder="Mật khẩu" class="form-control" required />
-                <span class="text-danger">*</span>
-            </div>
-        </div>
-
-        <button type="submit" class="login-button">Đăng ký</button>
-        
-        <div class="form-footer">
-            <p>Bạn đã có tài khoản? <a href="@Url.Action("Login", "Account")" class="forgot-password">Đăng nhập</a></p>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
-
-<style>
-.login-container {
-    max-width: 500px;
-    margin: 50px auto;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
-
-.form-title {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #333;
-    font-size: 2em;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.input-group {
-    position: relative;
-    margin-bottom: 10px;
-}
-
-.input-group i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-}
-
-.form-control {
-    width: 100%;
-    padding: 12px 40px;
-    border: none;
-    border-bottom: 2px solid #ddd;
-    background: transparent;
-    transition: all 0.3s ease;
-    font-size: 16px;
-}
-
-.form-control:focus {
-    border-color: #ff6b35;
-    outline: none;
-}
-
-.login-button {
-    width: 100%;
-    padding: 12px;
-    background: #ff6b35;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
-    margin-top: 20px;
-}
-
-.login-button:hover {
-    background: #ff6b35;
-}
-
-.form-footer {
-    text-align: center;
-    margin-top: 20px;
-    color: #666;
-}
-
-.form-footer a {
-    color: #ff6b35;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.form-footer a:hover {
-    color: #ff6b35;
-}
-
-body {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('@Url.Content("~/img/background.jpg")');
-    background-size: cover;
-    background-position: center;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.text-danger {
-    color: #ff6b35;
-    font-size: 14px;
-    margin-top: 5px;
-    display: block;
-}
-</style>
 
 @section Scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
@@ -193,10 +96,10 @@ body {
         $(document).ready(function () {
             $("#createAccountForm").on("submit", function (event) {
                 event.preventDefault();
-                
+
                 // Kiểm tra thông tin tài khoản
                 if (!$('#UserName').val().trim() || !$('#Password').val().trim()) {
-                    alert('Account information cannot be empty!');
+                    alert('Tên tài khoản không được để trống!');
                     return;
                 }
 
@@ -215,7 +118,7 @@ body {
                     success: function (result) {
                         if (result && result.accountID) {
                             var accountID = result.accountID;
-                            
+
                             // Tạo object chứa thông tin nhân viên
                             var EmployeeData = {
                                 EmployeeID: $('#EmployeeID').val(),
@@ -234,7 +137,7 @@ body {
                                 contentType: "application/json",
                                 data: JSON.stringify(EmployeeData),
                                 success: function (result) {
-                                    alert("Employee account created successfully!");
+                                    alert("Tài khoản nhân viên đã tạo thành công!");
                                     window.location.href = '/Account/Login';
                                 },
                                 error: function (err) {
@@ -243,7 +146,7 @@ body {
                                         url: '/Account/Delete/' + accountID,
                                         type: 'POST',
                                         success: function () {
-                                            alert('Failed to create employee. Account has been deleted.');
+                                            alert('Lỗi khi tạo tài khoản nhân viên!, đã xóa tài khoản thành công');
                                         },
                                         error: function () {
                                             alert('Could not delete account. Please check!');
@@ -254,13 +157,129 @@ body {
                         }
                     },
                     error: function (err) {
-                        alert("This account already exists. Please choose another username.");
+                        alert("Tên tài khoản đã tồn tại, hãy lấy tên tài khoản khác!");
                     }
                 });
             });
         });
     </script>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
 
+<style>
+    /* Modern Register Card */
+    .modern-register-card {
+        max-width: 700px;
+        border-radius: 22px;
+        box-shadow: 0 8px 32px rgba(34, 48, 90, 0.10);
+        background: #fff;
+        animation: fadeIn 0.5s;
+    }
 
+    .modern-title {
+        font-size: 2.2rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+    }
+
+    .modern-subtitle {
+        font-size: 1.08rem;
+        color: #888;
+        font-weight: 500;
+    }
+
+    .modern-group {
+        margin-bottom: 1.2rem;
+    }
+
+    .input-group {
+        box-shadow: 0 2px 8px rgba(243, 124, 0, 0.04);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .modern-input,
+    .modern-input:focus {
+        border: none !important;
+        background: #f8f9fa !important;
+        border-radius: 0 12px 12px 0 !important;
+        font-size: 1.08rem;
+        color: #22305a;
+        font-weight: 500;
+        box-shadow: none !important;
+        padding-left: 16px;
+        padding-right: 16px;
+        height: 48px;
+        transition: background 0.2s;
+    }
+
+    .modern-input:focus {
+        background: #fff !important;
+    }
+
+    .modern-icon {
+        background: linear-gradient(135deg, #f57c00 60%, #f37423 100%);
+        color: #fff !important;
+        border: none !important;
+        font-size: 1.25rem;
+        min-width: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 48px;
+        border-radius: 12px 0 0 12px !important;
+    }
+
+    .modern-btn {
+        background: linear-gradient(90deg, #f57c00 60%, #f37423 100%);
+        color: #fff;
+        border: none;
+        font-weight: 800;
+        border-radius: 12px;
+        font-size: 1.15rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 16px rgba(243, 124, 0, 0.10);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modern-btn:hover,
+    .modern-btn:focus {
+        background: #fff;
+        color: #f57c00;
+        border: 2px solid #f57c00;
+        box-shadow: 0 2px 8px rgba(243, 124, 0, 0.12);
+    }
+
+    @@media (max-width: 900px) {
+        .modern-register-card {
+            max-width: 98vw;
+            padding: 2rem 0.5rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .modern-register-card {
+            padding: 1.2rem 0.2rem;
+        }
+
+        .row.g-4 {
+            gap: 0.5rem !important;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .modern-register-card {
+            padding: 0.5rem 0.1rem;
+        }
+
+        .row.g-4 {
+            gap: 0.2rem !important;
+        }
+    }
+</style>

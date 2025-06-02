@@ -189,15 +189,13 @@ namespace QuanLyDoanhNghiep.Controllers
                     await ResumeFile.CopyToAsync(stream);
                 }
 
-                // Kiểm tra xem người dùng đã có CV nào đang chờ duyệt cho vị trí này chưa
-                var pendingCV = await _context.CV
-                    .FirstOrDefaultAsync(c => c.PositionID == PositionID &&
-                                            c.ID == ID &&
-                                            c.Status == 0); // Chỉ kiểm tra CV đang chờ duyệt
+                // Kiểm tra xem người dùng đã có CV nào cho vị trí này chưa (bất kỳ trạng thái nào)
+                var existedCV = await _context.CV
+                    .FirstOrDefaultAsync(c => c.PositionID == PositionID && c.ID == ID);
 
-                if (pendingCV != null)
+                if (existedCV != null)
                 {
-                    TempData["ErrorMessage"] = "Bạn đã có CV đang chờ duyệt cho vị trí này. Vui lòng đợi CV hiện tại được duyệt hoặc từ chối trước khi nộp CV mới.";
+                    TempData["ErrorMessage"] = "Bạn đã ứng tuyển vị trí này rồi.";
                     return RedirectToAction("Details", "JobPosition", new { id = PositionID });
                 }
 
@@ -342,6 +340,24 @@ namespace QuanLyDoanhNghiep.Controllers
 
                     ViewBag.CVSections = responseData["allSections"];
                     ViewBag.filePath = $"/uploads/cvs_suggested/{fileName}";
+                    var user = _context.User.FirstOrDefault(m => m.AccountID == int.Parse(CurrentID));
+                    if (user == null)
+                    {
+                        TempData["ErrorMessage"] = "Không tìm thấy người dùng.";
+                        return RedirectToAction("Index");
+                    }
+                    // Lưu lịch sử gợi ý
+                    var history = new SuggestedJobHistory
+                    {
+                        UserId = user.ID, // hoặc user.ID
+                        CVFilePath = $"/uploads/cvs_suggested/{fileName}",
+                        SuggestedAt = DateTime.Now,
+                        JobPositionIds = string.Join(",", matchedJobPositionIDs),
+                        CVSectionsJson = responseData["allSections"]?.ToString()
+                    };
+                    _context.SuggestedJobHistories.Add(history);
+                    await _context.SaveChangesAsync();
+
                     return View("SuggestedJobs", matchedJobPositions);
                 }
                 else
@@ -421,7 +437,9 @@ namespace QuanLyDoanhNghiep.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = status == 1 ? "Đã chấp nhận CV thành công!" : "Đã từ chối CV thành công!";
-                return RedirectToAction(nameof(Index));
+                
+                return View("ActiveJobs", "JobPosition");
+
             }
             catch (Exception ex)
             {
@@ -596,6 +614,36 @@ namespace QuanLyDoanhNghiep.Controllers
             ViewBag.Job = job;
 
             return View("CVByJob", cvs);
+        }
+
+        public IActionResult SuggestHistory()
+        {
+            var user = _context.User.FirstOrDefault(m => m.AccountID.ToString().Equals(CurrentID));
+            if (user == null)
+            {
+                return NotFound("Không tìm thấy người dùng.");
+            }
+            var histories = _context.SuggestedJobHistories
+                .Where(h => h.UserId.Equals(user.ID))
+                .OrderByDescending(h => h.SuggestedAt)
+                .ToList();
+
+            // Lấy tất cả JobPositionId xuất hiện trong lịch sử
+            var allJobIds = histories
+                .SelectMany(h => (h.JobPositionIds ?? "")
+                    .Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(id => int.TryParse(id, out var i) ? i : 0))
+                .Where(id => id > 0)
+                .Distinct()
+                .ToList();
+
+            // Lấy tên vị trí
+            var jobNames = _context.JobPosition
+                .Where(j => allJobIds.Contains(j.PositionID))
+                .ToDictionary(j => j.PositionID, j => j.PositionName);
+
+            ViewBag.JobNames = jobNames;
+            return View(histories);
         }
 
     }

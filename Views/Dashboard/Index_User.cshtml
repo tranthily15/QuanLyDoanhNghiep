@@ -1,8 +1,7 @@
-﻿@model IEnumerable<QuanLyDoanhNghiep.Models.User>
+﻿@* @model IEnumerable<QuanLyDoanhNghiep.Models.User>
 
 @{
     ViewData["Title"] = "Quản lý sinh viên";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
     var khoas = ViewBag.Khoas as List<string>;
     var khoaFilter = ViewBag.KhoaFilter as string;
     var searchString = ViewBag.SearchString as string;
@@ -30,18 +29,7 @@
         <input type="text" name="searchString" value="@searchString" class="form-control"
             placeholder="Tìm theo tên, mã SV, SĐT, email, khóa " />
     </div>
-    @* <div class="col-md-3">
-        <select name="khoaFilter" class="form-select">
-            <option value="">-- Tất cả khóa --</option>
-            @if (khoas != null)
-            {
-                foreach (var khoa in khoas)
-                {
-                    <option value="@khoa" @(khoa == khoaFilter ? "selected" : "")>@khoa</option>
-                }
-            }
-        </select>
-    </div> *@
+
     <div class="col-md-2">
         <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Tìm kiếm</button>
     </div>
@@ -133,3 +121,4 @@
         transform: translateY(-2px);
     }
 </style>
+ *@

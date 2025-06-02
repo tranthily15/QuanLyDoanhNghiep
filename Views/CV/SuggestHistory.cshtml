@@ -1,0 +1,227 @@
+@model IEnumerable<QuanLyDoanhNghiep.Models.SuggestedJobHistory>
+@{
+    ViewData["Title"] = "Lịch sử gợi ý việc làm";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var jobNames = ViewBag.JobNames as Dictionary<int, string>;
+}
+
+<style>
+    .suggest-card {
+        border-radius: 14px;
+        border: 1px solid #e9ecef;
+        background: #fff;
+        box-shadow: 0 2px 12px rgba(34, 48, 90, 0.07);
+    }
+
+    .suggest-card .badge.bg-primary {
+        background: #22305a !important;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .suggest-card .btn-apply-now {
+        background: #fff;
+        color: #f57c00;
+        font-weight: 600;
+        border-radius: 8px;
+        border: 2px solid #f57c00;
+        transition: background 0.2s, color 0.2s, border 0.2s;
+        box-shadow: none;
+    }
+
+    .suggest-card .btn-apply-now:hover,
+    .suggest-card .btn-apply-now:focus {
+        background: #f57c00;
+        color: #fff;
+        border: 2px solid #f57c00;
+    }
+
+    .suggest-card .job-card {
+        border: 1px solid #f7e2c4;
+        border-radius: 10px;
+        transition: box-shadow 0.2s;
+        background: #fff;
+    }
+
+    .suggest-card .job-card:hover {
+        box-shadow: 0 4px 16px rgba(245, 124, 0, 0.10);
+        border-color: #f57c00;
+    }
+
+    .suggest-card .fw-bold,
+    .suggest-card .text-navy {
+        color: #22305a !important;
+    }
+
+    .suggest-card .text-warning {
+        color: #f57c00 !important;
+    }
+
+    .suggest-card .btn-outline-secondary {
+        border-radius: 6px;
+    }
+</style>
+
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">
+            <i class="fas fa-history text-primary"></i> Lịch sử gợi ý việc làm
+        </h3>
+        <!-- Nút Gợi ý CV (đã có) -->
+        <a class="btn btn-warning fw-bold px-4 rounded-3"
+           data-bs-toggle="modal" data-bs-target="#uploadCvModal">
+            <i class="bi bi-lightbulb me-1"></i> Gợi ý CV
+        </a>
+    </div>
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">Bạn chưa có lịch sử gợi ý nào.</div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var item in Model)
+            {
+                var jobIds = item.JobPositionIds?.Split(',', StringSplitOptions.RemoveEmptyEntries) ?? new string[0];
+                <div class="col-12">
+                    <div class="card shadow-sm border-0 suggest-card">
+                        <div class="card-body d-flex flex-wrap align-items-center justify-content-between">
+                            <div>
+                                <div class="mb-2">
+                                    <span class="badge bg-primary"><i class="bi bi-clock-history me-1"></i>
+                                        @item.SuggestedAt.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                                <div>
+                                    <span class="me-2"><i class="bi bi-file-earmark-person"></i> File CV: </span>
+                                    @if (!string.IsNullOrEmpty(item.CVFilePath))
+                                    {
+                                        <a href="@item.CVFilePath" target="_blank" class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-file-alt"></i> Xem CV
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Không có file</span>
+                                    }
+                                </div>
+                            </div>
+                            <div>
+                                <button class="btn btn-apply-now px-4" type="button" data-bs-toggle="collapse"
+                                    data-bs-target="#suggestedJobs_@item.Id">
+                                    <i class="bi bi-lightbulb"></i> Xem chi tiết gợi ý
+                                </button>
+                            </div>
+                        </div>
+                        <div class="collapse" id="suggestedJobs_@item.Id">
+                            <div class="card-body border-top">
+                                @if (jobIds.Length == 0)
+                                {
+                                    <div class="alert alert-warning mb-0">Không có vị trí phù hợp trong lần gợi ý này.</div>
+                                }
+                                else
+                                {
+                                    <h6 class="mb-3 text-navy fw-bold">Các vị trí được gợi ý:</h6>
+                                    <div class="row row-cols-1 row-cols-md-2 g-3">
+                                        @foreach (var idStr in jobIds)
+                                        {
+                                            if (int.TryParse(idStr, out int jobId))
+                                            {
+                                                var jobName = jobNames != null && jobNames.ContainsKey(jobId) ? jobNames[jobId] : $"Vị trí ID: {jobId}";
+                                                var displayName = jobName.Length > 40 ? jobName.Substring(0, 40) + "..." : jobName;
+                                                <div class="col">
+                                                    <a asp-controller="JobPosition" asp-action="Details" asp-route-id="@jobId"
+                                                        target="_blank" class="card job-card p-3 h-100 text-decoration-none text-dark">
+                                                        <div class="d-flex align-items-center">
+                                                            <i class="bi bi-briefcase-fill fs-3 text-warning me-3"></i>
+                                                            <div>
+                                                                <div class="fw-bold" title="@jobName">@displayName</div>
+                                                                <div class="small text-muted">Xem chi tiết</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                            }
+                                        }
+                                    </div>
+                                }
+                                <div class="mt-4">
+                                    <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#cvSections_@item.Id">
+                                        <i class="fas fa-eye"></i> Xem chi tiết dữ liệu CV
+                                    </button>
+                                    <div class="collapse mt-2" id="cvSections_@item.Id">
+                                        <pre class="bg-light p-2 rounded small"
+                                            style="max-height:200px;overflow:auto;">@item.CVSectionsJson</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+<!-- Modal upload CV -->
+<div class="modal fade" id="uploadCvModal" tabindex="-1" aria-labelledby="uploadCvModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <form asp-action="UploadAndSuggest" asp-controller="CV" method="post" enctype="multipart/form-data">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="uploadCvModalLabel">
+                        <i class="bi bi-upload me-2 text-warning"></i>Gợi ý việc làm từ CV của bạn
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="ResumeFile" class="form-label fw-bold">Chọn file CV</label>
+                        <input type="file" class="form-control" id="ResumeFile" name="ResumeFile" required accept=".pdf,.doc,.docx" />
+                        <small class="text-muted">Chỉ chấp nhận PDF, DOC, DOCX (tối đa 5MB)</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-warning fw-bold px-4">
+                        <i class="bi bi-lightbulb me-1"></i> Gợi ý ngay
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@* <footer class="footer mt-5 pt-4 pb-2">
+        <div class="container">
+            <div class="row gy-4 align-items-center">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3"><i class="bi bi-info-circle-fill me-2 "></i>THÔNG TIN LIÊN HỆ</h5>
+                    <p class="mb-2">Trung tâm "Việc làm và thực tập sinh viên khoa CNTT"</p>
+                    <p class="mb-2"><i class="bi bi-geo-alt-fill me-2 "></i> Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà
+                        Nội
+                    </p>
+                    <p class="mb-2"><i class="bi bi-telephone-fill me-2 "></i> 096 159 55 99</p>
+                    <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> khoa.cntt@dainam.edu.vn</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5 class="mb-3"><i class="bi bi-link-45deg me-2"></i>LIÊN KẾT</h5>
+                    <a href="#" class="footer-link d-block mb-2"><i class="bi bi-briefcase-fill me-2"></i>Việc làm</a>
+                    <a href="#" class="footer-link d-block mb-2"><i class="bi bi-mortarboard-fill me-2"></i>Thực tập</a>
+                    <a href="#" class="footer-link d-block mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý việc
+                        làm</a>
+                    <a href="#" class="footer-link d-block"><i class="bi bi-file-earmark-person-fill me-2"></i>CV</a>
+                </div>
+                <div class="col-md-4 text-center">
+                    <h5 class="mb-3"><i class="bi bi-share-fill me-2 "></i>MẠNG XÃ HỘI</h5>
+                    <img src="~/img/logo.png" width="100" class="mb-3 rounded-circle border shadow-sm" />
+                    <div>
+                        <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                        <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-youtube"></i></a>
+                        <a href="#" class="footer-link fs-4"><i class="bi bi-envelope"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center mt-4 small" style="opacity:0.85;">
+                &copy; @DateTime.Now.Year FitJob - Khoa CNTT, Đại học Đại Nam. All rights reserved.
+            </div>
+        </div>
+    </footer> *@

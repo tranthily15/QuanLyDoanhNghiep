@@ -100,6 +100,7 @@ namespace QuanLyDoanhNghiep.Controllers
                 ViewBag.Provinces = await _context.Province.ToListAsync();
                 return View(model);
             }
+
         }
 
         [HttpGet]
@@ -290,6 +291,11 @@ namespace QuanLyDoanhNghiep.Controllers
                 // Kiểm tra xem vị trí đã được lưu chưa
                 ViewBag.IsSaved = await _context.SavedJob
                     .AnyAsync(sj => sj.UserID == user.ID && sj.PositionID == id && sj.IsSaved);
+                // Lấy ID sinh viên đăng nhập
+                var userId = user.ID;
+                // Kiểm tra xem sinh viên đã nộp CV cho vị trí này chưa
+                var hasApplied = _context.CV.Any(cv => cv.PositionID == jobPosition.PositionID && cv.ID == userId);
+                ViewBag.HasApplied = hasApplied;
                 return View(jobPosition);
             }
             else if (IsLogin && RoleUser == "1") // doanh nghiệp
@@ -469,8 +475,7 @@ namespace QuanLyDoanhNghiep.Controllers
                     // Lọc danh sách mới (loại bỏ bản ghi không hợp lệ)
                     var validNewLocations = JobLocations
                         .Where(l => !string.IsNullOrEmpty(l.ProvinceID) &&
-                                    !string.IsNullOrEmpty(l.DistrictID) &&
-                                    !string.IsNullOrEmpty(l.Street))
+                                    !string.IsNullOrEmpty(l.DistrictID))
                         .GroupBy(x => new { x.ProvinceID, x.DistrictID, Ward = x.WardID ?? "", x.Street })
                         .Select(g => g.First())
                         .ToList();
@@ -773,7 +778,7 @@ namespace QuanLyDoanhNghiep.Controllers
                 existed.SavedDate = DateTime.Now;
                 _context.SavedJob.Update(existed);
                 await _context.SaveChangesAsync();
-                return Json(new { success = true, message ="đã lưu việc làm"});
+                return Json(new { success = true, message = "đã lưu việc làm" });
             }
             //if (existed != null)
             //{
@@ -797,7 +802,7 @@ namespace QuanLyDoanhNghiep.Controllers
             //    IsSaved = true
             //};
 
-           
+
         }
 
         [HttpPost]

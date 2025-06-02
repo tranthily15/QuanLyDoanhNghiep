@@ -118,14 +118,14 @@
                             </div>
                         }
                     </div>
-                    <!-- Phân trang -->
                     @if (pendingTotalPages > 1)
                     {
                         <nav>
                             <ul class="pagination justify-content-center mt-3">
                                 <li class="page-item @(pendingPage == 1 ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage - 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })">Trước</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage - 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })"><i
+                                            class="bi bi-chevron-left"></i></a>
                                 </li>
                                 @for (int i = 1; i <= pendingTotalPages; i++)
                                 {
@@ -136,7 +136,8 @@
                                 }
                                 <li class="page-item @(pendingPage == pendingTotalPages ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage + 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })">Sau</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage + 1, acceptedPage = acceptedPage, rejectedPage = rejectedPage })"><i
+                                            class="bi bi-chevron-right"></i></a>
                                 </li>
                             </ul>
                         </nav>
@@ -169,7 +170,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="bi bi-calendar me-1"></i>
-                                        @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                        @cv.EvaluationDate?.ToString("dd/MM/yyyy")
                                     </small>
                                     <a href="@Url.Action("Details", "CV", new { id = cv.CV_ID })"
                                         class="btn btn-outline-primary btn-sm rounded-pill">
@@ -190,10 +191,11 @@
                     @if (acceptedTotalPages > 1)
                     {
                         <nav>
-                            <ul class="pagination justify-content-center mt-3">
+                            <ul class="pagination justify-content-center mt-4">
                                 <li class="page-item @(acceptedPage == 1 ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage - 1, rejectedPage = rejectedPage })">Trước</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage - 1, rejectedPage = rejectedPage })"><i
+                                            class="bi bi-chevron-left"></i></a>
                                 </li>
                                 @for (int i = 1; i <= acceptedTotalPages; i++)
                                 {
@@ -204,7 +206,8 @@
                                 }
                                 <li class="page-item @(acceptedPage == acceptedTotalPages ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage + 1, rejectedPage = rejectedPage })">Sau</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage + 1, rejectedPage = rejectedPage })"><i
+                                            class="bi bi-chevron-right"></i></a>
                                 </li>
                             </ul>
                         </nav>
@@ -237,7 +240,7 @@
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">
                                         <i class="bi bi-calendar me-1"></i>
-                                        @cv.SubmissionDate?.ToString("dd/MM/yyyy")
+                                        @cv.EvaluationDate?.ToString("dd/MM/yyyy")
                                     </small>
                                     <a href="@Url.Action("Details", "CV", new { id = cv.CV_ID })"
                                         class="btn btn-outline-primary btn-sm rounded-pill">
@@ -261,7 +264,8 @@
                             <ul class="pagination justify-content-center mt-3">
                                 <li class="page-item @(rejectedPage == 1 ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage - 1 })">Trước</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage - 1 })"><i
+                                            class="bi bi-chevron-left"></i></a>
                                 </li>
                                 @for (int i = 1; i <= rejectedTotalPages; i++)
                                 {
@@ -272,7 +276,8 @@
                                 }
                                 <li class="page-item @(rejectedPage == rejectedTotalPages ? "disabled" : "")">
                                     <a class="page-link"
-                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage + 1 })">Sau</a>
+                                        href="@Url.Action("ByJob", new { id = job.PositionID, pendingPage = pendingPage, acceptedPage = acceptedPage, rejectedPage = rejectedPage + 1 })"><i
+                                            class="bi bi-chevron-right"></i></a>
                                 </li>
                             </ul>
                         </nav>
@@ -282,116 +287,39 @@
         </div>
     </div>
 </div>
-<style>
-    /* Đặt đoạn này vào cuối file CVByJob.cshtml hoặc trong <style> riêng */
-@* .card {
-    transition: transform 0.2s ease-in-out;
-    height: 600px;
-    display: flex;
-    flex-direction: column;
-    border-radius: 18px;
-    box-shadow: 0 2px 16px rgba(0,0,0,0.06);
-}
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 24px rgba(0,0,0,0.12);
-}
-.card-header {
-    flex-shrink: 0;
-    border-radius: 18px 18px 0 0;
-    background: linear-gradient(90deg, #f8fafc 60%, #f1f5f9 100%);
-} *@
-.card-body {
-        flex: 1;
-        overflow: hidden;
-    }
 
-    .cv-list {
-        height: 100%;
-        overflow-y: auto;
-        scrollbar-width: thin;
-        scrollbar-color: #dee2e6 #fff;
-    }
-
-    .cv-list::-webkit-scrollbar {
-        width: 6px;
-    }
-
-    .cv-list::-webkit-scrollbar-track {
-        background: #fff;
-    }
-
-    .cv-list::-webkit-scrollbar-thumb {
-        background-color: #dee2e6;
-        border-radius: 3px;
-    }
-
-    .list-group-item {
-        transition: background-color 0.2s ease-in-out;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
-    }
-
-    .list-group-item:hover {
-        background-color: #f8f9fa;
-        box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
-    }
-
-    .badge {
-        font-weight: 500;
-        padding: 0.5em 0.8em;
-        font-size: 1rem;
-    }
-
-    .btn-outline-primary {
-        border-radius: 20px;
-        border-width: 1.5px;
-        transition: background 0.2s, color 0.2s;
-    }
-
-    .btn-outline-primary:hover {
-        background: #1a73e8;
-        color: #fff;
-        border-color: #1a73e8;
-        transform: translateY(-1px);
-    }
-
-    .table> :not(caption)>*>* {
-        padding: 1rem;
-    }
-
-    .text-muted {
-        color: #94a3b8 !important;
-    }
-
-    .section-header h4 {
-        font-weight: 700;
-        color: #1a202c;
-    }
-
-    .section-header i {
-        color: #f37423;
-        margin-right: 6px;
-    }
-
-    .pagination .page-link {
-        border-radius: 50% !important;
-        margin: 0 2px;
-        color: #1a73e8;
-        border: none;
-        background: #f1f8ff;
-        transition: background 0.2s, color 0.2s;
-    }
-
-    .pagination .page-item.active .page-link,
-    .pagination .page-link:hover {
-        background: #1a73e8;
-        color: #fff;
-    }
-
-    .pagination .page-item.disabled .page-link {
-        background: #e9ecef;
-        color: #b0b0b0;
-    }
-</style>
+<footer class="footer mt-5 pt-4 pb-2">
+    <div class="container">
+        <div class="row gy-4 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-info-circle-fill me-2 "></i>THÔNG TIN LIÊN HỆ</h5>
+                <p class="mb-2">Trung tâm "Việc làm và thực tập sinh viên khoa CNTT"</p>
+                <p class="mb-2">
+                    <i class="bi bi-geo-alt-fill me-2 "></i> Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà
+                    Nội
+                </p>
+                <p class="mb-2"><i class="bi bi-telephone-fill me-2 "></i> 096 159 55 99</p>
+                <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> khoa.cntt@dainam.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-link-45deg me-2"></i>LIÊN KẾT</h5>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-briefcase-fill me-2"></i>Việc làm</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-mortarboard-fill me-2"></i>Thực tập</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý việc làm</a>
+                <a href="#" class="footer-link d-block"><i class="bi bi-file-earmark-person-fill me-2"></i>CV</a>
+            </div>
+            <div class="col-md-4 text-center">
+                <h5 class="mb-3"><i class="bi bi-share-fill me-2 "></i>MẠNG XÃ HỘI</h5>
+                <img src="~/img/logo.png" width="100" class="mb-3 rounded-circle border shadow-sm" />
+                <div>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="footer-link fs-4"><i class="bi bi-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 small" style="opacity:0.85;">
+            &copy; @DateTime.Now.Year FitJob - Khoa CNTT, Đại học Đại Nam. All rights reserved.
+        </div>
+    </div>
+</footer>

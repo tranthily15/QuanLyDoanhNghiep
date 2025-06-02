@@ -172,7 +172,7 @@
                                                 <div class="mb-3">
                                                     <label class="form-label">Phường/Xã</label>
                                                     <select class="form-select ward-dropdown" name="JobLocations[@i].WardID"
-                                                        required data-selected="@location.WardID">
+                                                         data-selected="@location.WardID">
                                                         <option value="">-- Chọn phường/xã --</option>
                                                     </select>
                                                 </div>
@@ -774,7 +774,7 @@
                 const district = $(this).find('.district-dropdown').val();
                 const ward = $(this).find('.ward-dropdown').val();
                 const street = $(this).find('input[name$=".Street"]').val();
-                if (province && district && ward && street) {
+                if (province && district && street) {
                     validLocationExists = true;
                     return false; // Exit .each loop early
                 }

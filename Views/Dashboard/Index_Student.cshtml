@@ -1,244 +1,199 @@
 @{
     ViewData["Title"] = "Thống kê người dùng";
+    var student = ViewBag.User;
+    var cvStats = ViewBag.cv ?? new Dictionary<string, int>();
+    var timeStats = ViewBag.timeStats ?? new Dictionary<string, int>();
 }
 
-<div class="box"> </div>
-<nav aria-label="breadcrumb ms-1 mt-2">
-    <ol class="breadcrumb ">
-        <li class="breadcrumb-item">
-            <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
-        </li>
-        <li class="breadcrumb-item active" aria-current="page">
-            Thống kê nguời dùng
-        </li>
-    </ol>
-</nav>
-@if (ViewBag.Student != null)
-{
-    var student = ViewBag.Student;
-    <div class="student-profile-card mb-4">
-        <div class="profile-header">
-            <div class="profile-avatar">
-                @{
-                    var initials = !string.IsNullOrEmpty(student.FullName)
-                    ? student.FullName.Substring(0, Math.Min(1, student.FullName.Length)).ToUpper()
-                    : "SV";
-                }
-                <div class="avatar-placeholder">@initials</div>
-            </div>
-            <div class="profile-info">
-                <h4 class="profile-name">@(student.FullName ?? "Sinh viên")</h4>
-                <div class="profile-stats">
-                    <div class="stat-item">
-                        <i class="fas fa-file-alt"></i>
-                        <span>@(ViewBag.cv?["TotalCVCount"] ?? 0) CV đã nộp</span>
+<div class="box"></div>
+<div class="container py-2">
+    <nav aria-label="breadcrumb ms-1 mt-2">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Thống kê người dùng
+            </li>
+        </ol>
+    </nav>
+</div>
+
+<div class="container mb-4 py-2">
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 rounded-4 p-4 h-100">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="avatar-placeholder me-3" style="width:80px;height:80px;">
+                        @{
+                            var initials = !string.IsNullOrEmpty(student.FullName)
+                            ? student.FullName.Substring(0, 1).ToUpper()
+                            : "SV";
+                        }
+                        <span style="font-size:2.2rem;">@initials</span>
                     </div>
-                    <div class="stat-item">
-                        <i class="fas fa-check-circle"></i>
-                        <span>@(ViewBag.cv?["AcceptedCount"] ?? 0) CV được chấp nhận</span>
+                    <div>
+                        <h4 class="mb-1 fw-bold text-navy">@student.FullName</h4>
+                        <div class="text-muted">
+                            @(string.IsNullOrEmpty(student.Email) ? "Chưa cập nhật email" : student.Email)
+                        </div>
+                        <div class="text-muted">
+                            @(string.IsNullOrEmpty(student.PhoneNumber) ? "Chưa cập nhật SĐT" : student.PhoneNumber)
+                        </div>
+                    </div>
+                </div>
+                <div class="border-top pt-3 mt-3">
+                    <div class="d-flex flex-column gap-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-file-alt text-warning"></i>
+                            <span class="fw-semibold">@cvStats["TotalCVCount"] CV đã nộp</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-check-circle text-success"></i>
+                            <span class="fw-semibold">@cvStats["AcceptedCount"] CV được chấp nhận</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="fas fa-times-circle text-danger"></i>
+                            <span class="fw-semibold">@cvStats["RejectedCount"] CV bị từ chối</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="profile-contact">
-            <div class="contact-item">
-                <i class="fas fa-envelope"></i>
-                <span>@(student.Email ?? "Chưa cập nhật")</span>
-            </div>
-            <div class="contact-item">
-                <i class="fas fa-phone"></i>
-                <span>@(student.PhoneNumber ?? "Chưa cập nhật")</span>
-            </div>
-        </div>
-    </div>
-}
-
-<div class="dashboard-container">
-    <div class="container-fluid">
-        <h2 class="mb-4">Thống kê cá nhân</h2>
-
-        <!-- Thống kê CV -->
-        <div class="row">
-            <div class="col-md-8">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h4>
-                            <i class="fas fa-file-alt"></i> Thống kê CV của bạn
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
-                                title="Thống kê CV đã nộp và trạng thái"></i>
-                        </h4>
-                    </div>
-                    <div class="row stats-row mb-4">
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-icon blue">
-                                    <i class="fas fa-file-alt"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@(ViewBag.cv?["TotalCVCount"] ?? 0)</h5>
-                                    <p>Tổng số CV</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-icon yellow">
-                                    <i class="fas fa-clock"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@(ViewBag.cv?["PendingCount"] ?? 0)</h5>
-                                    <p>Đang chờ</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-icon green">
-                                    <i class="fas fa-check-circle"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@(ViewBag.cv?["AcceptedCount"] ?? 0)</h5>
-                                    <p>Đã chấp nhận</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="stat-box">
-                                <div class="stat-icon red">
-                                    <i class="fas fa-times-circle"></i>
-                                </div>
-                                <div class="stat-content">
-                                    <h5>@(ViewBag.cv?["RejectedCount"] ?? 0)</h5>
-                                    <p>Đã từ chối</p>
-                                </div>
-                            </div>
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 p-4 mb-4">
+                <h5 class="fw-bold mb-3 text-navy">
+                    <i class="fas fa-chart-bar text-warning me-2"></i>Thống kê CV của bạn
+                </h5>
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="stat-box text-center">
+                            <div class="stat-icon blue mb-2"><i class="fas fa-file-alt"></i></div>
+                            <div class="fw-bold fs-5">@cvStats["TotalCVCount"]</div>
+                            <div class="text-muted small">Tổng số CV</div>
                         </div>
                     </div>
-                    <div class="chart-section">
-                        <div class="chart-header">
-                            <span>Phân bố CV theo trạng thái</span>
+                    <div class="col-md-3">
+                        <div class="stat-box text-center">
+                            <div class="stat-icon yellow mb-2"><i class="fas fa-clock"></i></div>
+                            <div class="fw-bold fs-5">@cvStats["PendingCount"]</div>
+                            <div class="text-muted small">Đang chờ</div>
                         </div>
-                        <div class="chart-container" style="height: 250px;">
-                            <canvas id="cvStatusChart"></canvas>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-box text-center">
+                            <div class="stat-icon green mb-2"><i class="fas fa-check-circle"></i></div>
+                            <div class="fw-bold fs-5">@cvStats["AcceptedCount"]</div>
+                            <div class="text-muted small">Đã chấp nhận</div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="stat-box text-center">
+                            <div class="stat-icon red mb-2"><i class="fas fa-times-circle"></i></div>
+                            <div class="fw-bold fs-5">@cvStats["RejectedCount"]</div>
+                            <div class="text-muted small">Đã từ chối</div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="col-md-4">
-                <div class="section-card">
-                    <div class="section-header">
-                        <h4>
-                            <i class="fas fa-history"></i> Thống kê theo thời gian
-                            <i class="fas fa-info-circle text-muted" data-bs-toggle="tooltip"
-                                title="Số liệu CV theo thời gian"></i>
-                        </h4>
+                <div class="chart-section">
+                    <div class="chart-header mb-2 text-muted">Phân bố CV theo trạng thái</div>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="cvStatusChart"></canvas>
                     </div>
-                    <ul class="list-group list-group-flush">
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            CV nộp hôm nay
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedToday"] ??
-                                                                0)</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            CV nộp tuần này
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisWeek"] ??
-                                                                0)</span>
-                        </li>
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            CV nộp tháng này
-                            <span class="badge bg-primary rounded-pill">@(ViewBag.timeStats?["CVsSubmittedThisMonth"] ??
-                                                                0)</span>
-                        </li>
-                    </ul>
                 </div>
+            </div>
+            <div class="card shadow-sm border-0 rounded-4 p-4">
+                <h5 class="fw-bold mb-3 text-navy">
+                    <i class="fas fa-history text-warning me-2"></i>Thống kê theo thời gian
+                </h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        CV nộp hôm nay
+                        <span class="badge bg-primary rounded-pill">@timeStats["CVsSubmittedToday"]</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        CV nộp tuần này
+                        <span class="badge bg-primary rounded-pill">@timeStats["CVsSubmittedThisWeek"]</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        CV nộp tháng này
+                        <span class="badge bg-primary rounded-pill">@timeStats["CVsSubmittedThisMonth"]</span>
+                    </li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
-
+<footer class="footer mt-5 pt-4 pb-2">
+    <div class="container">
+        <div class="row gy-4 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-info-circle-fill me-2 "></i>THÔNG TIN LIÊN HỆ</h5>
+                <p class="mb-2">Trung tâm "Việc làm và thực tập sinh viên khoa CNTT"</p>
+                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2 "></i> Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà
+                    Nội
+                </p>
+                <p class="mb-2"><i class="bi bi-telephone-fill me-2 "></i> 096 159 55 99</p>
+                <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> khoa.cntt@dainam.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-link-45deg me-2"></i>LIÊN KẾT</h5>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-briefcase-fill me-2"></i>Việc làm</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-mortarboard-fill me-2"></i>Thực tập</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý việc
+                    làm</a>
+                <a href="#" class="footer-link d-block"><i class="bi bi-file-earmark-person-fill me-2"></i>CV</a>
+            </div>
+            <div class="col-md-4 text-center">
+                <h5 class="mb-3"><i class="bi bi-share-fill me-2 "></i>MẠNG XÃ HỘI</h5>
+                <img src="~/img/logo.png" width="100" class="mb-3 rounded-circle border shadow-sm" />
+                <div>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="footer-link fs-4"><i class="bi bi-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 small" style="opacity:0.85;">
+            &copy; @DateTime.Now.Year FitJob - Khoa CNTT, Đại học Đại Nam. All rights reserved.
+        </div>
+    </div>
+</footer>
 <style>
-    .dashboard-container {
-        background-color: #f8f9fa;
-        min-height: calc(100vh - 70px);
-        /* Adjust based on header height */
-        padding: 30px 0;
-    }
-
-    /* Section Card Styles */
-    .section-card {
-        background: white;
-        border-radius: 12px;
-        padding: 25px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        margin-bottom: 25px;
-    }
-
-    .section-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        padding-bottom: 15px;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .section-header h4 {
-        font-size: 18px;
-        font-weight: 600;
-        color: #2d2d2d;
-        margin: 0;
-    }
-
-    .section-header h4 i:first-child {
-        margin-right: 8px;
-        color: #ff6b35;
-        /* Example color */
-    }
-
-
-    /* Stats Styles */
-    .stats-row {
-        margin: 0 -10px;
-        /* Counteract padding on cols */
-    }
-
-    .stat-box {
-        display: flex;
-        align-items: center;
-        padding: 15px;
-        /* Slightly smaller padding */
-        background: #f8f9fa;
-        border-radius: 8px;
-        margin: 10px;
-        /* Add margin for spacing */
-        border: 1px solid #e9ecef;
-        transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-    }
-
-    .stat-box:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.08);
-    }
-
-
-    .stat-icon {
-        width: 45px;
-        /* Slightly smaller icon */
-        height: 45px;
-        border-radius: 12px;
+    .avatar-placeholder {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #f57c00 0%, #ffb980 100%);
+        color: #fff;
+        font-size: 2.2rem;
+        font-weight: 700;
+        border-radius: 50%;
         display: flex;
         align-items: center;
         justify-content: center;
-        margin-right: 15px;
+        box-shadow: 0 4px 15px rgba(245, 124, 0, 0.15);
     }
 
-    .stat-icon i {
-        font-size: 18px;
-        /* Slightly smaller icon font */
-        color: white;
+    .stat-box {
+        background: #f8f9fa;
+        border-radius: 10px;
+        padding: 18px 0 10px 0;
+        border: 1px solid #e9ecef;
+        min-height: 90px;
     }
 
-    /* Icon Colors (Match Employee Dashboard) */
+    .stat-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 6px auto;
+        color: #fff;
+        font-size: 1.2rem;
+    }
+
     .stat-icon.blue {
         background: #1a73e8;
     }
@@ -255,170 +210,34 @@
         background: #ea4335;
     }
 
-    .stat-icon.purple {
-        background: #673ab7;
-    }
-
-    /* Add more if needed */
-    .stat-icon.teal {
-        background: #009688;
-    }
-
-
-    .stat-content h5 {
-        font-size: 22px;
-        /* Slightly smaller */
-        font-weight: 700;
-        color: #2d2d2d;
-        margin: 0;
-    }
-
-    .stat-content p {
-        font-size: 13px;
-        /* Slightly smaller */
-        color: #6c757d;
-        margin: 4px 0 0;
-    }
-
-
-    /* Chart Styles */
     .chart-section {
         background: #f8f9fa;
         border-radius: 8px;
-        padding: 20px;
-        margin-top: 20px;
-        /* Add some top margin */
+        padding: 18px;
+        margin-top: 18px;
     }
 
     .chart-header {
-        margin-bottom: 15px;
         color: #6c757d;
         font-size: 14px;
     }
 
-    .chart-container {
-        position: relative;
-        height: 280px;
-        /* Default height */
-    }
-
-    /* List Group Styles */
-    .list-group {
-        padding-top: 10px;
-    }
-
     .list-group-item {
         border: none;
-        padding: 12px 0;
-        /* Adjust padding */
-        background-color: transparent;
-        /* Inherit background */
+        background: transparent;
+        font-size: 1rem;
+        font-weight: 500;
     }
 
     .list-group-item:not(:last-child) {
         border-bottom: 1px solid #e9ecef;
     }
 
-
-    .badge {
-        font-size: 13px;
-        padding: 6px 10px;
-    }
-
-    .student-profile-card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        overflow: hidden;
-        transition: transform 0.3s ease;
-    }
-
-    .student-profile-card:hover {
-        transform: translateY(-5px);
-    }
-
-    .profile-header {
-        padding: 2rem;
-        display: flex;
-        align-items: center;
-        gap: 2rem;
-        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-    }
-
-    .profile-avatar {
-        flex-shrink: 0;
-    }
-
-    .profile-image {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        object-fit: cover;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border: 3px solid white;
-    }
-
-    .profile-info {
-        flex: 1;
-    }
-
-    .profile-name {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: #2d2d2d;
-        margin-bottom: 0.5rem;
-    }
-
-    .profile-stats {
-        display: flex;
-        gap: 1.5rem;
-        margin-top: 1rem;
-    }
-
-    .stat-item {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        color: #6c757d;
-        font-size: 0.9rem;
-    }
-
-    .stat-item i {
-        color: #ff6b35;
-    }
-
-    .profile-contact {
-        padding: 1.5rem 2rem;
-        display: flex;
-        gap: 2rem;
-        border-top: 1px solid #e9ecef;
-        background: white;
-    }
-
-    .contact-item {
-        display: flex;
-        align-items: center;
-        gap: 0.75rem;
-        color: #6c757d;
-    }
-
-    .contact-item i {
-        color: #ff6b35;
-        font-size: 1.1rem;
-    }
-
-    .avatar-placeholder {
-        width: 80px;
-        height: 80px;
-        background: linear-gradient(135deg, #ff6b35 0%, #ff8f6b 100%);
-        color: white;
-        font-size: 2rem;
-        font-weight: 700;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        box-shadow: 0 4px 15px rgba(255, 107, 53, 0.2);
+    .badge.bg-primary {
+        background: #22305a !important;
+        color: #fff !important;
+        font-weight: 600;
+        font-size: 1rem;
     }
 </style>
 
@@ -434,9 +253,9 @@
                 datasets: [{
                     label: 'Số lượng CV',
                     data: [
-                        @(ViewBag.cv?["PendingCount"] ?? 0),
-                        @(ViewBag.cv?["AcceptedCount"] ?? 0),
-                        @(ViewBag.cv?["RejectedCount"] ?? 0)
+                            @(cvStats["PendingCount"]),
+                            @(cvStats["AcceptedCount"]),
+                        @(cvStats["RejectedCount"])
                     ],
                     backgroundColor: ['#fbbc04', '#00b14f', '#ea4335']
                 }]
@@ -445,20 +264,10 @@
                 responsive: true,
                 maintainAspectRatio: false,
                 plugins: {
-                    legend: {
-                        position: 'bottom'
-                    },
-                    title: {
-                        display: false
-                    }
+                    legend: { position: 'bottom' },
+                    title: { display: false }
                 }
             }
         });
-
-        // Initialize Bootstrap tooltips
-        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-            return new bootstrap.Tooltip(tooltipTriggerEl)
-        })
     </script>
 }

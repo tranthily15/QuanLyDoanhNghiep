@@ -127,9 +127,15 @@ namespace QuanLyDoanhNghiep.Controllers
                 .ToList();
             ViewBag.TopJobs = topJobs;
 
+            // Thống kê tổng số công ty và sinh viên hiện có
+            ViewBag.TotalCompany = _context.Company.Count();
+            ViewBag.TotalStudent = _context.User.Count(u => u.Account.Role == 2);
+
+
+
             return View();
         }
-        public async Task<IActionResult> Index_User(string searchString, int page = 1)
+        public async Task<IActionResult> UpdateUser()
         {
             if (!IsLogin || RoleUser == "2" || RoleUser == "1")
             {
@@ -141,46 +147,8 @@ namespace QuanLyDoanhNghiep.Controllers
                 await syncService.SyncDataAsync();
             }
 
-            int pageSize = 30;
-            var users = _context.User
-            .Include(u => u.CVs)
-            .Include(u => u.Account)
-            .AsQueryable();
-
-            // // Lọc theo khóa
-            // if (!string.IsNullOrEmpty(khoaFilter))
-            // {
-            //     users = users.Where(u => u.Khoa == khoaFilter);
-            // }
-
-            // Tìm kiếm theo tên, số điện thoại, mã sinh viên, email
-            if (!string.IsNullOrEmpty(searchString))
-            {
-                users = users.Where(u =>
-                    u.FullName.Contains(searchString) ||
-                    u.PhoneNumber.Contains(searchString) ||
-                    u.ID.ToString().Contains(searchString) ||
-                    u.Khoa.Contains(searchString) ||
-                    u.Email.Contains(searchString)
-                );
-            }
-
-            // Lấy danh sách các khóa để hiển thị dropdown
-            ViewBag.SearchString = searchString;
-
-            int totalUsers = await users.CountAsync();
-            int totalPages = (int)Math.Ceiling(totalUsers / (double)pageSize);
-
-            var usersPaged = await users
-                .OrderBy(u => u.Khoa)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = totalPages;
-
-            return View(usersPaged);
+            TempData["SuccessMessage"] = "Đã cập nhật thành công!";
+            return RedirectToAction("Index", "User");
         }
 
         public async Task<IActionResult> Index_Employee()
@@ -293,7 +261,11 @@ namespace QuanLyDoanhNghiep.Controllers
 
             var user = await _context.User
                  .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
-
+            if (user == null)
+            {
+                return NotFound();
+            }
+            ViewBag.User = user;
             // Thống kê CV của sinh viên
             var cvList = await _context.CV
                 .Include(c => c.JobPosition)
@@ -341,7 +313,301 @@ namespace QuanLyDoanhNghiep.Controllers
             };
             ViewBag.timeStats = timeBasedStats;
 
-            ViewBag.Student = user;
+            return View();
+        }
+
+        public IActionResult CompanyStudentStats(int? companyId, int? studentId, int? month, int? year)
+        {
+            if (!IsLogin || RoleUser != "0")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var now = DateTime.Now;
+            int selectedMonth = month ?? now.Month;
+            int selectedYear = year ?? now.Year;
+            var monthStart = new DateTime(selectedYear, selectedMonth, 1);
+            var monthEnd = monthStart.AddMonths(1);
+
+            // Danh sách công ty và sinh viên cho dropdown
+            ViewBag.Companies = _context.Company.Select(c => new { c.CompanyID, c.CompanyName }).ToList();
+            ViewBag.Students = _context.User.Where(u => u.Account.Role == 2)
+                .Select(u => new { u.ID, u.FullName }).ToList();
+
+            ViewBag.SelectedCompany = companyId;
+            ViewBag.SelectedStudent = studentId;
+            ViewBag.SelectedMonth = selectedMonth;
+            ViewBag.SelectedYear = selectedYear;
+            ViewBag.Months = Enumerable.Range(1, 12).ToList();
+            ViewBag.Years = Enumerable.Range(now.Year - 5, 6).ToList();
+
+            // Thống kê cho công ty
+            if (companyId != null)
+            {
+                var cvs = _context.CV
+                    .Include(cv => cv.JobPosition)
+                    .Where(cv => cv.JobPosition.CompanyID == companyId
+                        && cv.SubmissionDate >= monthStart && cv.SubmissionDate < monthEnd)
+                    .ToList();
+
+                var jobs = _context.JobPosition
+                    .Where(j => j.CompanyID == companyId
+                        && j.CreatedAt.HasValue && j.CreatedAt.Value >= monthStart && j.CreatedAt.Value < monthEnd)
+                    .ToList();
+
+                ViewBag.Stats = new
+                {
+                    Type = "Company",
+                    Name = _context.Company.Find(companyId)?.CompanyName,
+                    TotalCV = cvs.Count,
+                    AcceptedCV = cvs.Count(c => c.Status == 1),
+                    RejectedCV = cvs.Count(c => c.Status == 2),
+                    TotalJob = jobs.Count,
+                    ActiveJob = jobs.Count(j => j.Status == true)
+                };
+            }
+            // Thống kê cho sinh viên
+            else if (studentId != null)
+            {
+                var cvs = _context.CV
+                    .Where(cv => cv.ID.Equals(studentId)
+                        && cv.SubmissionDate >= monthStart && cv.SubmissionDate < monthEnd)
+                    .ToList();
+
+                ViewBag.Stats = new
+                {
+                    Type = "Student",
+                    Name = _context.User.Find(studentId)?.FullName,
+                    TotalCV = cvs.Count,
+                    AcceptedCV = cvs.Count(c => c.Status == 1),
+                    RejectedCV = cvs.Count(c => c.Status == 2),
+                    AppliedPositions = cvs.Select(c => c.PositionID).Distinct().Count()
+                };
+            }
+            else
+            {
+                ViewBag.Stats = null;
+            }
+
+            return View();
+        }
+        public IActionResult CompanyMonthlyStats(int? month, int? year, int page = 1, int pageSize = 20)
+        {
+            if (!IsLogin || RoleUser != "0")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var now = DateTime.Now;
+            int selectedMonth = month ?? now.Month;
+            int selectedYear = year ?? now.Year;
+            var monthStart = new DateTime(selectedYear, selectedMonth, 1);
+            var monthEnd = monthStart.AddMonths(1);
+
+            var companies = _context.Company
+                .Include(c => c.JobPositions)
+                .ToList();
+
+            var companyStats = companies.Select(c =>
+            {
+                var jobsInMonth = c.JobPositions
+                    .Where(j => j.CreatedAt.HasValue && j.CreatedAt.Value >= monthStart && j.CreatedAt.Value < monthEnd)
+                    .ToList();
+
+                var cvsInMonth = _context.CV
+                    .Include(cv => cv.JobPosition)
+                    .Where(cv => cv.JobPosition.CompanyID == c.CompanyID
+                        && cv.SubmissionDate >= monthStart && cv.SubmissionDate < monthEnd)
+                    .ToList();
+
+                return new
+                {
+                    CompanyID = c.CompanyID,
+                    CompanyName = c.CompanyName,
+                    JobCount = jobsInMonth.Count,
+                    CVTotal = cvsInMonth.Count,
+                    CVAccepted = cvsInMonth.Count(cv => cv.Status == 1),
+                    CVRejected = cvsInMonth.Count(cv => cv.Status == 2)
+                };
+            }).ToList();
+
+            int totalItems = companyStats.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var pagedStats = companyStats
+                .OrderByDescending(c => c.CVTotal)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.SelectedMonth = selectedMonth;
+            ViewBag.SelectedYear = selectedYear;
+            ViewBag.Months = Enumerable.Range(1, 12).ToList();
+            ViewBag.Years = Enumerable.Range(now.Year - 5, 6).ToList();
+            ViewBag.CompanyStats = pagedStats;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalActiveCompany = companies.Count(c => c.Status == 1);
+
+            return View();
+        }
+
+        public IActionResult CompanyYearlyStats(int? year, int page = 1, int pageSize = 20)
+        {
+            if (!IsLogin || RoleUser != "0")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var now = DateTime.Now;
+            int selectedYear = year ?? now.Year;
+            var yearStart = new DateTime(selectedYear, 1, 1);
+            var yearEnd = yearStart.AddYears(1);
+
+            var companies = _context.Company
+                .Include(c => c.JobPositions)
+                .ToList();
+
+            var companyStatsYear = companies.Select(c =>
+            {
+                var jobsInYear = c.JobPositions
+                    .Where(j => j.CreatedAt.HasValue && j.CreatedAt.Value >= yearStart && j.CreatedAt.Value < yearEnd)
+                    .ToList();
+
+                var cvsInYear = _context.CV
+                    .Include(cv => cv.JobPosition)
+                    .Where(cv => cv.JobPosition.CompanyID == c.CompanyID
+                        && cv.SubmissionDate >= yearStart && cv.SubmissionDate < yearEnd)
+                    .ToList();
+
+                return new
+                {
+                    CompanyID = c.CompanyID,
+                    CompanyName = c.CompanyName,
+                    JobCount = jobsInYear.Count,
+                    CVTotal = cvsInYear.Count,
+                    CVAccepted = cvsInYear.Count(cv => cv.Status == 1),
+                    CVRejected = cvsInYear.Count(cv => cv.Status == 2)
+                };
+            }).ToList();
+
+            int totalItems = companyStatsYear.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var pagedStats = companyStatsYear
+                .OrderByDescending(c => c.CVTotal)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.SelectedYear = selectedYear;
+            ViewBag.Years = Enumerable.Range(now.Year - 5, 6).ToList();
+            ViewBag.CompanyStatsYear = pagedStats;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalActiveCompany = companies.Count(c => c.Status == 1);
+
+            return View();
+        }
+
+        public IActionResult StudentMonthlyStats(int? month, int? year, int page = 1, int pageSize = 20)
+        {
+            if (!IsLogin || RoleUser != "0")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var now = DateTime.Now;
+            int selectedMonth = month ?? now.Month;
+            int selectedYear = year ?? now.Year;
+            var monthStart = new DateTime(selectedYear, selectedMonth, 1);
+            var monthEnd = monthStart.AddMonths(1);
+
+            var students = _context.User
+                .Include(u => u.CVs)
+                .Where(u => u.Account.Role == 2)
+                .ToList();
+
+            var studentStats = students.Select(s =>
+            {
+                var cvsInMonth = s.CVs
+                    .Where(cv => cv.SubmissionDate >= monthStart && cv.SubmissionDate < monthEnd)
+                    .ToList();
+
+                return new
+                {
+                    StudentID = s.ID,
+                    FullName = s.FullName,
+                    TotalCV = cvsInMonth.Count,
+                    AcceptedCV = cvsInMonth.Count(cv => cv.Status == 1),
+                    RejectedCV = cvsInMonth.Count(cv => cv.Status == 2)
+                };
+            }).ToList();
+
+            int totalItems = studentStats.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var pagedStats = studentStats
+                .OrderByDescending(s => s.TotalCV)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.SelectedMonth = selectedMonth;
+            ViewBag.SelectedYear = selectedYear;
+            ViewBag.Months = Enumerable.Range(1, 12).ToList();
+            ViewBag.Years = Enumerable.Range(now.Year - 5, 6).ToList();
+            ViewBag.StudentStats = pagedStats;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalStudent = students.Count;
+
+            return View();
+        }
+
+        public IActionResult StudentYearlyStats(int? year, int page = 1, int pageSize = 20)
+        {
+            if (!IsLogin || RoleUser != "0")
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            var now = DateTime.Now;
+            int selectedYear = year ?? now.Year;
+            var yearStart = new DateTime(selectedYear, 1, 1);
+            var yearEnd = yearStart.AddYears(1);
+
+            var students = _context.User
+                .Include(u => u.CVs)
+                .Where(u => u.Account.Role == 2)
+                .ToList();
+
+            var studentStatsYear = students.Select(s =>
+            {
+                var cvsInYear = s.CVs
+                    .Where(cv => cv.SubmissionDate >= yearStart && cv.SubmissionDate < yearEnd)
+                    .ToList();
+
+                return new
+                {
+                    StudentID = s.ID,
+                    FullName = s.FullName,
+                    TotalCV = cvsInYear.Count,
+                    AcceptedCV = cvsInYear.Count(cv => cv.Status == 1),
+                    RejectedCV = cvsInYear.Count(cv => cv.Status == 2)
+                };
+            }).ToList();
+
+            int totalItems = studentStatsYear.Count;
+            int totalPages = (int)Math.Ceiling((double)totalItems / pageSize);
+            var pagedStats = studentStatsYear
+                .OrderByDescending(s => s.TotalCV)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToList();
+
+            ViewBag.SelectedYear = selectedYear;
+            ViewBag.Years = Enumerable.Range(now.Year - 5, 6).ToList();
+            ViewBag.StudentStatsYear = pagedStats;
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = totalPages;
+            ViewBag.PageSize = pageSize;
+            ViewBag.TotalStudent = students.Count;
 
             return View();
         }

@@ -1,77 +1,115 @@
 ﻿@model IEnumerable<QuanLyDoanhNghiep.Models.User>
-
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách sinh viên";
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    int sttStart = (currentPage - 1) * 30 + 1;
 }
 <div class="box"></div>
-<div class="box"></div>
-<h1>Danh sách sinh viên</h1>
+<div class="container">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Dashboard")">Bảng điều khiển hệ thống</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Danh sách sinh viên
+            </li>
+        </ol>
+    </nav>
+</div>
+<div class="container my-4">
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Đóng"></button>
+        </div>
+    }
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="mb-0">
+            <i class="fas fa-user-graduate text-primary"></i> Danh sách sinh viên
+        </h3>
+        <a class="btn btn-warning fw-bold px-4 rounded-3" asp-action="UpdateUser" asp-controller="Dashboard">
+            <i class="bi bi-arrow-repeat me-1"></i> Cập nhật danh sách
+        </a>
+    </div>
+    <form class="row g-2 mb-3" method="get" action="@Url.Action("Index", "User")">
+        <div class="col-md-4">
+            <input type="text" name="search" value="@ViewBag.Search" class="form-control rounded-3"
+                placeholder="Tìm theo tên, mã SV, email, SĐT..." />
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary fw-bold px-4 rounded-3">
+                <i class="bi bi-search me-1"></i> Tìm kiếm
+            </button>
+        </div>
+    </form>
+    <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã SV</th>
+                    <th>Họ tên</th>
+                    <th>Email</th>
+                    <th>SĐT</th>
+                    <th>Năm tốt nghiệp</th>
+                    <th>GPA</th>
+                    <th>Danh hiệu</th>
+                    <th>Chi tiết</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = sttStart;
+                    foreach (var s in Model)
+                    {
+                        <tr>
+                            <td>@(stt++)</td>
+                            <td>@s.ID</td>
+                            <td>@s.FullName</td>
+                            <td>@s.Email</td>
+                            <td>@s.PhoneNumber</td>
+                            <td>@s.GraduationYear</td>
+                            <td>@s.GPA</td>
+                            <td>@s.Honors</td>
+                            <td>
+                                <a class="btn btn-sm btn-outline-primary" asp-action="Details" asp-route-id="@s.ID">
+                                    <i class="bi bi-eye"></i> Xem
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                STT
-            </th>
-            <th>
-                Mã sinh vien
-            </th>
-            <th>
-                Họ và tên
-            </th>
-            <th>
-                Ngày sinh
-            </th>
-            <th>
-                Giới tính
-            </th>
-            <th>
-                Email
-            </th>
-            <th>
-                Số điện thoại
-            </th>
-            <th>
-                Tên tài khoản
-            </th>
-            
-            <th>
-                chức năng
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var (item, index) in Model.Select((value, i) => (value, i + 1)))
-        {
-        <tr>
-            <td>@index</td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.FullName)
-            </td>
-            <td>
-                    @item.DateOfBirth.ToString("dd/MM/yyyy")
-            </td>
-            <td>
-                @(item.Gender? "Nữ" : "Nam")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Email)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.PhoneNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Account.UserName)
-            </td>
-            <td>
+    <!-- Phân trang -->
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination justify-content-center mt-4">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1 })">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1 })">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
 
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> 
 
-            </td>
-        </tr>
-}
-    </tbody>
-</table>
+</div>

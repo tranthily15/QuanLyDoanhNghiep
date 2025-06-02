@@ -129,7 +129,7 @@
                             <input type="hidden" asp-for="JobBenefits" id="jobBenefits" required />
                             <span asp-validation-for="JobBenefits" class="text-danger"></span>
                         </div>
-                       @*  <div class="form-group mb-3">
+                        @*  <div class="form-group mb-3">
                             <label asp-for="CategoryID" class="form-label fw-bold">Nhóm vị trí CNTT <span
                                     class="text-danger">*</span></label>
                             <select asp-for="CategoryID" class="form-select" asp-items="ViewBag.Categories">
@@ -141,7 +141,7 @@
                         <div class="form-group mb-4">
                             <label class="form-label fw-bold">Địa chỉ tuyển dụng <span
                                     class="text-danger">*</span></label>
-                            
+
                             <div id="jobLocations">
                                 <div class="job-location-item card mb-3">
                                     <div class="card-body">
@@ -186,7 +186,7 @@
                             <button type="button" class="btn btn-add-address" id="addLocation">
                                 <i class="fas fa-plus" title="Thêm địa chỉ"></i> Thêm địa chỉ
                             </button>
-                            
+
                         </div>
 
                         <div class="form-footer text-end">
@@ -342,14 +342,14 @@
                     }
 
                     var locationHtml = `
-                                        <div class="location-item">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                            <div class="location-content">
-                                                <p class="street">${street}</p>
-                                                <p class="area">${ward}, ${district}, ${province}</p>
+                                            <div class="location-item">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <div class="location-content">
+                                                    <p class="street">${street}</p>
+                                                    <p class="area">${ward}, ${district}, ${province}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                    `;
+                                        `;
                     locations.push(locationHtml);
                 }
             });
@@ -402,10 +402,11 @@
         });
 
         // Handle cascading dropdowns
-        $('.province-dropdown').change(function () {
+        $(document).on('change', '.province-dropdown', function () {
+            var $locationItem = $(this).closest('.job-location-item');
             var provinceId = $(this).val();
-            var districtDropdown = $(this).closest('.job-location-item').find('.district-dropdown');
-            var wardDropdown = $(this).closest('.job-location-item').find('.ward-dropdown');
+            var districtDropdown = $locationItem.find('.district-dropdown');
+            var wardDropdown = $locationItem.find('.ward-dropdown');
 
             districtDropdown.empty().append('<option value="">-- Chọn quận/huyện --</option>');
             wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
@@ -421,9 +422,10 @@
             }
         });
 
-        $('.district-dropdown').change(function () {
+        $(document).on('change', '.district-dropdown', function () {
+            var $locationItem = $(this).closest('.job-location-item');
             var districtId = $(this).val();
-            var wardDropdown = $(this).closest('.job-location-item').find('.ward-dropdown');
+            var wardDropdown = $locationItem.find('.ward-dropdown');
 
             wardDropdown.empty().append('<option value="">-- Chọn phường/xã --</option>');
 
@@ -631,6 +633,7 @@
         left: 0;
         font-weight: bold;
     }
+
     /* bút xóa*/
     .btn-delete-address {
         background-color: white;
@@ -642,10 +645,11 @@
         transition: all 0.3s ease;
     }
 
-        .btn-delete-address:hover {
-            background-color: #dc3545;
-            color: white;
-        }
+    .btn-delete-address:hover {
+        background-color: #dc3545;
+        color: white;
+    }
+
     /* bút thêm mới*/
     .btn-add-address {
         background-color: white;
@@ -657,8 +661,8 @@
         transition: all 0.3s ease;
     }
 
-        .btn-add-address:hover {
-            background-color: #198754;
-            color: white;
-        }
+    .btn-add-address:hover {
+        background-color: #198754;
+        color: white;
+    }
 </style>

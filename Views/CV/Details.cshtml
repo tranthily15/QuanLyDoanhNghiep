@@ -88,76 +88,82 @@
                 <!-- CV Status -->
                 <div class="cv-status mb-4">
                     <h5 class="section-title mb-2">Trạng thái CV</h5>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Trạng thái</span>
-                        <span class="status-badge @GetStatusClass(Model.Status)">
-                            @GetStatusText(Model.Status)
-                        </span>
-                    </div>
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <span>Nguồn</span>
-                        <span class="source-badge">Ứng tuyển</span>
-                    </div>
-                    @if (Model.Status != 0)
-                    {
-                        <div class="feedback-display mt-3">
-                            <div class="d-flex align-items-center mb-2">
-                                <i class="fas fa-comment-dots fa-lg me-2 text-primary"></i>
-                                <span class="fw-semibold">Phản hồi của người duyệt:</span>
-                            </div>
-                            <div class="feedback-content px-2 py-2 rounded-3 bg-light">
-                                @if (!string.IsNullOrEmpty(Model.Feedback))
-                                {
-                                    <span>@Model.Feedback</span>
-                                }
-                                else
-                                {
-                                    <span class="text-muted fst-italic">Chưa có phản hồi</span>
-                                }
-                            </div>
-                            <div class="text-end text-muted small mt-1">
-                                <i class="fas fa-calendar-alt me-1"></i>
-                                @(Model.EvaluationDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
-                            </div>
-                        </div>
-                    }
+                    <div class="d-flex justify-content-between align-items-center mb-2"></div>
+                    <span>Ngày ứng tuyển</span>
+                    <span class="text-muted">
+                        @(Model.SubmissionDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                    </span>
                 </div>
-                @if (ViewBag.Role == "1" && Model.Status == 0)
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Trạng thái</span>
+                    <span class="status-badge @GetStatusClass(Model.Status)">
+                        @GetStatusText(Model.Status)
+                    </span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span>Nguồn</span>
+                    <span class="source-badge">Ứng tuyển</span>
+                </div>
+                @if (Model.Status != 0)
                 {
-                    <hr />
-                    <!-- CV Evaluation -->
-                    <div class="cv-evaluation mb-4">
-                        <h5 class="section-title mb-2">Đánh giá CV</h5>
-                        <form id="evaluationForm" method="post" action="@Url.Action("UpdateStatus", "CV")">
-                            @Html.AntiForgeryToken()
-                            <input type="hidden" name="id" value="@Model.CV_ID" />
-                            <input type="hidden" name="status" id="statusInput" value="" />
-                            <div class="mb-3">
-                                <label for="feedback" class="form-label">Nhận xét đánh giá:</label>
-                                <textarea class="form-control" name="feedback" id="feedback" rows="3"
-                                required>@Model.Feedback</textarea>
-                            </div>
-                            <div class="d-grid gap-2">
-                                <button type="button" class="btn btn-success" onclick="submitForm(1)">
-                                    <i class="fas fa-check me-2"></i> Duyệt CV
-                                </button>
-                                <button type="button" class="btn btn-danger" onclick="submitForm(2)">
-                                    <i class="fas fa-times me-2"></i> Từ chối CV
-                                </button>
-                            </div>
-                        </form>
+                    <div class="feedback-display mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="fas fa-comment-dots fa-lg me-2 text-primary"></i>
+                            <span class="fw-semibold">Phản hồi của người duyệt:</span>
+                        </div>
+                        <div class="feedback-content px-2 py-2 rounded-3 bg-light">
+                            @if (!string.IsNullOrEmpty(Model.Feedback))
+                            {
+                                <span>@Model.Feedback</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted fst-italic">Chưa có phản hồi</span>
+                            }
+                        </div>
+                        <div class="text-end text-muted small mt-1">
+                            <i class="fas fa-calendar-alt me-1"></i>
+                            @(Model.EvaluationDate?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")
+                        </div>
                     </div>
                 }
+            </div>
+            @if (ViewBag.Role == "1" && Model.Status == 0)
+            {
                 <hr />
-                <!-- Action Buttons -->
-                <div class="cv-actions">
-                    <a href="@Model.Resume" download class="btn btn-outline-primary w-100">
-                        <i class="fas fa-download me-2"></i> Tải CV
-                    </a>
+                <!-- CV Evaluation -->
+                <div class="cv-evaluation mb-4">
+                    <h5 class="section-title mb-2">Đánh giá CV</h5>
+                    <form id="evaluationForm" method="post" action="@Url.Action("UpdateStatus", "CV")">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="id" value="@Model.CV_ID" />
+                        <input type="hidden" name="status" id="statusInput" value="" />
+                        <div class="mb-3">
+                            <label for="feedback" class="form-label">Nhận xét đánh giá:</label>
+                            <textarea class="form-control" name="feedback" id="feedback" rows="3"
+                            required>@Model.Feedback</textarea>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" class="btn btn-success" onclick="submitForm(1)">
+                                <i class="fas fa-check me-2"></i> Duyệt CV
+                            </button>
+                            <button type="button" class="btn btn-danger" onclick="submitForm(2)">
+                                <i class="fas fa-times me-2"></i> Từ chối CV
+                            </button>
+                        </div>
+                    </form>
                 </div>
+            }
+            <hr />
+            <!-- Action Buttons -->
+            <div class="cv-actions">
+                <a href="@Model.Resume" download class="btn btn-outline-primary w-100">
+                    <i class="fas fa-download me-2"></i> Tải CV
+                </a>
             </div>
         </div>
     </div>
+</div>
 </div>
 
 

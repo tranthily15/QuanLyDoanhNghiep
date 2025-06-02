@@ -1,0 +1,110 @@
+@{
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var pageSize = ViewBag.PageSize ?? 20;
+    int sttStart = (currentPage - 1) * pageSize + 1;
+}
+<div class="box"></div>
+<div class="container pb-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Dashboard")">Bảng điều khiển hệ thống</a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "User")">Danh sách sinh viên</a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">
+                Thống kê sinh viên theo năm
+            </li>
+        </ol>
+    </nav>
+</div>
+<div class="container mb-4">
+    <div class="card shadow-sm border-0 p-3 rounded-4 mb-3">
+        <form method="get" class="row g-3 align-items-center justify-content-center">
+            <div class="col-auto">
+                <label for="year" class="col-form-label fw-semibold text-navy">
+                    <i class="bi bi-calendar2 me-1 text-warning"></i>Năm
+                </label>
+            </div>
+            <div class="col-auto">
+                <select id="year" name="year" class="form-select rounded-3">
+                    @foreach (var y in ViewBag.Years)
+                    {
+                        if (y == ViewBag.SelectedYear)
+                        {
+                            <option value="@y" selected="selected">@y</option>
+                        }
+                        else
+                        {
+                            <option value="@y">@y</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-warning fw-bold px-4 rounded-3">
+                    <i class="bi bi-funnel me-1"></i> Lọc
+                </button>
+            </div>
+        </form>
+    </div>
+    <div class="alert alert-info mb-3">
+        <strong>Tổng số sinh viên đang tham gia:</strong> @ViewBag.TotalStudent
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>STT</th>
+                    <th>Sinh viên</th>
+                    <th>Tổng CV đã nộp</th>
+                    <th>CV được nhận</th>
+                    <th>CV bị từ chối</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int stt = sttStart;
+                    foreach (var s in ViewBag.StudentStatsYear)
+                    {
+                        <tr>
+                            <td>@(stt++)</td>
+                            <td>@s.FullName</td>
+                            <td>@s.TotalCV</td>
+                            <td>@s.AcceptedCV</td>
+                            <td>@s.RejectedCV</td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    @if (totalPages > 1)
+    {
+        <nav>
+            <ul class="pagination justify-content-center my-4">
+                <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                    <a class="page-link"
+                        href="@Url.Action("StudentYearlyStats", new { year = ViewBag.SelectedYear, page = currentPage - 1 })">
+                        <i class="bi bi-chevron-left"></i>
+                    </a>
+                </li>
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link"
+                            href="@Url.Action("StudentYearlyStats", new { year = ViewBag.SelectedYear, page = i })">@i</a>
+                    </li>
+                }
+                <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                    <a class="page-link"
+                        href="@Url.Action("StudentYearlyStats", new { year = ViewBag.SelectedYear, page = currentPage + 1 })">
+                        <i class="bi bi-chevron-right"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    }
+</div>

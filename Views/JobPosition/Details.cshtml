@@ -3,33 +3,50 @@
 @{
     ViewData["Title"] = "Chi tiết công việc";
     var isSaved = ViewBag.IsSaved ?? false;
+    var hasApplied = ViewBag.HasApplied as bool? ?? false;
+    var isExpired = Model.EndDate < DateTime.Now;
 }
 
 @Html.AntiForgeryToken()
 
 <div class="box"></div>
 <!-- Breadcrumb -->
-@* <div class="breadcrumb-container"> *@
-    <div class="container py-2">
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
+<div class="container py-2">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+            </li>
+            @if(ViewBag.Role == "1" && ViewBag.CurrentCompanyID.Equals(Model.CompanyID.ToString()))
+            {
                 <li class="breadcrumb-item">
-                    <a href="@Url.Action("Index", "JobPosition")">Trang chủ</a>
+                    <a href="@Url.Action("ActiveJobs", "JobPosition")">Quản lý vị trí tuyển dụng</a>
                 </li>
-                @if(ViewBag.Role == "1" && ViewBag.CurrentCompanyID.Equals(Model.CompanyID.ToString()))
-                {
-                    <li class="breadcrumb-item">
-                        <a href="@Url.Action("ActiveJobs", "JobPosition")">Quản lý vị trí tuyển dụng</a>
-                    </li>
-                }
-                <li class="breadcrumb-item active" aria-current="page">
-                    @Model.PositionName
-                </li>
-            </ol>
-        </nav>
-    </div>
-@* </div> *@
+            }
+            <li class="breadcrumb-item active" aria-current="page">
+                @Model.PositionName
+            </li>
+        </ol>
+    </nav>
+</div>
+
 <div class="job-details-page">
+    <!-- Thông báo đã ứng tuyển hoặc hết hạn -->
+    @if (isExpired)
+    {
+        <div class="alert alert-danger d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            Đã hết hạn ứng tuyển cho vị trí này.
+        </div>
+    }
+    else if (hasApplied)
+    {
+        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert">
+            <i class="bi bi-info-circle-fill me-2"></i>
+            Bạn đã ứng tuyển vị trí này rồi.
+        </div>
+    }
+
     <!-- Banner Section -->
     <div class="banner-section">
         <div class="container">
@@ -40,7 +57,7 @@
                             <a href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })">
                                 <img src="~/img/CompanyLogo/@Model.Company.CompanyLogo" alt="@Model.Company.CompanyName" class="company-logo" onerror="this.src='/img/company-default.png'" />
                             </a>
-                            <h1><a @* href="@Url.Action("Details", "Company", new { id = Model.Company.CompanyID })" *@ style="text-decoration: none; color: inherit;">@Model.PositionName</a></h1>
+                            <h1 style="text-decoration: none; color: inherit;">@Model.PositionName</h1>
                         </div>
                     </div>
                 </div>
@@ -48,7 +65,8 @@
                     <div class="job-actions">
                         @if (ViewBag.Role == "2")
                         {
-                            <button class="btn btn-edit" onclick="showApplyModal()">
+                            <button class="btn btn-edit" onclick="showApplyModal()" 
+                                    @(hasApplied || isExpired ? "disabled" : "")>
                                 <i class="fas fa-paper-plane"></i> Ứng tuyển ngay
                             </button>
                             <button class="btn btn-save @(isSaved ? "saved" : "")" onclick="toggleSaveJob(@Model.PositionID)">
@@ -264,7 +282,7 @@
                             <small class="text-muted">Hỗ trợ định dạng: PDF, DOC, DOCX (Tối đa 5MB)</small>
                         </div>
 
-                        <button type="submit" class="btn btn-apply w-100">
+                        <button type="submit" class="btn btn-apply-now w-100">
                             <i class="fas fa-paper-plane"></i> Gửi hồ sơ ứng tuyển
                         </button>
                     </form>
@@ -318,7 +336,40 @@
         }
     </script>
 }
-
+<footer class="footer mt-5 pt-4 pb-2">
+    <div class="container">
+        <div class="row gy-4 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-info-circle-fill me-2 "></i>THÔNG TIN LIÊN HỆ</h5>
+                <p class="mb-2">Trung tâm "Việc làm và thực tập sinh viên khoa CNTT"</p>
+                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2 "></i> Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà
+                    Nội
+                </p>
+                <p class="mb-2"><i class="bi bi-telephone-fill me-2 "></i> 096 159 55 99</p>
+                <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> khoa.cntt@dainam.edu.vn</p>
+            </div>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-link-45deg me-2"></i>LIÊN KẾT</h5>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-briefcase-fill me-2"></i>Việc làm</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-mortarboard-fill me-2"></i>Thực tập</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý việc làm</a>
+                <a href="#" class="footer-link d-block"><i class="bi bi-file-earmark-person-fill me-2"></i>CV</a>
+            </div>
+            <div class="col-md-4 text-center">
+                <h5 class="mb-3"><i class="bi bi-share-fill me-2 "></i>MẠNG XÃ HỘI</h5>
+                <img src="~/img/logo.png" width="100" class="mb-3 rounded-circle border shadow-sm" />
+                <div>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="footer-link fs-4"><i class="bi bi-envelope"></i></a>
+                </div>
+            </div>
+        </div>
+        <div class="text-center mt-4 small" style="opacity:0.85;">
+            &copy; @DateTime.Now.Year FitJob - Khoa CNTT, Đại học Đại Nam. All rights reserved.
+        </div>
+    </div>
+</footer>
 <style>
     :root {
         --primary-color: #ff6b35;
@@ -328,42 +379,6 @@
         --text-muted: #6c757d;
         --section-bg: #f8f9fa;
     }
-
-    /* Breadcrumb Styles */
-    @* .breadcrumb-container {
-        background-color: #f8f9fa;
-        padding: 12px 0;
-        border-bottom: 1px solid #e9ecef;
-    }
-
-    .breadcrumb {
-        margin-bottom: 0;
-        background-color: transparent;
-        padding: 0;
-    }
-
-    .breadcrumb-item {
-        font-size: 14px;
-    }
-
-        .breadcrumb-item a {
-            color: rgb(177, 121, 0);
-            text-decoration: none;
-        }
-
-            .breadcrumb-item a:hover {
-                color: rgb(177, 121, 0);
-                text-decoration: underline;
-            }
-
-        .breadcrumb-item.active {
-            color: #6c757d;
-        }
-
-        .breadcrumb-item + .breadcrumb-item::before {
-            content: ">";
-            color: #6c757d;
-        } *@
 
     /* Banner Section */
     .banner-section {
@@ -403,19 +418,23 @@
 
     /* Buttons */
     .btn-apply {
-        background-color: var(--primary-color);
-        color: white;
-        padding: 12px 30px;
-        border-radius: 8px;
+        background: #ff6b35;
+        color: #fff;
+        font-weight: 700;
         border: none;
-        font-weight: 600;
-        transition: all 0.3s ease;
+        border-radius: 8px;
+        padding: 12px 0;
+        font-size: 1.1rem;
+        box-shadow: 0 2px 8px rgba(255,107,53,0.08);
+        transition: background 0.2s, box-shadow 0.2s;
+        width: 100%;
     }
 
-        .btn-apply:hover {
-            background-color: var(--hover-color);
-            color: white;
-            transform: translateY(-2px);
+        .btn-apply:hover, .btn-apply:focus {
+            background: #ff6b35;
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(255,107,53,0.15);
+            transform: translateY(-2px) scale(1.02);
         }
 
     /* .btn-edit {
@@ -598,39 +617,54 @@
 
     /* Modal Styling */
     .modal-content {
-        border-radius: 12px;
-        border: none;
+        border-radius: 16px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 8px 32px rgba(34,48,90,0.10);
+        background: #fff;
     }
 
     .modal-header {
-        background-color: var(--primary-color);
-        color: white;
-        border-radius: 12px 12px 0 0;
+        background: #fff;
+        color: #22305a;
+        border-radius: 16px 16px 0 0;
+        border-bottom: 1px solid #e9ecef;
+        padding: 20px 24px;
+    }
+
+    .modal-title {
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: 0.5px;
+        color: #22305a;
+    }
+
+    .btn-close {
+        filter: none;
+        opacity: 0.7;
     }
 
     .modal-body {
-        padding: 25px;
+        padding: 28px 24px 24px 24px;
+        background: #fff;
+        border-radius: 0 0 16px 16px;
+    }
+
+    .form-group label {
+        color: #22305a;
+        font-weight: 600;
+        margin-bottom: 8px;
     }
 
     .form-control {
         border-radius: 8px;
+        border: 1px solid #e9ecef;
         padding: 12px 15px;
-        border: 1px solid var(--border-color);
+        font-size: 1rem;
     }
 
         .form-control:focus {
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 0.2rem rgba(0,177,79,0.25);
-        }
-
-    .form-group label {
-        color: var(--secondary-color);
-        margin-bottom: 8px;
-    }
-
-        .form-group label i {
-            color: var(--primary-color);
-            width: 20px;
+            border-color: #22305a;
+            box-shadow: 0 0 0 0.2rem rgba(34,48,90,0.08);
         }
 
     /* Content Formatting */

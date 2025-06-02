@@ -9,16 +9,20 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using QuanLyDoanhNghiep.Models;
+using QuanLyDoanhNghiep.Services;
+
 
 namespace QuanLyDoanhNghiep.Controllers
 {
     public class AccountController : BaseController
     {
         private readonly QuanLyDoanhNghiepDBContext _context;
+        private readonly IEmailService _emailService;
 
-        public AccountController(QuanLyDoanhNghiepDBContext context)
+        public AccountController(QuanLyDoanhNghiepDBContext context, IEmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // Ví dụ: Lấy danh sách tất cả các account
@@ -88,7 +92,7 @@ namespace QuanLyDoanhNghiep.Controllers
             // Chuyển hướng theo vai trò
             return loginUser.Role switch
             {
-                0 => RedirectToAction("Index", "JobPosition"), // Admin
+                0 => RedirectToAction("Index", "DashBoard"), // Admin
                 1 => await RedirectToEmployeeJobPosition(loginUser.AccountID), // Employee
                 _ => RedirectToAction("Index", "JobPosition") // User
             };
@@ -280,6 +284,70 @@ namespace QuanLyDoanhNghiep.Controllers
         private bool AccountExists(int id)
         {
             return _context.Account.Any(e => e.AccountID == id);
+        }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(string username, string email)
+        {
+            if (string.IsNullOrWhiteSpace(username) || string.IsNullOrWhiteSpace(email))
+            {
+                ViewBag.Message = "Vui lòng nhập đầy đủ tên tài khoản và email.";
+                return View();
+            }
+
+            var account = await _context.Account.FirstOrDefaultAsync(a => a.UserName == username);
+            if (account == null)
+            {
+                ViewBag.Message = "Tên tài khoản không tồn tại trong hệ thống!";
+                return View();
+            }
+
+            // if (!string.Equals(account.Email?.Trim(), email.Trim(), StringComparison.OrdinalIgnoreCase))
+            // {
+            //     ViewBag.Message = "Email không khớp với tài khoản đã đăng ký!";
+            //     return View();
+            // }
+
+            // Tạo mật khẩu mới ngẫu nhiên
+            var newPassword = Guid.NewGuid().ToString("N").Substring(0, 8);
+
+            // Mã hóa mật khẩu mới
+            using var hashMethod = System.Security.Cryptography.SHA256.Create();
+            account.Password = Util.Cryptography.GetHash(hashMethod, newPassword);
+            _context.Update(account);
+            await _context.SaveChangesAsync();
+
+            // Gửi email với định dạng HTML đẹp
+            var emailSubject = "Mật khẩu mới từ FitJob";
+            var emailBody = $@"
+    <h2>Xin chào {account.UserName},</h2>
+    <p>Bạn vừa yêu cầu cấp lại mật khẩu trên hệ thống FitJob.</p>
+    <ul>
+        <li><b>Tên đăng nhập:</b> {account.UserName}</li>
+        <li><b>Email nhận mật khẩu:</b> {email}</li>
+        <li><b>Mật khẩu mới:</b> <span style='color:#f57c00;font-weight:bold'>{newPassword}</span></li>
+    </ul>
+    <p>Vui lòng đăng nhập bằng mật khẩu mới này và đổi lại mật khẩu sau khi đăng nhập.</p>
+    <p style='color:#888;font-size:13px'>Nếu bạn không yêu cầu chức năng này, hãy bỏ qua email này.</p>
+    <p>Trân trọng,<br>Ban quản trị hệ thống FitJob</p>";
+
+            try
+            {
+                await _emailService.SendEmailAsync(email, emailSubject, emailBody);
+                ViewBag.Message = "Mật khẩu mới đã được gửi về email của bạn. Vui lòng kiểm tra hộp thư.";
+            }
+            catch
+            {
+                ViewBag.Message = "Gửi email thất bại. Vui lòng thử lại sau!";
+            }
+            return View();
         }
     }
 }

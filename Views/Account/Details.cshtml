@@ -1,4 +1,4 @@
-﻿@model QuanLyDoanhNghiep.Models.Account
+﻿@* @model QuanLyDoanhNghiep.Models.Account
 
 @{
     ViewData["Title"] = "Details";
@@ -33,10 +33,7 @@
         </dd>
     </dl>
 </div>
-@* <div>
-    <a asp-action="Edit" asp-route-id="@Model?.AccountID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div> *@
+
 <div class="form-footer">
             <button type="button" class="btn_save" onclick="location.href='@Url.Action("Edit", new { id = Model?.AccountID })'">Chỉnh sửa</button>
 
@@ -44,4 +41,4 @@
 
 </div>
     </div>
-</center>
+</center> *@

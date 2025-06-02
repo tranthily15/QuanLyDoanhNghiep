@@ -26,12 +26,11 @@ body.admin-body {
     /* Default text is dark */
 }
 
+/* Sidebar màu xanh navy */
 .admin-sidebar {
-    width: 250px;
-    background-color: var(--admin-primary-color);
-    /* Use primary orange */
-    color: var(--admin-text-color);
-    /* Light text */
+    background: #22305a !important;
+    color: #fff;
+    width: 240px;
     padding-top: 1rem;
     position: fixed;
     height: 100vh;
@@ -48,6 +47,7 @@ body.admin-body {
 }
 
 .admin-sidebar .navbar-brand h5 {
+    color: #fff;
     font-weight: 600;
     margin-top: 0.5rem;
 }
@@ -63,38 +63,29 @@ body.admin-body {
 }
 
 .admin-sidebar .nav-link {
-    color: var(--admin-text-color);
-    text-decoration: none;
+    color: #fff !important;
+    background: transparent;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    font-weight: 500;
+    transition: background 0.2s, color 0.2s;
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 0.75rem 1rem;
-    border-radius: 6px;
-    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .admin-sidebar .nav-link:hover,
 .admin-sidebar .nav-link.active {
-    /* Add active state style */
-    background-color: var(--admin-secondary-color);
-    /* Darker orange on hover/active */
-    color: #ffffff;
-    /* Ensure text is white on hover */
+    background: #f2f6fa !important;
+    color: #22305a !important;
 }
 
 .admin-sidebar .nav-link i {
-    min-width: 20px;
-    /* Ensure icons align */
-    font-size: 1.1rem;
-}
-
-.main-content {
-    margin-left: 250px;
-    /* Match sidebar width */
-    /* padding is handled in layout */
-    width: calc(100% - 250px);
-    flex-grow: 1;
-
+    color: #f57c00 !important;
+    /* Cam nhấn cho icon */
+    font-size: 1.2rem;
+    min-width: 22px;
 }
 
 /* Optional: Style cards and charts within admin */
@@ -191,21 +182,31 @@ body.admin-body {
     font-size: 14px;
 }
 
-    .breadcrumb-item a {
-        color: rgb(177, 121, 0);
-        text-decoration: none;
-    }
+.breadcrumb-item a {
+    color: rgb(177, 121, 0);
+    text-decoration: none;
+}
 
-        .breadcrumb-item a:hover {
-            color: rgb(177, 121, 0);
-            text-decoration: underline;
-        }
+.breadcrumb-item a:hover {
+    color: rgb(177, 121, 0);
+    text-decoration: underline;
+}
 
-    .breadcrumb-item.active {
-        color: #6c757d;
-    }
+.breadcrumb-item.active {
+    color: #6c757d;
+}
 
-    .breadcrumb-item + .breadcrumb-item::before {
-        content: ">";
-        color: #6c757d;
-    }
+.breadcrumb-item+.breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+}
+
+.main-content {
+    background: #f5f6fa;
+    color: #22305a;
+    margin-left: 250px;
+    /* Match sidebar width */
+    /* padding is handled in layout */
+    width: calc(100% - 250px);
+    flex-grow: 1;
+}

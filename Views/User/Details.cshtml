@@ -1,91 +1,145 @@
 ﻿@model QuanLyDoanhNghiep.Models.User
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Chi tiết sinh viên";
 }
-<div class="box"></div>
-<div class="box"></div>
-<center>
-    <div class="form-container">
-<h1>Details</h1>
-
-<div>
-    <h4 class="form-title">User</h4>
-            <<br />
-    <dl class="row">
-        <dt class="col-sm-3">
-            @Html.DisplayNameFor(model => model.ID)
-        </dt>
-        <dd class="col-sm-8">
-            @Html.DisplayFor(model => model.ID)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.FullName)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.FullName)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.DateOfBirth)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.DateOfBirth)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Gender)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.Gender)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.GraduationYear)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.GraduationYear)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.GPA)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.GPA)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Honors)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.Honors)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Email)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.Email)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.PhoneNumber)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.PhoneNumber)
-        </dd>
-        <dt class = "col-sm-3">
-            @Html.DisplayNameFor(model => model.Account)
-        </dt>
-        <dd class = "col-sm-8">
-            @Html.DisplayFor(model => model.Account.AccountID)
-        </dd>
-    </dl>
-</div>
-@* <div>
-    <a asp-action="Edit" asp-route-id="@Model?.ID">Edit</a> |
-    <a asp-action="Index">Back to List</a>
-</div> *@
-        <div class="form-footer">
-            @if (ViewBag.Role == "1")
-            {
-                <button type="button" class="btn_save" onclick="location.href='@Url.Action("Edit", new { id = Model?.ID })'">Chỉnh sửa</button>
-            }        
-            <button type="button" class="btn_close" onclick="location.href='@Url.Action("Index")'">Đóng</button>
-
+<div class="login-bg" style="background: #F1F3F5; min-height: 100vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="card shadow-lg border-0 rounded-4 p-4 modern-user-card">
+                    <div class="text-center mb-4">
+                        <img src="~/img/avatar-default.png" alt="Avatar" class="user-avatar mb-3" />
+                        <h2 class="fw-bold text-navy mb-1">@Model.FullName</h2>
+                        <div class="text-muted mb-2" style="font-size:16px;">Mã sinh viên: <b>@Model.ID</b></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-label">Ngày sinh:</div>
+                            <div class="detail-value">@Model.DateOfBirth.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Giới tính:</div>
+                            <div class="detail-value">
+                                @(Model.Gender == true ? "Nữ" : "Nam")
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Năm tốt nghiệp:</div>
+                            <div class="detail-value">@Model.GraduationYear</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">GPA:</div>
+                            <div class="detail-value">@Model.GPA</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Email:</div>
+                            <div class="detail-value">@Model.Email</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Số điện thoại:</div>
+                            <div class="detail-value">@Model.PhoneNumber</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="detail-label">Danh hiệu:</div>
+                            <div class="detail-value">@Model.Honors</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Quay lại</a>
+                        @if (ViewBag.Role == "0" || ViewBag.Role == "2")
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.ID" class="btn modern-btn rounded-pill px-4">Chỉnh
+                                sửa</a>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-</center>
+</div>
+
+<style>
+    .modern-user-card {
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 8px 32px rgba(34, 48, 90, 0.10);
+        animation: fadeIn 0.5s;
+    }
+
+    .user-avatar {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #f57c00;
+        background: #fff8f2;
+        box-shadow: 0 2px 8px rgba(243, 124, 0, 0.08);
+    }
+
+    .text-navy {
+        color: #22305a !important;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #888;
+        font-size: 1.05rem;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: #22305a;
+        font-size: 1.08rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .modern-btn {
+        background: linear-gradient(90deg, #f57c00 60%, #f37423 100%);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        font-size: 1.08rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 16px rgba(243, 124, 0, 0.10);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .modern-btn:hover,
+    .modern-btn:focus {
+        background: #fff;
+        color: #f57c00;
+        border: 2px solid #f57c00;
+        box-shadow: 0 2px 8px rgba(243, 124, 0, 0.12);
+    }
+
+    @@media (max-width: 900px) {
+        .modern-user-card {
+            max-width: 98vw;
+            padding: 2rem 0.5rem;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .modern-user-card {
+            padding: 0.5rem 0.1rem;
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>

@@ -5,144 +5,106 @@
     Layout = "~/Views/Shared/_AuthLayout.cshtml";
 }
 
-<div class="login-container">
-    <h1 class="form-title">Đăng nhập</h1>
-    <form asp-action="Login" method="post" class="login-form">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-user"></i>
-                <input type="text" asp-for="UserName" placeholder="Tên đăng nhập" class="form-control" />
+<div class="login-bg d-flex justify-content-center align-items-center w-100"
+    style="min-height:100vh; background: #F1F3F5;">
+    <div class="card shadow-sm border-0 rounded-4 p-4 mx-auto" style="width: 380px; background: #fff;">
+        <div class="text-center mb-4">
+            <a asp-action="Index" asp-controller="JobPosition">
+                <img src="~/img/logo.png" alt="Logo" style="height:56px;" class="mb-2" /></a>
+            <h2 class="fw-bold text-navy mb-2">Đăng nhập</h2>
+            <div class="text-muted mb-2" style="font-size:15px;">Chào mừng bạn quay lại hệ thống</div>
+        </div>
+        <form asp-action="Login" method="post" class="login-form">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-2"></div>
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-user text-navy"></i></span>
+                    <input type="text" asp-for="UserName" placeholder="Tên đăng nhập"
+                        class="form-control border-start-0 rounded-end" autocomplete="username" />
+                </div>
+                <span asp-validation-for="UserName" class="text-danger small"></span>
             </div>
-            <span asp-validation-for="UserName" class="text-danger"></span>
-        </div>
-
-        <div class="form-group">
-            <div class="input-group">
-                <i class="fas fa-lock"></i>
-                <input type="password" asp-for="Password" placeholder="••••••" class="form-control" />
+            <div class="mb-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-white border-end-0"><i class="fas fa-lock text-navy"></i></span>
+                    <input type="password" asp-for="Password" placeholder="Mật khẩu"
+                        class="form-control border-start-0 rounded-end" autocomplete="current-password" />
+                </div>
+                <span asp-validation-for="Password" class="text-danger small"></span>
             </div>
-            <span asp-validation-for="Password" class="text-danger"></span>
-        </div>
-
-        <div class="form-options">
-            <label class="remember-me">
-                <input type="checkbox" name="remember"> Remember me
-            </label>
-            <a href="#" class="forgot-password">Forgot Password?</a>
-        </div>
-
-        <button type="submit" class="login-button">Đăng nhập</button>
-        
-    </form>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <label class="form-check-label text-muted">
+                    <input type="checkbox" name="remember" class="form-check-input me-1" /> Ghi nhớ đăng nhập
+                </label>
+                <a asp-action="ForgotPassword" class="text-navy small" style="text-decoration:none;">Quên mật khẩu?</a>
+            </div>
+            <button type="submit" class="btn modern-btn w-100 py-2 fs-5">Đăng nhập</button>
+        </form>
+    </div>
 </div>
 
-<style>
-.login-container {
-    max-width: 400px;
-    margin: 50px auto;
-    padding: 40px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
+@* <style>
+    /* Đảm bảo cha chiếm toàn bộ chiều rộng */
+    .login-bg {
+        width: 100vw;
+        min-height: 100vh;
+        background: #F1F3F5;
+    }
 
-.form-title {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #333;
-    font-size: 2em;
-}
+    .login-form .input-group-text {
+        border-radius: 8px 0 0 8px;
+        border: 1.5px solid #e9ecef;
+        border-right: 0;
+        background: #fff;
+        color: #22305a;
+        font-size: 1.1rem;
+    }
 
-.form-group {
-    margin-bottom: 20px;
-}
+    .login-form .form-control {
+        border-radius: 0 8px 8px 0;
+        border: 1.5px solid #e9ecef;
+        border-left: 0;
+        font-size: 1.1rem;
+        background: #f8f9fa;
+        color: #22305a;
+        font-weight: 500;
+        box-shadow: none;
+    }
 
-.input-group {
-    position: relative;
-    margin-bottom: 10px;
-}
+    .login-form .form-control:focus {
+        border-color: #f57c00;
+        background: #fff;
+        box-shadow: 0 0 0 0.15rem #f57c0033;
+    }
 
-.input-group i {
-    position: absolute;
-    left: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #666;
-}
+    .btn-apply-now {
+        background: #f57c00;
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        border-radius: 8px;
+        transition: background 0.2s, color 0.2s;
+    }
 
-.form-control {
-    width: 100%;
-    padding: 12px 40px;
-    border: none;
-    border-bottom: 2px solid #ddd;
-    background: transparent;
-    transition: all 0.3s ease;
-    font-size: 16px;
-}
+    .btn-apply-now:hover,
+    .btn-apply-now:focus {
+        background: #fff;
+        color: #f57c00;
+        border: 1.5px solid #f57c00;
+    }
 
-.form-control:focus {
-    border-color: #;
-    outline: none;
-}
+    .card {
+        border-radius: 18px;
+        box-shadow: 0 8px 32px rgba(34, 48, 90, 0.08);
+    }
 
-.form-options {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 20px 0;
-}
-
-.remember-me {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    color: #666;
-}
-
-.forgot-password {
-    color: #666;
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.forgot-password:hover {
-    color: #ff6b35;
-}
-
-.login-button {
-    width: 100%;
-    padding: 12px;
-    background: #ff6b35;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
-
-.login-button:hover {
-    background: #ff6b35;
-}
-
-body {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('@Url.Content("~/img/background.jpg")');
-    background-size: cover;
-    background-position: center;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-</style>
+    .text-navy {
+        color: #22305a !important;
+    }
+</style> *@
 
 @section Scripts {
-    <script src="https://kit.fontawesome.com/your-code.js" crossorigin="anonymous"></script>
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
-
-

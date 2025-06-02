@@ -23,14 +23,42 @@ namespace QuanLyDoanhNghiep.Controllers
         }
 
         // GET: User
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int page = 1, string search = "")
         {
-            await _syncDataService.SyncDataAsync();
+            if (!IsLogin || RoleUser != "0") // Kiểm tra quyền (RoleUser = 0 `là quản trị viên)
+            {
+                return RedirectToAction("Login", "Account");
+            }
+            int pageSize = 30;
+            var studentsQuery = _context.User
+                .Include(u => u.Account)
+                .Where(u => u.Account.Role == 2);
 
-            var quanLyDoanhNghiepDBContext = _context.User.Include(u => u.Account);
-            return View(await quanLyDoanhNghiepDBContext.ToListAsync());
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                studentsQuery = studentsQuery.Where(u =>
+                    u.FullName.Contains(search) ||
+                    u.ID.Contains(search) ||
+                    u.Email.Contains(search) ||
+                    u.PhoneNumber.Contains(search)
+                );
+            }
 
+            studentsQuery = studentsQuery.OrderBy(u => u.FullName);
+
+            int totalStudents = await studentsQuery.CountAsync();
+            var students = await studentsQuery
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalStudents / pageSize);
+            ViewBag.Search = search;
+
+            return View(students);
         }
+
 
         // GET: User/Details/5
         public async Task<IActionResult> Details(string id)
@@ -169,9 +197,9 @@ namespace QuanLyDoanhNghiep.Controllers
                 return RedirectToAction("Login", "Account");
             }
 
-           
+
             var user = await _context.User
-                .Include (u => u.Account)
+                .Include(u => u.Account)
                 .FirstOrDefaultAsync(u => u.AccountID.ToString().Equals(CurrentID));
 
             if (user == null)

@@ -8,9 +8,6 @@ namespace QuanLyDoanhNghiep.Models
     {
         [Key]
         public int NotificationID { get; set; }
-
-       
-
         [Required]
         [StringLength(500)]
         public string Message { get; set; }

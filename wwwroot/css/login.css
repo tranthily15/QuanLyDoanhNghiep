@@ -6,8 +6,15 @@
     padding: 0;
 }
 
+html,
 body {
-    background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/background.jpg');
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+body {
     background-size: cover;
     background-position: center;
     display: flex;
@@ -216,6 +223,107 @@ select.form-control {
     color: #f9a65f;
 }
 
+.login-bg {
+    min-height: 100vh;
+    min-width: 100vw;
+    width: 100vw;
+    height: 100vh;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    background: #F1F3F5;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+}
+
+/* Sửa lỗi icon bị che trong input-group */
+.input-group .input-group-text {
+    border-radius: 8px 0 0 8px;
+    border: 1.5px solid #e9ecef;
+    border-right: 0;
+    background: #fff;
+    color: #22305a;
+    font-size: 1.3rem;
+    min-width: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0;
+}
+
+.input-group .form-control {
+    border-radius: 0 8px 8px 0;
+    border: 1.5px solid #e9ecef;
+    border-left: 0;
+    font-size: 1.1rem;
+    background: #f8f9fa;
+    color: #22305a;
+    font-weight: 500;
+    box-shadow: none;
+    height: 48px;
+    padding-left: 16px;
+    padding-right: 16px;
+    display: block;
+}
+
+/* Đảm bảo icon không bị che khi nhập */
+.input-group {
+    align-items: stretch;
+}
+
+/* Căn giữa chữ trong nút đăng nhập */
+/* .btn-apply-now {
+    background: #f57c00;
+    color: #fff;
+    border: none;
+    font-weight: 700;
+    border-radius: 8px;
+    transition: background 0.2s, color 0.2s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    letter-spacing: 1px;
+}
+
+.btn-apply-now:hover,
+.btn-apply-now:focus {
+    background: #fff;
+    color: #f57c00;
+    border: 1.5px solid #f57c00;
+}
+
+.btn-apply-now:active {
+    background: #f57c00;
+    color: #fff;
+} */
+.modern-btn {
+    background: linear-gradient(90deg, #f57c00 60%, #f37423 100%);
+    color: #fff;
+    border: none;
+    font-weight: 800;
+    border-radius: 12px;
+    font-size: 1.15rem;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 16px rgba(243, 124, 0, 0.10);
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modern-btn:hover,
+.modern-btn:focus {
+    background: #fff;
+    color: #f57c00;
+    border: 2px solid #f57c00;
+    box-shadow: 0 2px 8px rgba(243, 124, 0, 0.12);
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .login-container {
@@ -292,22 +400,7 @@ footer a {
     color: #3c97bf;
     text-decoration: none;
 }
-/* nút  submit*/
-.btn-apply-now {
-    background-color: #ff6b35;
-    color: white;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.3s ease;
-}
 
-    .btn-apply-now:hover {
-        background-color: #ff6b35; /* vẫn giữ màu nền */
-        color: white; /* đảm bảo chữ vẫn màu trắng */
-        transform: translateY(-2px);
-    }
+.text-navy {
+    color: #22305a !important;
+}

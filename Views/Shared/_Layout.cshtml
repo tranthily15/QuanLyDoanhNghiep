@@ -1,5 +1,5 @@
 ﻿<!DOCTYPE html>
-<html lang="en" style="height: 70px">
+<html lang="en">
 
 <head>
     <meta charset="utf-8" />
@@ -11,167 +11,166 @@
     <link rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @if (ViewData["CSS"] != null)
     {
         <link rel="stylesheet" href="@ViewData["CSS"]" />
     }
-    <link rel="stylesheet" href="~/QuanLyDoanhNghiep.styles.css" asp-append-version="true" />
-
-    <style>
-        header .navbar {
-            background-color: #f37423 !important;
-            height: 70px;
-        }
-
-        .navbar-brand img {
-            width: 60px;
-            height: 60px;
-        }
-
-        .navbar-nav .nav-link {
-            color: white !important;
-            font-weight: 500;
-        }
-
-        .dropdown-menu {
-            min-width: 200px;
-        }
-
-        .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 18px;
-            text-align: center;
-            background-color: #e41e3f;
-            color: white;
-            border-radius: 9px;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transform: scale(1);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        .notification-badge.animate {
-            animation: notification-badge-pulse 0.5s ease-in-out;
-        }
-
-        @@keyframes notification-badge-pulse {
-            0% {
-                transform: scale(1);
-            }
-
-            50% {
-                transform: scale(1.2);
-            }
-
-            100% {
-                transform: scale(1);
-            }
-        }
-
-        #notificationCount {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            min-width: 18px;
-            height: 18px;
-            padding: 0 5px;
-            font-size: 11px;
-            font-weight: 600;
-            line-height: 18px;
-            text-align: center;
-            background-color: #e41e3f;
-            color: white;
-            border-radius: 9px;
-            border: 2px solid #fff;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transform: scale(1);
-            transition: transform 0.2s ease-in-out;
-        }
-
-        #notificationCount.animate {
-            animation: notification-badge-pulse 0.5s ease-in-out;
-        }
-    </style>
     @RenderSection("Styles", required: false)
 </head>
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-lg navbar-light border-bottom shadow-sm">
-            <div class="container-fluid d-flex justify-content-between">
+        <nav class="navbar navbar-expand-lg glass-nav fixed-top py-2">
+            <div class="container">
                 <!-- Logo và Trang chủ bên trái -->
-                <div class="d-flex align-items-center">
-                    <a class="navbar-brand me-3" asp-area="" asp-controller="JobPosition" asp-action="Index">
-                        <img src="~/img/logo.png" alt="Logo">
-                    </a>
-                    <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="Index">
-                        <i class="bi bi-house-door text-light"></i> Trang chủ
-                    </a>
-                </div>
+                <a class="navbar-brand fw-bold d-flex align-items-center me-4" asp-area="" asp-controller="JobPosition"
+                    asp-action="Index">
+                    <img src="~/img/logo.png" alt="Logo" width="44"
+                        class="rounded-circle me-2 border border-2 shadow-sm" />
+                    <span class="fs-4" style="color:#22305a;">FitJob</span>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-end" id="mainNav">
+                    <ul class="navbar-nav align-items-center gap-2">
 
-                <!-- Các mục còn lại bên phải -->
-                <div>
-                    <ul class="navbar-nav flex-row gap-3">
                         @if (ViewBag.IsLogin == true)
                         {
-                            @if (ViewBag.Role == "0") // Admin
+                            if (ViewBag.Role == "0") // Admin
                             {
-                                <a class="nav-link text-light" asp-area="" asp-controller="Dashboard" asp-action="Index">
-                                    <i class="fas fa-chart-bar text-light"></i> Dashboard
-                                </a>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded dropdown-toggle"
+                                        href="#" id="studentDropdown" role="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Quản lý sinh viên
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="studentDropdown">
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Dashboard"
+                                                asp-action="StudentMonthlyStats">
+                                                <i class="bi bi-bar-chart-fill me-1"></i> Thống kê theo tháng
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Dashboard"
+                                                asp-action="StudentYearlyStats">
+                                                <i class="bi bi-bar-chart-fill me-1"></i> Thống kê theo năm
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Index">
+                                                <i class="bi bi-people-fill me-1"></i> Danh sách sinh viên
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded dropdown-toggle"
+                                        href="#" id="companyDropdown" role="button" data-bs-toggle="dropdown"
+                                        aria-expanded="false">
+                                        Quản lý công ty
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="companyDropdown">
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Dashboard"
+                                                asp-action="CompanyMonthlyStats">
+                                                <i class="bi bi-bar-chart-fill me-1"></i> Thống kê theo tháng
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Dashboard"
+                                                asp-action="CompanyYearlyStats">
+                                                <i class="bi bi-bar-chart-fill me-1"></i> Thống kê theo năm
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Company" asp-action="Index">
+                                                <i class="bi bi-building me-1"></i> Danh sách doanh nghiệp
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="Dashboard" asp-action="Index">
+                                        Dashboard
+                                    </a>
+                                </li>
                             }
                             else if (ViewBag.Role == "1") // Employee
                             {
-                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="Create">
-                                    <i class="fas fa-file-alt text-light"></i> Đăng tin tuyển
-                                </a>
-                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="ActiveJobs">
-                                    <i class="fas fa-briefcase text-light"></i> Tin tuyển dụng
-                                </a>
-                                @* <a class="nav-link text-light" asp-area="" asp-controller="CV" asp-action="Index">
-                                    <i class="fas fa-file-alt text-light"></i> CV
-                                </a> *@
-                                <a class="nav-link text-light" asp-area="" asp-controller="Dashboard"
-                                    asp-action="Index_Employee">
-                                    <i class="fas fa-chart-bar text-light"></i> Thống kê
-                                </a>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="JobPosition" asp-action="Create">
+                                        Đăng tin tuyển
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="JobPosition" asp-action="ActiveJobs">
+                                        Tin tuyển dụng
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="Dashboard" asp-action="Index_Employee">
+                                        Thống kê
+                                    </a>
+                                </li>
                             }
                             else if (ViewBag.Role == "2") // Student
                             {
-                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="Index">
-                                    <i class="fas fa-search text-light"></i> Tìm việc
-                                </a>
-                                <a class="nav-link text-light" asp-area="" asp-controller="JobPosition" asp-action="SavedJobs">
-                                    <i class="fas fa-heart text-light"></i> Việc làm đã lưu
-                                </a>
-                                <a class="nav-link text-light" asp-area="" asp-controller="CV" asp-action="Index">
-                                    <i class="fas fa-file-alt text-light"></i> CV của tôi
-                                </a>
-                                <a class="nav-link text-light" asp-area="" asp-controller="Dashboard"
-                                    asp-action="Index_Student">
-                                    <i class="fas fa-chart-bar text-light"></i> Thống kê
-                                </a>
-
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="JobPosition" asp-action="Index">
+                                        Tìm việc
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="JobPosition" asp-action="SavedJobs">
+                                        Việc làm đã lưu
+                                    </a>
+                                </li>
+                                <!-- Dropdown cho CV -->
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded dropdown-toggle"
+                                        href="#" id="cvDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        CV của tôi
+                                    </a>
+                                    <ul class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="cvDropdown">
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="Index" asp-controller="CV" asp-action="Index">
+                                                <i class="bi bi-file-earmark-person me-1"></i> Vị trí đã ứng tuyển
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="CV"
+                                                asp-action="SuggestHistory">
+                                                <i class="bi bi-lightbulb me-1"></i> Gợi ý CV
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                        asp-controller="Dashboard" asp-action="Index_Student">
+                                        Thống kê
+                                    </a>
+                                </li>
                             }
-                            <div class="dropdown nav-item mx-1 position-relative">
-                                <a class="nav-link position-relative dropdown-toggle" href="#" id="notificationDropdown"
+                            <!-- Thông báo -->
+                            <li class="nav-item dropdown mx-1 position-relative">
+                                <a class="nav-link position-relative px-3 rounded" href="#" id="notificationDropdown"
                                     role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="fas fa-bell fa-fw fs-5"></i>
-                                    <span id="notificationCount" class="notification-badge" style="display: none;">0</span>
+                                    <i class="bi bi-bell-fill fs-5"></i>
+                                    <span id="notificationCount"
+                                        class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                                        style="font-size:0.7rem;display:none;">0</span>
                                 </a>
                                 <div class="dropdown-menu dropdown-menu-end notification-dropdown"
                                     aria-labelledby="notificationDropdown" style="width: 360px;"
@@ -189,58 +188,80 @@
                                         <a href="#" class="text-decoration-none"></a>
                                     </div>
                                 </div>
-                            </div>
-                        }
-                        @if (ViewBag.IsLogin == true)
-                        {
-                            <div class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
-                                    data-bs-toggle="dropdown" aria-expanded="false">
-                                    <i class="bi bi-person-circle"></i> @(ViewBag.IsLogin == true ? ViewBag.CurrentUser :
-                                                                    "Tài khoản")
-                            </a>
-                            <div class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="userDropdown">
-                                @if (ViewBag.Role == "1")
+                            </li>
+                            <!-- User dropdown -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle d-flex align-items-center px-3 rounded" href="#"
+                                    id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <i class="bi bi-person-circle fs-5 me-1"></i>
+                                    <span>@(ViewBag.CurrentUser ?? "Tài khoản")</span>
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end fade-up" aria-labelledby="userDropdown">
+                                    @if (ViewBag.Role == "1")
                                     {
-                                        <a class="dropdown-item" asp-area="" asp-controller="Company" asp-action="Details"
-                                            asp-route-id="@ViewBag.CurrentCompanyID">
-                                            <i class="bi bi-person-square"></i> Thông tin công ty
-                                        </a>
-                                        <a class="dropdown-item" asp-area="" asp-controller="Employee"
-                                            asp-action="CompanyEmployees">
-                                            <i class="bi bi-building"></i> Nhân viên của công ty
-                                        </a>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Company" asp-action="Details"
+                                                asp-route-id="@ViewBag.CurrentCompanyID">
+                                                <i class="bi bi-person-square"></i> Thông tin công ty
+                                            </a>
+                                        </li>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="Employee"
+                                                asp-action="CompanyEmployees">
+                                                <i class="bi bi-building"></i> Nhân viên của công ty
+                                            </a>
+                                        </li>
                                     }
                                     else if (ViewBag.Role == "2")
                                     {
-                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Profile">
-                                            <i class="bi bi-person-square"></i> Thông tin cá nhân
-                                        </a>
+                                        <li class="mb-2">
+                                            <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Profile">
+                                                <i class="bi bi-person-square"></i> Thông tin cá nhân
+                                            </a>
+                                        </li>
                                     }
-                                    <a class="dropdown-item" asp-area="" asp-controller="Account"
-                                        asp-action="ChangePassword">
-                                        <i class="bi bi-key"></i> Đổi mật khẩu
-                                    </a>
-                                    <a class="dropdown-item" asp-area="" asp-controller="Account" asp-action="Logout">
-                                        <i class="bi bi-box-arrow-right"></i> Đăng xuất
-                                    </a>
-                                </div>
-                            </div>
+                                    <li class="mb-2">
+                                        <a class="dropdown-item" asp-area="" asp-controller="Account"
+                                            asp-action="ChangePassword">
+                                            <i class="bi bi-key"></i> Đổi mật khẩu
+                                        </a>
+                                    </li>
+                                    <li class="mb-2">
+                                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post"
+                                            class="d-inline">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i> Đăng xuất
+                                            </button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
                         }
-                        @if (ViewBag.IsLogin != true) // Show if not logged in
+                        else
                         {
-                            <a class="nav-link text-light" asp-area="" asp-controller="Account" asp-action="Login">
-                                <i class="bi bi-box-arrow-in-right"></i> Đăng nhập
-                            </a>
-                            <a class="nav-link text-light" asp-area="" asp-controller="Company" asp-action="Create">
-                                <i class="bi bi-building"></i> Dành cho doanh nghiệp
-                            </a>
+                            <li class="nav-item">
+                                <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                    asp-controller="JobPosition" asp-action="Index">
+                                    Việc làm
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link fw-semibold d-flex align-items-center px-3 rounded" asp-area=""
+                                    asp-controller="Company" asp-action="Create">
+                                    @* <i class="bi bi-building fs-5 me-1 text-warning"></i> *@ Dành cho doanh nghiệp
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="btn btn-warning fw-bold px-3 ms-2" asp-area="" asp-controller="Account"
+                                    asp-action="Login">Đăng nhập</a>
+                            </li>
                         }
                     </ul>
                 </div>
             </div>
         </nav>
     </header>
+    <div style="height:64px"></div>
 
     <div class="container-fluid">
         <main role="main" class="pb-3">
@@ -251,7 +272,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             }
-            @if (TempData["ErrorMessage"] != null) // Optional: Add for error messages too
+            @if (TempData["ErrorMessage"] != null)
             {
                 <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
                     <i class="fas fa-exclamation-triangle me-2"></i> @TempData["ErrorMessage"]
@@ -266,8 +287,6 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
-
-
     <script>
         $(document).ready(function () {
             var notificationSkip = 0;
@@ -276,34 +295,34 @@
 
             function renderNotificationItem(notification) {
                 return `
-        <div class="notification-item${notification.isRead ? '' : ' unread'}" data-id="${notification.notificationID}" data-path="${notification.notificationPath || ''}">
-            <div class="d-flex align-items-start">
-                <div class="notification-icon me-2">
-                    <i class="fas fa-bell"></i>
-                </div>
-                <div class="flex-grow-1">
-                    <div class="notification-text">${notification.message}</div>
-                    <div class="notification-meta">
-                        <small class="text-muted">
-                            <i class="far fa-clock me-1"></i>
-                            ${new Date(notification.createdAt).toLocaleString('vi-VN', {
+                <div class="notification-item${notification.isRead ? '' : ' unread'}" data-id="${notification.notificationID}" data-path="${notification.notificationPath || ''}">
+                    <div class="d-flex align-items-start">
+                        <div class="notification-icon me-2">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="notification-text">${notification.message}</div>
+                            <div class="notification-meta">
+                                <small class="text-muted">
+                                    <i class="far fa-clock me-1"></i>
+                                    ${new Date(notification.createdAt).toLocaleString('vi-VN', {
                     hour: '2-digit',
                     minute: '2-digit',
                     day: '2-digit',
                     month: '2-digit',
                     year: 'numeric'
                 })}
-                        </small>
+                                </small>
+                            </div>
+                        </div>
+                        <form class="m-0 p-0">
+                            <button type="button" class="btn btn-link btn-sm text-danger p-0 ms-2 delete-notification" title="Xóa thông báo">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <form class="m-0 p-0">
-                    <button type="button" class="btn btn-link btn-sm text-danger p-0 ms-2 delete-notification" title="Xóa thông báo">
-                        <i class="fas fa-trash-alt"></i>
-                    </button>
-                </form>
-            </div>
-        </div>
-    `;
+            `;
             }
 
             // Khi mở dropdown thì load lại toàn bộ danh sách
@@ -319,11 +338,11 @@
                 $.get('/Notification/GetAllNotifications', function (data) {
                     if (!data.notifications || data.notifications.length === 0) {
                         $list.html(`
-                <div class="text-center py-3">
-                    <i class="fas fa-bell-slash text-muted mb-2"></i>
-                    <p class="text-muted mb-0">Không có thông báo</p>
-                </div>
-            `);
+                        <div class="text-center py-3">
+                            <i class="fas fa-bell-slash text-muted mb-2"></i>
+                            <p class="text-muted mb-0">Không có thông báo</p>
+                        </div>
+                    `);
                         return;
                     }
                     data.notifications.forEach(function (notification) {
@@ -415,85 +434,6 @@
             }
         });
     </script>
-
-    <style>
-        .notification-dropdown {
-            padding: 0;
-        }
-
-        .notification-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            padding: 0.75rem 1rem;
-            border-bottom: 1px solid #e9ecef;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-item:hover {
-            background-color: #f8f9fa;
-        }
-
-        .notification-item.unread {
-            background-color: #f1f8ff;
-        }
-
-        .notification-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #e4e6eb;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .notification-icon i {
-            font-size: 14px;
-            color: #1877f2;
-        }
-
-        .notification-text {
-            font-size: 13px;
-            line-height: 1.4;
-            margin-bottom: 2px;
-        }
-
-        .notification-meta {
-            font-size: 11px;
-        }
-
-        .dropdown-header {
-            padding: 0.75rem 1rem;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            border-radius: 0.5rem;
-        }
-
-        .dropdown-footer {
-            background-color: #f8f9fa;
-        }
-
-        .dropdown-footer a {
-            color: #1877f2;
-            font-size: 13px;
-        }
-
-        .dropdown-footer a:hover {
-            text-decoration: underline !important;
-        }
-    </style>
-
-    @* <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> *@
-
 </body>
 
 </html>

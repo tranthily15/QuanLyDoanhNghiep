@@ -4,33 +4,75 @@
     ViewData["Title"] = "Trang chủ";
 }
 
-<div class="single-image-container bg-white mt-20">
-    <img src="~/img/anhindex.jpg"
-         alt="Thông tin việc làm"
-         style="width: 100%; height: 100%;">
+@* <nav class="navbar navbar-expand-lg glass-nav fixed-top py-2">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-white" href="#">
+            <img src="~/img/logo.png" alt="Logo" width="40" class="rounded-circle me-2" /> Việc Làm CNTT
+        </a>
+        <button class="navbar-toggler bg-white" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="mainNav">
+            <ul class="navbar-nav ms-auto align-items-center gap-2">
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#"><i class="bi bi-briefcase"></i> Việc làm</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white fw-semibold" href="#"><i class="bi bi-building"></i> Dành cho doanh
+                        nghiệp</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle text-white" href="#" id="langDropdown" role="button"
+                        data-bs-toggle="dropdown">
+                        <i class="bi bi-globe"></i> VN
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="#">VN</a></li>
+                        <li><a class="dropdown-item" href="#">EN</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-white rounded-circle bg-white bg-opacity-10 px-2" href="#"><i
+                            class="bi bi-person-circle fs-4"></i></a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-warning fw-bold px-3 ms-2" href="#">Đăng nhập</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div style="height:64px"></div> *@ <!-- Để tránh che nội dung bởi navbar -->
+
+<div class="hero-section position-relative mb-4">
+    <img src="~/img/anhindex.jpg" alt="Thông tin việc làm" class="w-100 hero-img" />
+    <div
+        class="hero-overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center">
+        <h1 class="display-5 fw-bold text-white mb-3 text-shadow">Tìm việc làm phù hợp với bạn</h1>
+        <p class="lead text-white text-shadow">Khám phá hàng trăm cơ hội việc làm và thực tập hấp dẫn</p>
+    </div>
 </div>
 
 <div class="container py-4">
-    <div class="search-container bg-white rounded-4 shadow-sm p-4 mb-4">
+    <div class="search-container glass-card rounded-4 shadow-sm p-4 mb-4">
         <form id="searchForm" class="row g-3 align-items-end" method="get" action="@Url.Action("Index", "JobPosition")">
-            <div class="col-md-6">
-                <label for="keyword" class="form-label text-muted mb-2">
+            <div class="col-md-7">
+                @* <label for="keyword" class="form-label text-muted mb-2">
                     <i class="bi bi-search me-1"></i>Tìm kiếm
-                </label>
+                </label> *@
                 <div class="input-group">
                     <span class="input-group-text bg-white border-end-0 rounded-start-3">
-                        <i class="bi bi-briefcase text-muted"></i>
+                        <i class="bi bi-search me-1"></i>
                     </span>
                     <input type="text" id="keyword" name="keyword" class="form-control border-start-0 rounded-end-3"
-                           placeholder="Nhập vị trí công việc, kỹ năng hoặc tên công ty..."
-                           value="@Model.Keyword">
+                        placeholder="Nhập vị trí công việc, kỹ năng hoặc tên công ty..." value="@Model.Keyword">
                 </div>
             </div>
-            <div class="col-md-5">
-                <label for="provinceFilter" class="form-label text-muted mb-2">
-                    <i class="bi bi-geo-alt me-1"></i>Địa điểm
-                </label>
+            <div class="col-md-4">
                 <select id="provinceFilter" name="provinces" class="form-select rounded-3">
+                    @* <span class="input-group-text bg-white border-end-0 rounded-start-3">
+                        <i class="bi bi-geo-alt me-1"></i>
+                    </span> *@
                     <option value="">Tất cả địa điểm</option>
                     @foreach (var p in ViewBag.Provinces)
                     {
@@ -39,8 +81,9 @@
                 </select>
             </div>
             <div class="col-md-1">
-                <button class="btn search-btn w-100" id="searchButton"><i class="bi bi-search"></i> </button>
-
+                <button class="btn btn-warning fw-bold px-3 ms-2 rounded-3" id="searchButton" type="submit">
+                    <i class="bi bi-search fs-5 me-1"></i>
+                </button>
             </div>
         </form>
     </div>
@@ -54,17 +97,22 @@
                     @foreach (var job in Model.FullTimeJobs)
                     {
                         <div class="col">
-                            <a asp-action="Details" asp-route-id="@job.PositionID" class="text-decoration-none text-dark position-relative">
+                            <a asp-action="Details" asp-route-id="@job.PositionID"
+                                class="text-decoration-none text-dark position-relative">
                                 <div class="card job-card shadow-sm p-4 d-flex flex-row align-items-center">
-                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
-                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0"
+                                        style="width:70px; height:70px;">
+                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName"
+                                            style="width:100%; height:100%; object-fit:contain; display:block;">
                                     </div>
                                     <div class="ms-3 flex-grow-1 overflow-hidden">
-                                        <h6 class="fw-bold mb-2 position-name text-truncate" title="@job.PositionName" data-bs-toggle="tooltip">@job.PositionName</h6>
-                                        <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
+                                        <h6 class="fw-bold mb-3 position-name text-truncate" title="@job.PositionName"
+                                            data-bs-toggle="tooltip">@job.PositionName</h6>
+                                        <p class="text-muted mb-3 small text-truncate">@job.Company?.CompanyName</p>
                                         <div class="d-flex flex-wrap gap-2">
                                             <span class="badge bg-secondary">@job.Salary</span>
-                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i>
+                                                @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
                                         </div>
                                     </div>
                                 </div>
@@ -74,24 +122,36 @@
                 }
                 else
                 {
-                    <div class="col-12"><div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div></div>
+                    <div class="col-12">
+                        <div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div>
+                    </div>
                 }
             </div>
             @if (Model.TotalFullTimePages > 1)
             {
-                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage - 1, internshipPage = Model.InternshipPage })"
-                       class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == 1 ? "disabled" : "")">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
-                    <span class="text-muted">
-                        <strong>@Model.FullTimePage</strong> / @Model.TotalFullTimePages trang
-                    </span>
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage + 1, internshipPage = Model.InternshipPage })"
-                       class="btn btn-outline-primary rounded-circle @(Model.FullTimePage == Model.TotalFullTimePages ? "disabled" : "")">
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+                <nav>
+                    <ul class="pagination justify-content-center mt-4">
+                        <li class="page-item @(Model.FullTimePage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage - 1, internshipPage = Model.InternshipPage })">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalFullTimePages; i++)
+                        {
+                            <li class="page-item @(Model.FullTimePage == i ? "active" : "")">
+                                <a class="page-link"
+                                    href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = i, internshipPage = Model.InternshipPage })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.FullTimePage == Model.TotalFullTimePages ? "disabled" : "")">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), fulltimePage = Model.FullTimePage + 1, internshipPage = Model.InternshipPage })">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             }
         </div>
 
@@ -103,17 +163,22 @@
                     @foreach (var job in Model.Internships)
                     {
                         <div class="col">
-                            <a asp-action="Details" asp-route-id="@job.PositionID" class="text-decoration-none text-dark position-relative">
+                            <a asp-action="Details" asp-route-id="@job.PositionID"
+                                class="text-decoration-none text-dark position-relative">
                                 <div class="card job-card shadow-sm p-4 d-flex flex-row align-items-center">
-                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0" style="width:70px; height:70px;">
-                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName" style="width:100%; height:100%; object-fit:contain; display:block;">
+                                    <div class="d-flex justify-content-center align-items-center border rounded overflow-hidden bg-white flex-shrink-0"
+                                        style="width:70px; height:70px;">
+                                        <img src="~/img/CompanyLogo/@job.Company?.CompanyLogo" alt="@job.Company?.CompanyName"
+                                            style="width:100%; height:100%; object-fit:contain; display:block;">
                                     </div>
                                     <div class="ms-3 flex-grow-1 overflow-hidden">
-                                        <h6 class="fw-bold mb-2 position-name text-truncate" title="@job.PositionName" data-bs-toggle="tooltip">@job.PositionName</h6>
-                                        <p class="text-muted mb-2 small text-truncate">@job.Company?.CompanyName</p>
+                                        <h6 class="fw-bold mb-3 position-name text-truncate" title="@job.PositionName"
+                                            data-bs-toggle="tooltip">@job.PositionName</h6>
+                                        <p class="text-muted mb-3 small text-truncate">@job.Company?.CompanyName</p>
                                         <div class="d-flex flex-wrap gap-2">
                                             <span class="badge bg-secondary">@job.Salary</span>
-                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i> @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
+                                            <span class="badge bg-light text-dark"><i class="bi bi-geo-alt"></i>
+                                                @(job.JobLocations?.FirstOrDefault()?.Province?.ProvinceName ?? "")</span>
                                         </div>
                                     </div>
                                 </div>
@@ -123,122 +188,173 @@
                 }
                 else
                 {
-                    <div class="col-12"><div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div></div>
+                    <div class="col-12">
+                        <div class="alert alert-info">Không tìm thấy việc làm phù hợp.</div>
+                    </div>
                 }
             </div>
             @if (Model.TotalInternshipPages > 1)
             {
-                <div class="d-flex justify-content-center align-items-center gap-3 mt-4">
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage - 1, fulltimePage = Model.FullTimePage })"
-                       class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == 1 ? "disabled" : "")">
-                        <i class="bi bi-chevron-left"></i>
-                    </a>
-                    <span class="text-muted">
-                        <strong>@Model.InternshipPage</strong> / @Model.TotalInternshipPages trang
-                    </span>
-                    <a href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage + 1, fulltimePage = Model.FullTimePage })"
-                       class="btn btn-outline-primary rounded-circle @(Model.InternshipPage == Model.TotalInternshipPages ? "disabled" : "")">
-                        <i class="bi bi-chevron-right"></i>
-                    </a>
-                </div>
+                <nav>
+                    <ul class="pagination justify-content-center mt-4">
+                        <li class="page-item @(Model.InternshipPage == 1 ? "disabled" : "")">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage - 1, fulltimePage = Model.FullTimePage })">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        @for (int i = 1; i <= Model.TotalInternshipPages; i++)
+                        {
+                            <li class="page-item @(Model.InternshipPage == i ? "active" : "")">
+                                <a class="page-link"
+                                    href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = i, fulltimePage = Model.FullTimePage })">@i</a>
+                            </li>
+                        }
+                        <li class="page-item @(Model.InternshipPage == Model.TotalInternshipPages ? "disabled" : "")">
+                            <a class="page-link"
+                                href="@Url.Action("Index", new { keyword = Model.Keyword, provinces = string.Join(",", Model.SelectedProvinces), internshipPage = Model.InternshipPage + 1, fulltimePage = Model.FullTimePage })">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
             }
         </div>
     </div>
 </div>
-<footer>
-    <div class="footer">
-        <div class="footer-content">
-            <div class="footer-column">
-                <h3>THÔNG TIN LIÊN HỆ</h3>
-                <p>Trung tâm "Việc làm và thực tập sinh viên khoa Công Nghệ Thông Tin</p>
-                <p>Địa điểm: Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà Nội, Hanoi, Vietnam</p>
-                <p>Điện thoại: 096 159 55 99</p>
-                <p>Địa chỉ email: khoa.cntt@dainam.edu.vn</p>
+<footer class="footer mt-5 pt-4 pb-2">
+    <div class="container">
+        <div class="row gy-4 align-items-center">
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-info-circle-fill me-2 "></i>THÔNG TIN LIÊN HỆ</h5>
+                <p class="mb-2">Trung tâm "Việc làm và thực tập sinh viên khoa CNTT"</p>
+                <p class="mb-2"><i class="bi bi-geo-alt-fill me-2 "></i> Số 1 Phố Xốm, Phú Lãm, Hà Đông, Hà
+                    Nội
+                </p>
+                <p class="mb-2"><i class="bi bi-telephone-fill me-2 "></i> 096 159 55 99</p>
+                <p class="mb-0"><i class="bi bi-envelope-fill me-2"></i> khoa.cntt@dainam.edu.vn</p>
             </div>
-            <div class="footer-column">
-                <h3>LIÊN KẾT</h3>
-                <a href="#" class="footer-link">Việc làm</a>
-                <a href="#" class="footer-link">Thực tập</a>
-                <a href="#" class="footer-link">Gợi ý việc làm</a>
-                <a href="#" class="footer-link">CV</a>
+            <div class="col-md-4 mb-3 mb-md-0">
+                <h5 class="mb-3"><i class="bi bi-link-45deg me-2"></i>LIÊN KẾT</h5>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-briefcase-fill me-2"></i>Việc làm</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-mortarboard-fill me-2"></i>Thực tập</a>
+                <a href="#" class="footer-link d-block mb-2"><i class="bi bi-lightbulb-fill me-2"></i>Gợi ý việc làm</a>
+                <a href="#" class="footer-link d-block"><i class="bi bi-file-earmark-person-fill me-2"></i>CV</a>
             </div>
-            <div class="footer-column">
-                <h3>MẠNG XÃ HỘI</h3>
-                <div class="footer-logo">
-                    <img src="~/img/logo.png" width="200" height="200" />
+            <div class="col-md-4 text-center">
+                <h5 class="mb-3"><i class="bi bi-share-fill me-2 "></i>MẠNG XÃ HỘI</h5>
+                <img src="~/img/logo.png" width="100" class="mb-3 rounded-circle border shadow-sm" />
+                <div>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="footer-link fs-4 me-3"><i class="bi bi-youtube"></i></a>
+                    <a href="#" class="footer-link fs-4"><i class="bi bi-envelope"></i></a>
                 </div>
             </div>
         </div>
+        <div class="text-center mt-4 small" style="opacity:0.85;">
+            &copy; @DateTime.Now.Year FitJob - Khoa CNTT, Đại học Đại Nam. All rights reserved.
+        </div>
     </div>
 </footer>
-
 @section Styles {
     <style>
-        .search-container {
-            background: linear-gradient(to right, #f8f9fa, #ffffff);
-            border: 1px solid rgba(0,0,0,.08);
+        body {
+            background: #f7f8fa;
+            font-family: 'Inter', Arial, sans-serif;
         }
 
-        .form-label {
-            font-size: 0.9rem;
-            font-weight: 500;
-        }
-
-        .input-group-text {
-            border-color: #dee2e6;
-        }
-
-        .form-control, .form-select {
-            border-color: #dee2e6;
-            padding: 0.6rem 1rem;
-            font-size: 0.95rem;
-        }
-
-            .form-control:focus, .form-select:focus {
-                border-color: #86b7fe;
-                box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
-            }
-
-        .btn-primary {
-            padding: 0.6rem 1.5rem;
-            font-weight: 500;
-            transition: all 0.2s ease-in-out;
-        }
-
-            .btn-primary:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            }
-
-        .highlighted-text {
-            color: #2c3e50;
-            font-weight: 600;
+        /* Hero */
+        .hero-section {
+            height: 260px;
+            overflow: hidden;
+            border-radius: 0 0 32px 32px;
             position: relative;
-            padding-left: 15px;
         }
 
-            .highlighted-text::before {
-                content: '';
-                position: absolute;
-                left: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                width: 4px;
-                height: 70%;
-                background-color: #ff9220;
-                border-radius: 2px;
-            }
+        .hero-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.7);
+        }
 
+        .hero-overlay {
+            background: transparent !important;
+            z-index: 2;
+            text-align: center;
+        }
+
+        .text-shadow {
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+        }
+
+
+        /* Search */
+        .glass-card {
+            background: #fff;
+            border: none;
+            /* Bỏ viền cam */
+            box-shadow: 0 4px 24px rgba(34, 48, 90, 0.06);
+        }
+
+
+
+        .form-select:focus,
+        .form-control:focus {
+            border-color: #f9a825;
+            box-shadow: 0 0 0 0.2rem rgba(249, 168, 37, 0.15);
+        }
+
+        /* Job Card */
         .job-card {
+            border-radius: 18px;
             transition: transform 0.2s, box-shadow 0.2s;
             border: none;
-            border-radius: 10px;
+            /* Bỏ viền cam */
+            background: #fff;
         }
 
-            .job-card:hover {
-                transform: translateY(-3px);
-                box-shadow: 0 .5rem 1rem rgba(0,0,0,.1) !important;
-            }
+        .job-card:hover {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 8px 32px #22305a33 !important;
+            background: #f7f8fa;
+        }
+
+        .job-card .position-name {
+            color: #22305a;
+            font-size: 1.15rem;
+        }
+
+        .badge.bg-warning {
+            background: #f57c00 !important;
+            color: #fff !important;
+        }
+
+        .badge.bg-info {
+            background: #22305a !important;
+            color: #fff !important;
+        }
+
+        .badge.bg-success {
+            background: #f9a825 !important;
+            color: #22305a !important;
+        }
+
+        .search-container .btn-warning {
+            background: #f9a825;
+            color: #fff;
+            border: none;
+            font-weight: 700;
+            border-radius: 8px;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .search-container .btn-warning:hover {
+            background: #fff;
+            color: #f9a825;
+            border: 1.5px solid #f9a825;
+            text-decoration: none;
+        }
     </style>
 }
 

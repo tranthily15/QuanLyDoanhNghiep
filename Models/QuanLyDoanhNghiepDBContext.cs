@@ -18,6 +18,7 @@ namespace QuanLyDoanhNghiep.Models
         public DbSet<Notification> Notification { get; set; }
         public DbSet<ITPositionCategory> ITPositionCategory { get; set; }
         public DbSet<SavedJob> SavedJob { get; set; }
+        public DbSet<SuggestedJobHistory> SuggestedJobHistories { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -34,6 +35,7 @@ namespace QuanLyDoanhNghiep.Models
             modelBuilder.Entity<Notification>().ToTable("Notification");
             modelBuilder.Entity<ITPositionCategory>().ToTable("ITPositionCategory");
             modelBuilder.Entity<SavedJob>().ToTable("SavedJob");
+            modelBuilder.Entity<SuggestedJobHistory>().ToTable("SuggestedJobHistory");
 
             // Configure unique constraint for SavedJob
             modelBuilder.Entity<SavedJob>()

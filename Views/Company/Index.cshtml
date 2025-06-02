@@ -2,9 +2,9 @@
 
 @{
     ViewData["Title"] = "Danh sách doanh nghiệp";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    @* Layout = "~/Views/Shared/_AdminLayout.cshtml"; *@
 }
-<div class="container pb-4">
+<div class="container py-4">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item">
@@ -19,10 +19,10 @@
         </ol>
     </nav>
 </div>
-<div class="container-fluid px-4 py-5">
+<div class="container px-4">
     <div class="row mb-4">
         <div class="col-12 d-flex justify-content-between align-items-center">
-            <a asp-action="Create" class="btn btn-primary">
+            <a asp-action="Create" class="btn btn-apply-now">
                 <i class="fas fa-plus me-2" title="Thêm mới doanh nghiệp"></i>
             </a>
         </div>
@@ -56,7 +56,7 @@
                         </div>
 
                         <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary w-100">
+                            <button type="submit" class="btn btn-apply-now w-100">
                                 <i class="fas fa-filter me-2"></i>Tìm kiếm
                             </button>
                         </div>
@@ -167,7 +167,7 @@
             }
             <li class="page-item @(currentPage == 1 ? "disabled" : "")">
                 <a class="page-link"
-                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage - 1 })">Trước</a>
+                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage - 1 })"><i class="bi bi-chevron-left" style="color:#22305a"></i></a>
             </li>
             @for (int i = 1; i <= totalPages; i++)
             {
@@ -178,7 +178,7 @@
             }
             <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
                 <a class="page-link"
-                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage + 1 })">Sau</a>
+                    href="@Url.Action("Index", new { searchTerm = searchTerm, provinceId = provinceId, districtId = districtId, page = currentPage + 1 })"> <i class="bi bi-chevron-right" style="color:#22305a"></i></a>
             </li>
         </ul>
     </nav>
@@ -567,5 +567,10 @@
         border-radius: 1em;
         font-weight: 500;
         letter-spacing: 0.02em;
+    }
+
+    .action-btn, .btn-success, .btn-secondary, .btn-light {
+        border-radius: 8px !important;
+        font-weight: 600;
     }
 </style>

@@ -1,49 +1,148 @@
 ﻿@model QuanLyDoanhNghiep.Models.User
+
 @{
-    ViewData["Title"] = "Thông tin cá nhân";
+    ViewData["Title"] = "Chi tiết sinh viên";
 }
-<div class="profile-container">
-    <div class="profile-card">
-        <h2 class="text-center">Thông Tin Cá Nhân</h2>
-        <div class="profile-info">
-            <p><strong>Họ và Tên:</strong> @Model.FullName</p>
-            <p><strong>Ngày Sinh:</strong> @Model.DateOfBirth.ToString("dd/MM/yyyy")</p>
-            <p><strong>Giới Tính:</strong> @Model.Gender</p>
-            <p><strong>Email:</strong> @Model.Email</p>
-            <p><strong>Số Điện Thoại:</strong> @Model.PhoneNumber</p>
+<div class="box"></div>
+<div class="login-bg" style="background: #F1F3F5; min-height: 100vh;">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="card shadow-lg border-0 rounded-4 p-4 modern-user-card">
+                    <div class="text-center mb-4">
+                        @* <img src="~/img/avt/default-avt.png" alt="Avatar" class="user-avatar mb-3" /> *@
+                        <h2 class="fw-bold text-navy mb-1">@Model.FullName</h2>
+                        <div class="text-muted mb-2" style="font-size:16px;">Mã sinh viên: <b>@Model.ID</b></div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <div class="detail-label">Ngày sinh:</div>
+                            <div class="detail-value">@Model.DateOfBirth.ToString("dd/MM/yyyy")</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Giới tính:</div>
+                            <div class="detail-value">
+                                @(Model.Gender == true ? "Nữ" : "Nam")
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Năm tốt nghiệp:</div>
+                            <div class="detail-value">@Model.GraduationYear</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">GPA:</div>
+                            <div class="detail-value">@Model.GPA</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Email:</div>
+                            <div class="detail-value">@Model.Email</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="detail-label">Số điện thoại:</div>
+                            <div class="detail-value">@Model.PhoneNumber</div>
+                        </div>
+                        <div class="col-12">
+                            <div class="detail-label">Danh hiệu:</div>
+                            <div class="detail-value">@Model.Honors</div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between mt-4">
+                        <a asp-action="Index" class="btn btn-outline-secondary rounded-pill px-4">Quay lại</a>
+                        @if (ViewBag.Role == "0" || ViewBag.Role == "2")
+                        {
+                            <a asp-action="Edit" asp-route-id="@Model.ID" class="btn modern-btn rounded-pill px-4">
+                                Chỉnh
+                                sửa
+                            </a>
+                        }
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
 
-@section Styles {
-    <style>
-        .profile-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f8f9fa;
-        }
+<style>
+    .modern-user-card {
+        border-radius: 22px;
+        background: #fff;
+        box-shadow: 0 8px 32px rgba(34, 48, 90, 0.10);
+        animation: fadeIn 0.5s;
+    }
 
-        .profile-card {
-            width: 100%;
-            max-width: 600px;
+    .user-avatar {
+        width: 110px;
+        height: 110px;
+        object-fit: cover;
+        border-radius: 50%;
+        border: 3px solid #f57c00;
+        background: #fff8f2;
+        box-shadow: 0 2px 8px rgba(243, 124, 0, 0.08);
+    }
+
+    .text-navy {
+        color: #22305a !important;
+    }
+
+    .detail-label {
+        font-weight: 600;
+        color: #888;
+        font-size: 1.05rem;
+    }
+
+    .detail-value {
+        font-weight: 600;
+        color: #22305a;
+        font-size: 1.08rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .modern-btn {
+        background: linear-gradient(90deg, #f57c00 60%, #f37423 100%);
+        color: #fff;
+        border: none;
+        font-weight: 700;
+        border-radius: 12px;
+        font-size: 1.08rem;
+        letter-spacing: 1px;
+        box-shadow: 0 4px 16px rgba(243, 124, 0, 0.10);
+        transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+        text-align: center;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+        .modern-btn:hover,
+        .modern-btn:focus {
             background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            color: #f57c00;
+            border: 2px solid #f57c00;
+            box-shadow: 0 2px 8px rgba(243, 124, 0, 0.12);
         }
 
-        .profile-info p {
-            font-size: 16px;
-            margin-bottom: 10px;
+    @@media (max-width: 900px) {
+        .modern-user-card {
+            max-width: 98vw;
+            padding: 2rem 0.5rem;
+        }
+    }
+
+    @@media (max-width: 600px) {
+        .modern-user-card {
+            padding: 0.5rem 0.1rem;
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
         }
 
-        .profile-info strong {
-            font-weight: bold;
+        to {
+            opacity: 1;
+            transform: translateY(0);
         }
-    </style>
-}
-
-
-
+    }
+</style>
