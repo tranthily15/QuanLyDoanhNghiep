@@ -437,8 +437,9 @@ namespace QuanLyDoanhNghiep.Controllers
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = status == 1 ? "Đã chấp nhận CV thành công!" : "Đã từ chối CV thành công!";
-                
-                return View("ActiveJobs", "JobPosition");
+
+                return RedirectToAction(nameof(Index));
+
 
             }
             catch (Exception ex)
